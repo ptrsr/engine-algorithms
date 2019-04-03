@@ -11,6 +11,7 @@ DEPENDENCIES = ['git', 'cmake']
 # add sudo to commands if not root
 SUDO = "sudo " if os.geteuid() else '' 
 
+
 def printUsage():
     print(inspect.cleandoc("""
         Created by Ruud Peters (ruud_peters96@hotmail.com)
@@ -26,6 +27,7 @@ def printUsage():
          -r      - release mode (debug default)
          -y      - do not prompt"
         """))
+
 
 def parseOpts():
     class Opts:
@@ -56,6 +58,7 @@ def parseOpts():
 
     return opts
 
+
 def confirmation():
     for i in range(0, 3):
         input_str = input('(y/n): ')
@@ -70,8 +73,8 @@ def confirmation():
         
         return input_str == 'y'
 
-def installDependencies(prompt = True):
 
+def installDependencies(prompt = True):
     # list missing dependencies
     missing = [ ]
     for dep in DEPENDENCIES:
@@ -99,45 +102,11 @@ def installDependencies(prompt = True):
         print("Something went wrong while installing. Exiting...")
         exit(1)
 
-def resolveWSL():
-    status, result = commands.getstatusoutput("uname -r | grep \"Microsoft\"")
-    
-    # no need for resolving if not WSL
-    if status != 0:
-        return
 
-    scriptPath = sys.path[0]
-
-    try:
-        driveSearch = re.search('\/mnt\/[a-z]', scriptPath)
-        mount = driveSearch.group(0)
-        drive = '/' + mount[-1:]
-    except:
-        print("Warning: you are on WSL, but do not have the project on a mount. Are you sure you want to continue?")
-        if not confirmation():
-            print("Exiting...")
-            exit(0)
-        else:
-            return
-
-    if os.path.isdir(mount):
-        if os.path.isdir(drive):
-            print("Drive \'" + drive + "\' already linked.")
-            return
-        else:
-            print("Due to a bug with Docker, WSL needs to create a symlink "
-                  '\'' + drive + "\' for \'" + mount + "\'. Continue?")
-            if not confirmation():
-                print("Cannot continue. Exiting...")
-                exit(0)
-    else:
-        print("Error: something went horribly wrong. Exiting...")
-        exit(1)
-
-    os.system("sudo ln -s " + mount + ' ' + drive)
-    
 def runDocker(args):
-    # TODO: remove -d
+    # do not run docker in docker container
+    args.remove('-d')
+
     bStatus = os.system("docker build --rm -f \"Dockerfile\" -t engine-algorithms:latest .")
     if bStatus != 0:
         print("Something went wrong with docker. Exiting...")
@@ -146,8 +115,6 @@ def runDocker(args):
     argsString = ' '.join(args)
     print(argsString)
     rStatus = os.system("docker run engine-algorithms:latest ./bootstrap.sh -y " + argsString)
-
-
 
 def main():
     args = sys.argv[1:]
@@ -164,7 +131,6 @@ def main():
     if opts.docker:
         runDocker(args)
 
-    
 
 if __name__ == '__main__':
     main()
