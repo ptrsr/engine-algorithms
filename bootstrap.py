@@ -24,12 +24,11 @@ def printUsage():
          -t      - include and run tests
          -b r:d  - build executable in 
                  (r)elease or (d)ebug
-         -r      - release mode (debug default)
          -y      - do not prompt"
         """))
 
 
-def parseOpts():
+def parseOpts(args):
     class Opts:
         docker = False
         tests  = False
@@ -41,8 +40,8 @@ def parseOpts():
 
     try:
         options, remainder = getopt.getopt(
-            sys.argv[1:], 
-            'dtryb:', [])
+            args, 
+            'dtyb:', [])
 
     except Exception as e:
         print("Error: " + str(e) + ". Exiting...")
@@ -124,13 +123,14 @@ def main():
         printUsage()
         exit(0)
 
-    opts = parseOpts()
+    opts = parseOpts(args)
     installDependencies(opts.prompt)
     #resolveWSL()
     
     if opts.docker:
         runDocker(args)
 
+    
 
 if __name__ == '__main__':
     main()

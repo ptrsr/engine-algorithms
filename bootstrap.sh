@@ -34,7 +34,7 @@ if [ ! -x "$(command -v python3)" ]; then
     fi
 
     # docker does not recognize sudo, omitting if already root
-    if [ $(whoami) != 'root' ]; then
+    if [ $EUID -ne 0 ]; then
         usr = sudo
     fi
 
