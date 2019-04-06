@@ -23,7 +23,7 @@ ExternalProject_Add(glfw PREFIX glfw
 
 ExternalProject_Get_Property(glfw INSTALL_DIR)
 set(GLFW_INCLUDE_DIR ${INSTALL_DIR}/include)
-set(GLFW_LIBRARIES
+set(GLFW_LIBS
     ${INSTALL_DIR}/lib/${CMAKE_STATIC_LIBRARY_PREFIX}glfw3${CMAKE_STATIC_LIBRARY_SUFFIX})
 
 if(UNIX)
@@ -50,11 +50,11 @@ if(UNIX)
         message(FATAL_ERROR "Xinput library not found - required for GLFW")
     endif()
 
-    list(APPEND GLFW_LIBRARIES
+    list(APPEND GLFW_LIBS
         "${X11_Xrandr_LIB}" "${X11_Xxf86vm_LIB}" "${X11_Xcursor_LIB}"
         "${X11_Xinerama_LIB}" "${X11_Xinput_LIB}"
         "${CMAKE_THREAD_LIBS_INIT}" -lrt -ldl)
 endif()
 
 set(GLFW_INCLUDE_DIR ${GLFW_INCLUDE_DIR} CACHE STRING "")
-set(GLFW_LIBRARIES ${GLFW_LIBRARIES} CACHE STRING "")
+set(GLFW_LIBS ${GLFW_LIBS} CACHE STRING "")

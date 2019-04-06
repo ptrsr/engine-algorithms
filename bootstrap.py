@@ -7,7 +7,7 @@ import re
 
 ## CONSTANTS
 # dependencies that will be installed
-DEPENDENCIES = ['git', 'cmake']
+DEPENDENCIES = ['git', 'cmake', 'libudev-dev']
 # add sudo to commands if not root
 SUDO = "sudo " if os.geteuid() else '' 
 
