@@ -1,80 +1,55 @@
+cmake_minimum_required(VERSION 3.0)
+
+# DECLARING
+# framework headers
 include_directories(./)
 
-list(APPEND SOURCES
-	config.hpp
-
-	mge/auxiliary/Hex.cpp
-	mge/auxiliary/octree/Ball.cpp
-	mge/auxiliary/octree/OcNode.cpp
-	
-	mge/behaviours/AbstractBehaviour.cpp
-	mge/behaviours/AbstractLight.cpp
-	mge/behaviours/CameraBehaviour.cpp
-	mge/behaviours/DirectionalLight.cpp
-	mge/behaviours/KeysBehaviour.cpp
-	mge/behaviours/LookAt.cpp
-	mge/behaviours/OrbitBehaviour.cpp
-	mge/behaviours/PointLight.cpp
-	mge/behaviours/RotatingBehaviour.cpp
-	mge/behaviours/SpotLight.cpp
-
-	
-	mge/core/AbstractGame.cpp
-	mge/core/Camera.cpp
-	mge/core/GameObject.cpp
-	mge/core/Mesh.cpp
-	mge/core/Renderer.cpp
-	mge/core/ShaderProgram.cpp
-	mge/core/Texture.cpp
-	mge/core/World.cpp
-	
-	mge/materials/AbstractMaterial.cpp
-	mge/materials/ColorMaterial.cpp
-	mge/materials/LitMaterial.cpp
-	
-	mge/scenes/OctreeScene.cpp
-	
-	mge/util/DebugHud.cpp
-	mge/util/InputHandler.cpp
-)
-
-# -------------------------- Threading
-# Multithreading support library
-if(UNIX)
-	set(THREADS_PREFER_PTHREAD_FLAG ON)
-	find_package(Threads REQUIRED)
-	set (THREADING Threads::Threads)
-endif()
-
-
-# ========================== Building =========================== #
-
-# ----------------------- engine-algorithms
-
+# dependency headers
 include_directories(
-	${GLEW_INCLUDE_DIR}
-	${GLFW_INCLUDE_DIR}
+	${GLBINDING_INCLUDE_DIR}
 	${GLM_INCLUDE_DIR}
 	${SFML_INCLUDE_DIR}
 )
 
-add_executable(engine-algorithms main.cpp
+# framework implementation
+list(APPEND SOURCES
 	glm.hpp
-	${SOURCES}
-)
-target_link_libraries(engine-algorithms 
-	${GLEW_LIBS}
-	${GLFW_LIBS}
-	${SFML_LIBS}
+
+	auxiliary/c_getopt.h
+	auxiliary/options.hpp
 )
 
-set_target_properties(engine-algorithms PROPERTIES DEBUG_POSTFIX "-debug")
+## BUILDING
+# package all source files in a library
+# (for linking to both project and testing exe)
+add_library(framework ${SOURCES})
+
+# (wait for dependencies to be set up before continuing)
+add_dependencies(framework glm sfml glbinding)
+SET_TARGET_PROPERTIES(framework PROPERTIES LINKER_LANGUAGE CXX)
+
+# (glm is header only, no need to link)
+#target_link_libraries(framework ${GLEW_LIBS} ${GLFW_LIBS} ${SFML_LIBS})
+
+# build executable
+add_executable(engine-algorithms engine-algorithms.cpp)
+add_dependencies(engine-algorithms framework)
+target_link_libraries(engine-algorithms framework)
+
+#target_link_libraries(engine-algorithms framework)
+
+set_target_properties( engine-algorithms PROPERTIES 
+	RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/bin 
+	LIBRARY_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/bin
+	DEBUG_POSTFIX "-debug"
+)
 target_compile_options(engine-algorithms PRIVATE ${COMPILE_OPTS})
 
 
-# =========================== Export ============================ #
+
+## EXPORT
 # Testing requires the testing executable to know the
-# full paths to the LOC3D_CPP files
+# full paths to the source files
 
 # Macro for converting list with local paths to full paths
 macro(ListToAbsolute REL_LIST REAL_LIST)
@@ -85,9 +60,9 @@ macro(ListToAbsolute REL_LIST REAL_LIST)
 	endforeach(REL)
 endmacro()
 
-# Convert LOC3D_CPP local paths to global
+# Convert source local paths to global
 # and export to upper CMakeLists
 
-#ListToAbsolute(LOC3D_CPP ABS_FILES)
+ListToAbsolute(SOURCES ABS_SOURCES)
 #set (TEST_FILES ${ABS_FILES} PARENT_SCOPE)
 #set (TEST_HEADERS ${CMAKE_CURRENT_SOURCE_DIR} PARENT_SCOPE)

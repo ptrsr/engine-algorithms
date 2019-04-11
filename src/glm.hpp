@@ -15,8 +15,6 @@
  * std::ostream & operator << ( std::ostream & out, glm::mat4 m );
  */
 
-
-
 inline std::ostream & operator << ( std::ostream & out, const glm::ivec2 & v ) {
 	out << "(" << v.x << "," << v.y << ")";
 	return out;
