@@ -10,12 +10,7 @@ add_executable(test-engine
 	# tests
 	engine-algorithms.test.cpp
 	options.test.cpp
-	
-	# auxiliary files
-	${TEST_FILES}
 )
-
-message(${GOOGLETEST_LIBS})
 
 #Multithreading library
 if(UNIX)
@@ -26,8 +21,7 @@ endif()
 
 add_dependencies(test-engine googletest)
 
-target_link_libraries(test-engine 
+target_link_libraries(test-engine framework
     ${GOOGLETEST_LIBS}
-    framework
     ${THREADING}
 )

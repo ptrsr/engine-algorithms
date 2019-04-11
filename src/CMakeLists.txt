@@ -9,6 +9,7 @@ include_directories(
 	${GLBINDING_INCLUDE_DIR}
 	${GLM_INCLUDE_DIR}
 	${SFML_INCLUDE_DIR}
+	${GOOGLETEST_INCLUDE_DIR}
 )
 
 # framework implementation
@@ -17,33 +18,30 @@ list(APPEND SOURCES
 
 	auxiliary/c_getopt.h
 	auxiliary/options.hpp
+	auxiliary/options.cpp
 )
 
 ## BUILDING
 # package all source files in a library
 # (for linking to both project and testing exe)
 add_library(framework ${SOURCES})
+add_dependencies(framework glbinding glm sfml)
 
-# (wait for dependencies to be set up before continuing)
-add_dependencies(framework glm sfml glbinding)
+
+# because the libraries do not exist during configuration time,
+# preditermine the library language (to avoid a warning)
 SET_TARGET_PROPERTIES(framework PROPERTIES LINKER_LANGUAGE CXX)
 
 # (glm is header only, no need to link)
-#target_link_libraries(framework ${GLEW_LIBS} ${GLFW_LIBS} ${SFML_LIBS})
+target_link_libraries(framework ${GLBINDING_LIBS} ${GLM_LIBS} ${SFML_LIBS})
 
 # build executable
 add_executable(engine-algorithms engine-algorithms.cpp)
 add_dependencies(engine-algorithms framework)
 target_link_libraries(engine-algorithms framework)
 
-#target_link_libraries(engine-algorithms framework)
-
-set_target_properties( engine-algorithms PROPERTIES 
-	RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/bin 
-	LIBRARY_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/bin
-	DEBUG_POSTFIX "-debug"
-)
-target_compile_options(engine-algorithms PRIVATE ${COMPILE_OPTS})
+set_target_properties( engine-algorithms PROPERTIES DEBUG_POSTFIX "-debug")
+# target_compile_options(engine-algorithms PRIVATE ${COMPILE_OPTS})
 
 
 
@@ -63,6 +61,6 @@ endmacro()
 # Convert source local paths to global
 # and export to upper CMakeLists
 
-ListToAbsolute(SOURCES ABS_SOURCES)
+#ListToAbsolute(SOURCES ABS_SOURCES)
 #set (TEST_FILES ${ABS_FILES} PARENT_SCOPE)
 #set (TEST_HEADERS ${CMAKE_CURRENT_SOURCE_DIR} PARENT_SCOPE)

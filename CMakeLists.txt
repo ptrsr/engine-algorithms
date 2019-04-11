@@ -14,6 +14,13 @@ set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin/)
 # setup libraries
 list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/lib/)
 
+# set parallel build for MSVC
+if(MSVC)
+    add_compile_options($<$<CXX_COMPILER_ID:MSVC>:/MP>)
+    set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /MT")
+    set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /MTd")
+endif()
+
 # dependencies
 include(glbinding)
 include(glm)
@@ -26,4 +33,8 @@ include(googletest)
 add_subdirectory(src/)
 
 # build tests
-add_subdirectory(test/)
+option(BUILD_TESTS "Build tests" ON)
+if (${BUILD_TESTS})
+    add_subdirectory(test/)
+endif()
+

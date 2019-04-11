@@ -8,28 +8,12 @@ ExternalProject_Add(googletest PREFIX googletest
   UPDATE_COMMAND ""
 
   CMAKE_ARGS
-    "-DINSTALL_GTEST=OFF"
+    "-DINSTALL_GTEST=ON"
+    "-DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>"
 
   CMAKE_CACHE_ARGS
     "-DCMAKE_C_COMPILER:FILEPATH=${CMAKE_C_COMPILER}"
     "-DCMAKE_CXX_COMPILER:FILEPATH=${CMAKE_CXX_COMPILER}"
-
-  # copy include directories to install dir
-  INSTALL_COMMAND ${CMAKE_COMMAND} -E copy_directory 
-    <SOURCE_DIR>/googletest/include/ <INSTALL_DIR>/include/
-  COMMAND ${CMAKE_COMMAND} -E copy_directory 
-    <SOURCE_DIR>/googlemock/include/ <INSTALL_DIR>/include/
-
-  # create a new lib directory
-  COMMAND ${CMAKE_COMMAND} -E make_directory <INSTALL_DIR>/lib/
-  
-  # copy libs
-  COMMAND ${CMAKE_COMMAND} -E copy 
-    <BINARY_DIR>/googlemock/${CMAKE_STATIC_LIBRARY_PREFIX}gmock${CMAKE_STATIC_LIBRARY_SUFFIX} 
-    <INSTALL_DIR>/lib/
-  COMMAND ${CMAKE_COMMAND} -E copy 
-    <BINARY_DIR>/googlemock/gtest/${CMAKE_STATIC_LIBRARY_PREFIX}gtest${CMAKE_STATIC_LIBRARY_SUFFIX}
-    <INSTALL_DIR>/lib/
 
   LOG_DOWNLOAD 1 LOG_UPDATE 1 LOG_CONFIGURE 1 LOG_BUILD 1 LOG_INSTALL 1 LOG_OUTPUT_ON_FAILURE 1
 )
