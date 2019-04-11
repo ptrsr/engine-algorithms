@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.0)
 
-# DECLARING
+## INCLUDING
 # framework headers
 include_directories(./)
 
@@ -27,7 +27,6 @@ list(APPEND SOURCES
 add_library(framework ${SOURCES})
 add_dependencies(framework glbinding glm sfml)
 
-
 # because the libraries do not exist during configuration time,
 # preditermine the library language (to avoid a warning)
 SET_TARGET_PROPERTIES(framework PROPERTIES LINKER_LANGUAGE CXX)
@@ -42,25 +41,3 @@ target_link_libraries(engine-algorithms framework)
 
 set_target_properties( engine-algorithms PROPERTIES DEBUG_POSTFIX "-debug")
 # target_compile_options(engine-algorithms PRIVATE ${COMPILE_OPTS})
-
-
-
-## EXPORT
-# Testing requires the testing executable to know the
-# full paths to the source files
-
-# Macro for converting list with local paths to full paths
-macro(ListToAbsolute REL_LIST REAL_LIST)
-	foreach(REL IN LISTS ${REL_LIST})
-		get_filename_component(REAL "${REL}"
-                       REALPATH BASE_DIR)
-	    list(APPEND ${REAL_LIST} ${REAL})
-	endforeach(REL)
-endmacro()
-
-# Convert source local paths to global
-# and export to upper CMakeLists
-
-#ListToAbsolute(SOURCES ABS_SOURCES)
-#set (TEST_FILES ${ABS_FILES} PARENT_SCOPE)
-#set (TEST_HEADERS ${CMAKE_CURRENT_SOURCE_DIR} PARENT_SCOPE)

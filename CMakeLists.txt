@@ -26,15 +26,16 @@ include(glbinding)
 include(glm)
 include(sfml)
 
-# testing framework
-include(googletest)
-
 # build project
 add_subdirectory(src/)
 
 # build tests
 option(BUILD_TESTS "Build tests" ON)
 if (${BUILD_TESTS})
+    # testing framework
+    include(googletest)
+    
+    # test project
     add_subdirectory(test/)
 endif()
 
