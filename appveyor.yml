@@ -41,7 +41,10 @@ build:
 
 test_script: 
 - cmd: |-
-    echo %DIR%
+    cd ..
+    dir
+    cd bin
+    dir
 
 only_commits:
   files:
