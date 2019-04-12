@@ -38,6 +38,13 @@ build:
   project: c:\projects\engine-algorithms\build\engine-algorithms.sln
   verbosity: minimal
   parallel: true
+
+test_script: - cmd: |-
+  cd ..
+  dir
+  cd bin
+  dir
+
 only_commits:
   files:
     - CMakeLists.txt

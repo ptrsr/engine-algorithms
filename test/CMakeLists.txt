@@ -21,6 +21,11 @@ endif()
 
 add_dependencies(test-engine googletest)
 
+set_target_properties(test-engine
+	PROPERTIES DEBUG_POSTFIX "-d"
+	RUNTIME_OUTPUT_DIRECTORY_DEBUG   ${PROJECT_SOURCE_DIR}/bin
+	RUNTIME_OUTPUT_DIRECTORY_RELEASE ${PROJECT_SOURCE_DIR}/bin
+)
 target_link_libraries(test-engine framework
     ${GOOGLETEST_LIBS}
     ${THREADING}

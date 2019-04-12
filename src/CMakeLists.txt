@@ -29,7 +29,7 @@ add_dependencies(framework glbinding glm sfml)
 
 # because the libraries do not exist during configuration time,
 # preditermine the library language (to avoid a warning)
-SET_TARGET_PROPERTIES(framework PROPERTIES LINKER_LANGUAGE CXX)
+set_target_properties(framework PROPERTIES LINKER_LANGUAGE CXX)
 
 # (glm is header only, no need to link)
 target_link_libraries(framework ${GLBINDING_LIBS} ${GLM_LIBS} ${SFML_LIBS})
@@ -39,5 +39,9 @@ add_executable(engine-algorithms engine-algorithms.cpp)
 add_dependencies(engine-algorithms framework)
 target_link_libraries(engine-algorithms framework)
 
-set_target_properties( engine-algorithms PROPERTIES DEBUG_POSTFIX "-debug")
+set_target_properties(engine-algorithms 
+	PROPERTIES DEBUG_POSTFIX "-d"
+	RUNTIME_OUTPUT_DIRECTORY_DEBUG ${PROJECT_SOURCE_DIR}/bin
+	RUNTIME_OUTPUT_DIRECTORY_RELEASE ${PROJECT_SOURCE_DIR}/bin
+)
 # target_compile_options(engine-algorithms PRIVATE ${COMPILE_OPTS})

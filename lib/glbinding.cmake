@@ -10,7 +10,7 @@ ExternalProject_Add(glbinding PREFIX glbinding
 
     CMAKE_ARGS
         "-DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>"
-        "-DCMAKE_BUILD_TYPE=Release"
+        "-DCMAKE_BUILD_TYPE=$<$<CONFIG:Debug>:Debug>$<$<CONFIG:Release>:Release>"
         "-DBUILD_SHARED_LIBS=OFF"
         "-DOPTION_BUILD_EXAMPLES=OFF"
 
@@ -23,4 +23,4 @@ ExternalProject_Add(glbinding PREFIX glbinding
 
 ExternalProject_Get_Property(glbinding INSTALL_DIR)
 set(GLBINDING_INCLUDE_DIR ${INSTALL_DIR}/include)
-set(GLBINDING_LIBS ${INSTALL_DIR}/lib/${CMAKE_STATIC_LIBRARY_PREFIX}glbinding${CMAKE_STATIC_LIBRARY_SUFFIX}) # not linking aux lib
+set(GLBINDING_LIBS ${INSTALL_DIR}/lib/${CMAKE_STATIC_LIBRARY_PREFIX}glbinding$<$<CONFIG:Debug>:d>${CMAKE_STATIC_LIBRARY_SUFFIX}) # not linking aux lib
