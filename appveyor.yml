@@ -41,7 +41,7 @@ build:
 
 test_script: 
 - cmd: |-
-  echo %DIR%
+    echo %DIR%
 
 only_commits:
   files:
