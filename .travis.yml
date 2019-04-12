@@ -5,6 +5,7 @@ services:
 
 before_install:
 - docker build --rm -f Dockerfile -t engine-algorithms:latest .
+- sudo chmod +x ./bootstrap.sh
 - docker run engine-algorithms:latest ./bootstrap.sh -y -e -j2
 
 script:
