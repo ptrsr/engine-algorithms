@@ -39,7 +39,8 @@ build:
   verbosity: minimal
   parallel: true
 
-test_script: - cmd: |-
+test_script: 
+- cmd: |-
   cd ..
   dir
   cd bin
