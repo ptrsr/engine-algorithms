@@ -18,4 +18,4 @@ WORKDIR /usr/src/engine-algorithms
 
 # Run bootstrap
 # - infinite jobs, do not prompt, headless, test
-CMD ["/usr/src/engine-algorithms/bootstrap.sh", "-ji", "-y", "-e", "-t"]
+CMD ["./bootstrap.sh", "-ji", "-y", "-e", "-t"]
