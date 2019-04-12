@@ -42,9 +42,9 @@ build:
 test_script: 
 - cmd: |-
   cd ..
-  dir .
+  echo %DIR%
   cd bin
-  dir .
+  echo %DIR%
 
 only_commits:
   files:
