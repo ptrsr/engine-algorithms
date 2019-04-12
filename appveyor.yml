@@ -13,7 +13,6 @@ platform:
 environment:
   matrix:
   - arch: Win64
-  # - arch: #does not work, Release|x64 not a valid target
 matrix:
   fast_finish: true
 
@@ -25,8 +24,10 @@ init:
 - echo %APPVEYOR_BUILD_WORKER_IMAGE%
 - if "%APPVEYOR_BUILD_WORKER_IMAGE%"=="Visual Studio 2017" ( set generator="Visual Studio 15 2017%arch%" )
 - if "%APPVEYOR_BUILD_WORKER_IMAGE%"=="Visual Studio 2015" ( set generator="Visual Studio 14 2015%arch%" )
-- if "%APPVEYOR_BUILD_WORKER_IMAGE%"=="Visual Studio 2013" ( set generator="Visual Studio 12 2013%arch%" )
 - echo %generator%
+- set dpostf=
+- echo %CONFIGURATION%
+- if "%CONFIGURATION%"=="Debug" ( set dpostf=-d)
 
 before_build:
 - cmd: |-
@@ -34,17 +35,17 @@ before_build:
     cd build
     cmake --version
     cmake .. -G %generator%
-build:
-  project: c:\projects\engine-algorithms\build\engine-algorithms.sln
-  verbosity: minimal
-  parallel: true
+
+ build:
+   project: c:\projects\engine-algorithms\build\engine-algorithms.sln
+   verbosity: minimal
+   parallel: true
 
 test_script: 
 - cmd: |-
     cd ..
-    dir
     cd bin
-    dir
+    .\test-engine%dpostf%.exe
 
 only_commits:
   files:
