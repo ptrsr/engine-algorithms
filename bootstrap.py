@@ -8,7 +8,7 @@ from os.path import dirname, abspath
 
 ## CONSTANTS
 # dependencies that will be installed
-DEPENDENCIES = ['git', 'cmake']
+DEPENDENCIES = ['git', 'cmake', 'g++', ]
 # add sudo to commands if not root
 SUDO = "sudo " if os.geteuid() else '' 
 
@@ -36,6 +36,7 @@ def printUsage():
 
          -j N    - Build parallel with
                    (N) amount of cores.
+                   (set to 'i' for infinite)
         """))
 
 
@@ -71,6 +72,10 @@ def parseOpts(args):
         elif opt == '-e':
             opts.head = False
         elif opt == '-j':
+            if arg[0] == 'i':
+                cores = 0
+                continue
+
             cores = int(arg)
             if cores < 1:
                 print("Error: cannot build with " + arg + "cores. Exiting...")
@@ -96,11 +101,6 @@ def confirmation():
 
 
 def installDependencies(opts):
-    if opts.platf == 'windows':
-        DEPENDENCIES.extend([
-            'mingw-w64'
-        ])
-    
     # list missing dependencies
     missing = [ ]
     for dep in DEPENDENCIES:
@@ -123,7 +123,7 @@ def installDependencies(opts):
             print("Cannot continue without installing dependencies. Exiting...")
             exit(0)
 
-    status = os.system("%sapt-get install -y "% SUDO + missingString)
+    status = os.system("%sapt-get install -y -qq "% SUDO + missingString)
     if status != 0:
         print("Something went wrong while installing. Exiting...")
         exit(1)
@@ -133,7 +133,7 @@ def runDocker(args):
     # do not run docker in docker container
     args.remove('-d')
 
-    bStatus = os.system("docker build --rm -f \"Dockerfile\" -t engine-algorithms:latest .")
+    bStatus = os.system("docker build --rm -f Dockerfile -t engine-algorithms:latest .")
     if bStatus != 0:
         print("Something went wrong with docker. Exiting...")
         exit(1)
@@ -157,17 +157,6 @@ def setupProject(opts, pdir):
 
     # cmake command
     cmake_command = ['cmake']
-    toolchain = 'x86_64-w64-mingw32'
-    if opts.platf == 'windows':
-        cmake_command.extend([
-            "-DCMAKE_SYSTEM_NAME=Windows",
-            "-DCMAKE_C_COMPILER=" + toolchain + "-gcc",
-            "-DCMAKE_CXX_COMPILER=" + toolchain + "-g++",
-            "-DCMAKE_RC_COMPILER=" + toolchain + "-windres",
-            "-DCMAKE_FIND_ROOT_PATH_MODE_PROGRAM=NEVER",
-            "-DCMAKE_FIND_ROOT_PATH_MODE_INCLUDE=ONLY",
-        ])
-    cmake_command.append(pdir)
 
     if opts.head == False:
         cmake_command.append("-DBUILD_HEAD=OFF")
@@ -175,13 +164,15 @@ def setupProject(opts, pdir):
     if opts.build == 'debug':
         cmake_command.append("-DCMAKE_BUILD_TYPE=Debug")
 
+    cmake_command.append(pdir)
     cmake_process = subprocess.Popen(cmake_command, cwd=bdir, stdout=sys.stdout)
     cmake_process.wait()
 
     # makefile command
     make_command = ['make']
-    if opts.cores > 1: 
-        make_command.append('-j' + str(opts.cores))
+    if opts.cores != 1:
+        core_str = '' if opts.core == 0 else str(opts.cores)
+        make_command.append('-j' + core_str)
 
     make_process = subprocess.Popen(make_command, cwd=bdir, stdout=sys.stdout)
     make_process.wait()

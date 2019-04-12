@@ -7,8 +7,6 @@ EXPOSE 80
 # Update apps on the base image
 RUN apt-get -y update && apt-get install -y
 
-RUN apt-get install -y python3 g++ cmake git
-
 # Install the Clang compiler
 #RUN apt-get -y install clang
 
@@ -18,5 +16,6 @@ COPY ["./", "./usr/src/engine-algorithms/"]
 # Specify the working directory
 WORKDIR /usr/src/engine-algorithms
 
-# Run the output program from the previous step
-CMD ["./bootstrap.sh", '-y', '-e', '-t' ]
+# Run bootstrap
+# - infinite jobs, do not prompt, headless, test
+CMD ["./bootstrap.sh", '-ji', '-y', '-e', '-t' ]
