@@ -35,7 +35,8 @@ before_build:
     cd build
     cmake --version
     cmake .. -G %generator%
- build:
+
+build:
    project: c:\projects\engine-algorithms\build\engine-algorithms.sln
    verbosity: minimal
    parallel: true
