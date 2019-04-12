@@ -173,7 +173,7 @@ def setupProject(opts, pdir):
         cmake_command.append("-DBUILD_HEAD=OFF")
 
     if opts.build == 'debug':
-        cmake_command.append("-CMAKE_BUILD_TYPE=Debug")
+        cmake_command.append("-DCMAKE_BUILD_TYPE=Debug")
 
     cmake_process = subprocess.Popen(cmake_command, cwd=bdir, stdout=sys.stdout)
     cmake_process.wait()
