@@ -1,13 +1,14 @@
-import getopt
 import sys
+import getopt
 import inspect
 import subprocess
 import os
 import re
+from os.path import dirname, abspath
 
 ## CONSTANTS
 # dependencies that will be installed
-DEPENDENCIES = ['git', 'cmake', 'libudev-dev']
+DEPENDENCIES = ['git', 'cmake']
 # add sudo to commands if not root
 SUDO = "sudo " if os.geteuid() else '' 
 
@@ -20,11 +21,21 @@ def printUsage():
         Setup project for engine algorithms course.
 
         COMMANDS
-         -d      - run in docker
-         -t      - include and run tests
-         -b r:d  - build executable in 
-                 (r)elease or (d)ebug
-         -y      - do not prompt"
+         -d      - Run in Docker.
+         -t      - Include and run tests.
+         -y      - Do not prompt.
+
+         -r      - Build in release.
+                   (Default: debug)
+
+         -w      - Build for Windows.
+                   (Default: Linux)
+
+         -e      - Headless.
+                   (For testing on Linux)
+
+         -j N    - Build parallel with
+                   (N) amount of cores.
         """))
 
 
@@ -34,15 +45,14 @@ def parseOpts(args):
         tests  = False
         conf   = False
         prompt = True
-        build  = "Debug"
-
+        head   = True
+        build  = "debug"
+        platf  = "linux"
+        cores  = 1
     opts = Opts()
 
     try:
-        options, remainder = getopt.getopt(
-            args, 
-            'dtyb:', [])
-
+        options, remainder = getopt.getopt(args,  'dtyrwej:', [])
     except Exception as e:
         print("Error: " + str(e) + ". Exiting...")
         exit(1)
@@ -54,6 +64,18 @@ def parseOpts(args):
             opts.tests = True
         elif opt == '-y':
             opts.prompt = False
+        elif opt == '-r':
+            opts.build = 'release'
+        elif opt == '-w':
+            opts.platf = 'windows'
+        elif opt == '-e':
+            opts.head = False
+        elif opt == '-j':
+            cores = int(arg)
+            if cores < 1:
+                print("Error: cannot build with " + arg + "cores. Exiting...")
+                exit(1)
+            opts.cores = cores
 
     return opts
 
@@ -64,7 +86,7 @@ def confirmation():
 
         if (input_str != 'y' and input_str != 'n'):
             if i == 2:
-                print('too many errors. Exiting...')
+                print("too many errors. Exiting...")
                 exit(1)
                 
             print("\'" + input_str +  "\' is invalid. Try again...")
@@ -73,11 +95,16 @@ def confirmation():
         return input_str == 'y'
 
 
-def installDependencies(prompt = True):
+def installDependencies(opts):
+    if opts.platf == 'windows':
+        DEPENDENCIES.extend([
+            'mingw-w64'
+        ])
+    
     # list missing dependencies
     missing = [ ]
     for dep in DEPENDENCIES:
-        status, result = subprocess.getstatusoutput('which ' + dep)
+        status, result = subprocess.getstatusoutput('dpkg-query -W --showformat=\'${Status}\' %s|grep "install ok installed"'% dep)
         if status != 0:
             missing.append(dep)
 
@@ -87,7 +114,7 @@ def installDependencies(prompt = True):
     # missing dependency names seperated by a whitespace
     missingString = ' '.join(missing)
 
-    if prompt:
+    if opts.prompt:
         print("The following dependencies are missing:")
         print("- " + missingString)
         print("Would you like to install them?")
@@ -113,10 +140,59 @@ def runDocker(args):
 
     argsString = ' '.join(args)
     print(argsString)
-    rStatus = os.system("docker run engine-algorithms:latest ./bootstrap.sh -y " + argsString)
+    rStatus = os.system('docker run engine-algorithms:latest ./bootstrap.sh -y -e ' + argsString)
+
+def setupProject(opts, pdir):
+    bdir = pdir + '/build/'
+    if not os.path.isdir(bdir):
+        os.mkdir(bdir)
+
+    bdir += 'linux/' if opts.platf == 'linux' else 'windows/'
+    if not os.path.isdir(bdir):
+        os.mkdir(bdir)
+
+    bdir += 'debug/' if opts.build == 'debug' else 'release/'
+    if not os.path.isdir(bdir):
+        os.mkdir(bdir)
+
+    # cmake command
+    cmake_command = ['cmake']
+    toolchain = 'x86_64-w64-mingw32'
+    if opts.platf == 'windows':
+        cmake_command.extend([
+            "-DCMAKE_SYSTEM_NAME=Windows",
+            "-DCMAKE_C_COMPILER=" + toolchain + "-gcc",
+            "-DCMAKE_CXX_COMPILER=" + toolchain + "-g++",
+            "-DCMAKE_RC_COMPILER=" + toolchain + "-windres",
+            "-DCMAKE_FIND_ROOT_PATH_MODE_PROGRAM=NEVER",
+            "-DCMAKE_FIND_ROOT_PATH_MODE_INCLUDE=ONLY",
+        ])
+    cmake_command.append(pdir)
+
+    if opts.head == False:
+        cmake_command.append("-DBUILD_HEAD=OFF")
+
+    if opts.build == 'debug':
+        cmake_command.append("-CMAKE_BUILD_TYPE=Debug")
+
+    cmake_process = subprocess.Popen(cmake_command, cwd=bdir, stdout=sys.stdout)
+    cmake_process.wait()
+
+    # makefile command
+    make_command = ['make']
+    if opts.cores > 1: 
+        make_command.append('-j' + str(opts.cores))
+
+    make_process = subprocess.Popen(make_command, cwd=bdir, stdout=sys.stdout)
+    make_process.wait()
+
 
 def main():
+    # given arguments
     args = sys.argv[1:]
+
+    # project directory
+    pdir = dirname(abspath(__file__))
 
     # print usage if no arguments are given
     if len(args) == 0:
@@ -124,13 +200,22 @@ def main():
         exit(0)
 
     opts = parseOpts(args)
-    installDependencies(opts.prompt)
-    #resolveWSL()
     
+    # will forward args to bootstrap inside docker
     if opts.docker:
         runDocker(args)
+        exit(0)
 
-    
+    installDependencies(opts)
+    setupProject(opts, pdir)
+
+    if opts.tests:
+        os.system('./bin/test-engine' + ('-d' if opts.build == 'debug' else ''))
+
+# ensure python 3
+if sys.version_info < (3, 0):
+    sys.stdout.write("Error: this script requires Python 3, not Python 2\n")
+    sys.exit(1)    
 
 if __name__ == '__main__':
     main()

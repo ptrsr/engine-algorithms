@@ -1,0 +1,9 @@
+# ignore everything
+*
+
+# except
+!src/
+!lib/
+!test/
+!bootstrap*
+!CMakeLists.txt

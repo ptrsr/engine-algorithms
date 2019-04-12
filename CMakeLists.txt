@@ -4,16 +4,35 @@ project(engine-algorithms
     VERSION 0.0.1 
 )
 
+option(BUILD_TESTS "Build tests" ON)
+option(BUILD_HEAD "Build with graphics" ON)
+
+
 # Set C++ version to 11
 set(CMAKE_CXX_STANDARD 11) 
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# setup libraries
+if(CMAKE_BUILD_TYPE)
+	# capitalizing first character to avoid confusion
+	string(TOLOWER ${CMAKE_BUILD_TYPE} CMAKE_BUILD_TYPE)
+	string(SUBSTRING "${CMAKE_BUILD_TYPE}" 0 1 FIRST_CHARACTER)
+	string(SUBSTRING "${CMAKE_BUILD_TYPE}" 1 -1 LAST_CHARACTER)
+	string(TOUPPER ${FIRST_CHARACTER} FIRST_CHARACTER)
+    string(CONCAT CMAKE_BUILD_TYPE ${FIRST_CHARACTER} ${LAST_CHARACTER})
+else()
+    # default to release
+    set(CMAKE_BUILD_TYPE Release)
+endif()
+
+# include lib directory for importing (library) modules
 list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/lib/)
 
-# set parallel build for MSVC
+# visual studio
 if(MSVC)
+    # set parallel build for MSVC
     add_compile_options($<$<CXX_COMPILER_ID:MSVC>:/MP>)
+    
+    # some neccessary compiler flags
     set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /MT")
     set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /MTd")
 endif()
@@ -27,7 +46,6 @@ include(sfml)
 add_subdirectory(src/)
 
 # build tests
-option(BUILD_TESTS "Build tests" ON)
 if (${BUILD_TESTS})
     # testing framework
     include(googletest)
@@ -35,4 +53,3 @@ if (${BUILD_TESTS})
     # test project
     add_subdirectory(test/)
 endif()
-

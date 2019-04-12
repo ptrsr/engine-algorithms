@@ -1,3 +1,15 @@
-.vscode
-bin/*
-build/*
+* # ignore everything
+
+# except the following
+!src/
+!lib/
+!test/
+
+!bootstrap*
+!CMakeLists.txt
+
+!appveyor.yml
+!.travis.yml
+
+!Dockerfile
+!.dockerignore
