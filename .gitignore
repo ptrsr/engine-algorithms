@@ -4,7 +4,7 @@
 # except the following
 !README.md
 
-!src/
+!src/**/
 !lib/
 !test/
 
