@@ -1,17 +1,14 @@
 #include <stdio.h>
 #include <iostream>
+#include <auxiliary/options.hpp>
+#include <core/object.hpp>
 
 int main(int argc, char** argv) {
-    std::cout << "hello!" << std::endl;
-    //Options opts = Options::ParseOptions(argc, argv);
 
-    // if (opts.track_timing) {
-    //     printf("tracking timing!");
-    // }
+    Options opts = Options::ParseOptions(argc, argv);
 
-    // if (opts.verbose) {
-    //     printf("I am so verbose!");
-    // }
+    Object obj = Object();
+    std::cout << obj << std::endl;
 
     return 0;
 }

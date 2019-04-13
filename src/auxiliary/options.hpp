@@ -14,7 +14,7 @@ typedef struct Options { Options() :
 	bool verbose;
 
     static void PrintUsage(FILE* output = stdout);
-    static Options ParseOptions(int argc, char** argv);
+    static Options ParseOptions(int argc, char** const argv);
 
 } Options;
 

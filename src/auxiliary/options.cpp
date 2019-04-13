@@ -1,7 +1,7 @@
 #include "options.hpp"
 #include "c_getopt.h"
 
-static void PrintUsage(FILE* output = stdout) {
+void Options::PrintUsage(FILE* output) {
         Options opts;
         
         fprintf(output, "\
@@ -19,17 +19,12 @@ static void PrintUsage(FILE* output = stdout) {
         );
     }
 
-static Options ParseOptions(int argc, char** argv) {
-    printf("hello!");
-
+Options Options::ParseOptions(int argc, char** const argv) {
     Options opts;
     std::string options = "htv";
 
     int c;
     while ((c = getopt(argc, argv, options.c_str())) != -1) {
-        const char* test = (char*)c;
-        printf("hello!");
-        printf(test);
         switch (c) {
             // Reminder: add new options to 'options_str' above and print_usage()!
             case 'h': PrintUsage(stdout); exit(0); break;

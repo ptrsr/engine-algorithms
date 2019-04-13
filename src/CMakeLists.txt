@@ -19,6 +19,8 @@ list(APPEND SOURCES
 	auxiliary/c_getopt.h
 	auxiliary/options.hpp
 	auxiliary/options.cpp
+
+	core/object.cpp
 )
 
 ## BUILDING
@@ -26,7 +28,7 @@ list(APPEND SOURCES
 # (for linking to both project and testing exe)
 add_library(framework ${SOURCES})
 add_dependencies(framework glbinding glm sfml)
-
+set(FRAMEWORK framework PARENT_SCOPE)
 # because the libraries do not exist during configuration time,
 # preditermine the library language (to avoid a warning)
 set_target_properties(framework PROPERTIES LINKER_LANGUAGE CXX)
