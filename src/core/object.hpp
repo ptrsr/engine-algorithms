@@ -28,17 +28,15 @@ class Object : public std::enable_shared_from_this<Object> {
         const Object_ptr GetParent();
         const std::vector<Object_ptr>& GetChildren();
 
-        // members
-        glm::mat4 transform;
-
         friend std::ostream& operator<< (std::ostream& os, const Object& object) {
             return os << object.transform;
         }
 
     private:
+        // members
+        glm::mat4 transform;
         Object_ptr parent;
         std::vector<Object_ptr> children;
 };
-
 
 #endif // OBJECT_HPP_

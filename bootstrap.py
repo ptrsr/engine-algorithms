@@ -126,21 +126,22 @@ def installDependencies(opts):
     status = os.system("%sapt-get install -y -qq "% SUDO + missingString)
     if status != 0:
         print("Something went wrong while installing. Exiting...")
-        exit(1)
+        exit(status)
 
 
 def runDocker(args):
     # do not run docker in docker container
     args.remove('-d')
 
-    bStatus = os.system("docker build --rm -f Dockerfile -t engine-algorithms:latest .")
-    if bStatus != 0:
+    status = os.system("docker build --rm -f Dockerfile -t engine-algorithms:latest .")
+    if status != 0:
         print("Something went wrong with docker. Exiting...")
-        exit(1)
+        exit(status)
 
     argsString = ' '.join(args)
-    print(argsString)
-    rStatus = os.system('docker run engine-algorithms:latest ./bootstrap.sh -y -e ' + argsString)
+    status = os.system('docker run engine-algorithms:latest ./bootstrap.sh -y -e ' + argsString)
+    if status != 0:
+        exit(status)
 
 def setupProject(opts, pdir):
     bdir = pdir + '/build/'
@@ -166,17 +167,20 @@ def setupProject(opts, pdir):
 
     cmake_command.append(pdir)
     cmake_process = subprocess.Popen(cmake_command, cwd=bdir, stdout=sys.stdout)
-    cmake_process.wait()
+    status = cmake_process.wait()
+    if status != 0:
+        exit(status)
 
     # makefile command
     make_command = ['make']
     if opts.cores != 1:
-        core_str = '' if opts.core == 0 else str(opts.cores)
+        core_str = '' if opts.cores == 0 else str(opts.cores)
         make_command.append('-j' + core_str)
 
     make_process = subprocess.Popen(make_command, cwd=bdir, stdout=sys.stdout)
-    make_process.wait()
-
+    status = make_process.wait()
+    if status != 0:
+        exit(status)
 
 def main():
     # given arguments
@@ -201,7 +205,9 @@ def main():
     setupProject(opts, pdir)
 
     if opts.tests:
-        os.system('./bin/test-engine' + ('-d' if opts.build == 'debug' else ''))
+        status = os.system('./bin/test-engine' + ('-d' if opts.build == 'debug' else ''))
+    if status != 0:
+        exit(status)
 
 # ensure python 3
 if sys.version_info < (3, 0):

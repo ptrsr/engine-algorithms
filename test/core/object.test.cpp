@@ -8,11 +8,11 @@
 TEST(Object, Init) {
     // assert init with no parameters means unit mat4
     Object object = Object();
-    ASSERT_EQ(object.transform, glm::mat4(1));
+    ASSERT_EQ(object.GetTransform(), glm::mat4(1));
 
     // assert init with mat
     object = Object(glm::mat4(2));
-    ASSERT_EQ(object.transform, glm::mat4(2));
+    ASSERT_EQ(object.GetTransform(), glm::mat4(2));
 }
 
 TEST(Object, Position) {
@@ -29,12 +29,11 @@ TEST(Object, Position) {
 
 TEST(Object, rotation) {
     Object_ptr object = std::make_shared<Object>();
+    ASSERT_TRUE(CompareMats(object->GetTransform(), glm::mat4(0), TRIG_DIF));
+    
+    
     object->Rotate(glm::pi<float>(), glm::vec3(0, 1, 0));
 
-
-    glm::mat2 test(1,2,3,4);
-    std::cout << test << std::endl;
-    EXPECT_TRUE(CompareVecsAbs(glm::mat<2, 2, float>(1.0003f,1.f,1.f,1.f), glm::mat<2, 2, float>(3.f,1.f,1.000006f,6.f), 1.f));
     // std::cout << object->GetTransform() << std::endl;
     // std::cout << glm::mat4(-1, 0, 0, 0,
     //                0, 1, 0, 0,
@@ -92,4 +91,3 @@ TEST(Object, Remove) {
     // assert after closing scope if pointer count drops to one
     ASSERT_EQ(parent->GetChildren()[0].use_count(), 1);
 }
-
