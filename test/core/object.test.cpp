@@ -29,10 +29,19 @@ TEST(Object, Position) {
 
 TEST(Object, rotation) {
     Object_ptr object = std::make_shared<Object>();
-    ASSERT_TRUE(CompareMats(object->GetTransform(), glm::mat4(0), TRIG_DIF));
     
+    // new object should have identity matrix
+    ASSERT_TRUE(CompareMats(object->GetTransform(), glm::mat4(1), TRIG_DIF));
     
+    // rotating by pi should negate x and z vectors
     object->Rotate(glm::pi<float>(), glm::vec3(0, 1, 0));
+
+    ASSERT_TRUE(CompareMats(object->GetTransform(), glm::mat4(
+        -1,  0,  0,  0,
+         0,  1,  0,  0,
+         0,  0, -1,  0,
+         0,  0,  0,  1 
+    ), TRIG_DIF));
 
     // std::cout << object->GetTransform() << std::endl;
     // std::cout << glm::mat4(-1, 0, 0, 0,
