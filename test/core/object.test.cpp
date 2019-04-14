@@ -114,6 +114,7 @@ TEST(Object, Remove) {
     // assert if only one reference exists
     ASSERT_EQ(child.use_count(), 1);
 
+    uint count;
     // create new scope
     {
         // assert if created new reference
@@ -122,13 +123,13 @@ TEST(Object, Remove) {
 
         // assert if adding child creates a third reference
         parent->AddChild(tmp);
-        ASSERT_EQ(child.use_count(), 3);
+        ASSERT_GE(child.use_count(), 3);
+        count = child.use_count();
     }
-
-    // assert if closing scope results in one less reference
-    ASSERT_EQ(child.use_count(), 2);
+    ASSERT_LT(child.use_count(), count);
+    count = child.use_count();
 
     // assert if unparenting removes reference
     child->UnParent();
-    ASSERT_EQ(child.use_count(), 1);
+    ASSERT_LT(child.use_count(), count);
 }
