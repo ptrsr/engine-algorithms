@@ -9,8 +9,8 @@ include_directories(
 
 add_executable(test-engine engine-algorithms.test.cpp
 	# tests
-	auxiliary/options.test.cpp
-
+	input/options.test.cpp
+	
 	core/object.test.cpp
 )
 

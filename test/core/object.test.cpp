@@ -2,7 +2,8 @@
 #include <core/object.hpp>
 #include <iostream>
 #include <exception>
-#include <vec.aux.hpp>
+
+#include <auxiliary/mat.aux.hpp>
 
 TEST(Object, Init) {
     // assert init with no parameters means unit mat4
