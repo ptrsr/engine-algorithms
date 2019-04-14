@@ -19,6 +19,10 @@ void Object::SetPosition(const glm::vec3& position) {
     transform[3] = glm::vec4(position, 1);
 }
 
+void Object::Translate(const glm::vec3& translation) {
+    transform[3] += glm::vec4(translation, 0);
+}
+
 void Object::Rotate(const float angle, const glm::vec3& axis) {
     transform = glm::rotate(transform, angle, axis);
 }

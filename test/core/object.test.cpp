@@ -25,6 +25,32 @@ TEST(Object, Position) {
 
     // assert if right column is set
     ASSERT_EQ(object->GetTransform()[3], glm::vec4(object->GetPosition(), 1));
+    
+    // assert if rest of matrix is not adjusted
+    ASSERT_TRUE(CompareMats(glm::transpose(glm::mat4(
+         1,  0,  0,  1,
+         0,  1,  0,  2,
+         0,  0,  1,  3,
+         0,  0,  0,  1
+        )), object->GetTransform(), 0.f));
+}
+
+TEST(Object, Translate) {
+    Object_ptr object = std::make_shared<Object>();
+
+    object->Translate(glm::vec3(1, 2, 3));
+    ASSERT_EQ(object->GetPosition(), glm::vec3(1, 2, 3));
+
+    object->Translate(glm::vec3(3, 2, 1));
+    ASSERT_EQ(object->GetPosition(), glm::vec3(4, 4, 4));
+
+    // assert if rest of matrix is not adjusted
+    ASSERT_TRUE(CompareMats(glm::transpose(glm::mat4(
+         1,  0,  0,  4,
+         0,  1,  0,  4,
+         0,  0,  1,  4,
+         0,  0,  0,  1
+    )), object->GetTransform(), 0.f));
 }
 
 TEST(Object, rotation) {
@@ -35,29 +61,21 @@ TEST(Object, rotation) {
     
     // rotating by pi should negate x and z vectors
     object->Rotate(glm::pi<float>(), glm::vec3(0, 1, 0));
-
-    ASSERT_TRUE(CompareMats(object->GetTransform(), glm::mat4(
+    ASSERT_TRUE(CompareMats(glm::mat4(
         -1,  0,  0,  0,
          0,  1,  0,  0,
          0,  0, -1,  0,
-         0,  0,  0,  1 
-    ), TRIG_DIF));
+         0,  0,  0,  1
+        ), object->GetTransform(), TRIG_DIF));
 
-    // std::cout << object->GetTransform() << std::endl;
-    // std::cout << glm::mat4(-1, 0, 0, 0,
-    //                0, 1, 0, 0,
-    //                0, 0,-1, 0,
-    //                0, 0, 0, 1) << std::endl;
-
-    // glm::mat4
-
-    // ASSERT_NEAR(object->GetTransform(), 
-    //     glm::mat4(-1, 0, 0, 0,
-    //                0, 1, 0, 0,
-    //                0, 0,-1, 0,
-    //                0, 0, 0, 1), 0.000001f
-    // );
-
+    // half a flip over X axis
+    object->Rotate(glm::pi<float>(), glm::vec3(1, 0, 0));
+    ASSERT_TRUE(CompareMats(glm::mat4(
+        -1,  0,  0,  0,
+         0, -1,  0,  0,
+         0,  0,  1,  0,
+         0,  0,  0,  1
+        ), object->GetTransform(), TRIG_DIF));
 }
 
 TEST(Object, Parent) {
@@ -89,14 +107,28 @@ TEST(Object, Parent) {
 }
 
 TEST(Object, Remove) {
-    Object_ptr parent = std::make_shared<Object>();
-    {
-        Object_ptr child = std::make_shared<Object>();
-        parent->AddChild(child);
 
-        // assert if two shared pointers exist
-        ASSERT_EQ(parent->GetChildren()[0].use_count(), 2);
+    Object_ptr parent = std::make_shared<Object>();
+    Object_ptr child = std::make_shared<Object>();
+    
+    // assert if only one reference exists
+    ASSERT_EQ(child.use_count(), 1);
+
+    // create new scope
+    {
+        // assert if created new reference
+        Object_ptr tmp = child;
+        ASSERT_EQ(child.use_count(), 2);
+
+        // assert if adding child creates a third reference
+        parent->AddChild(tmp);
+        ASSERT_EQ(child.use_count(), 3);
     }
-    // assert after closing scope if pointer count drops to one
-    ASSERT_EQ(parent->GetChildren()[0].use_count(), 1);
+
+    // assert if closing scope results in one less reference
+    ASSERT_EQ(child.use_count(), 2);
+
+    // assert if unparenting removes reference
+    child->UnParent();
+    ASSERT_EQ(child.use_count(), 1);
 }

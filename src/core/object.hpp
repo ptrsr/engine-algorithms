@@ -20,6 +20,8 @@ class Object : public std::enable_shared_from_this<Object> {
         glm::vec3 GetPosition();
         void SetPosition(const glm::vec3& position);
 
+        void Translate(const glm::vec3& translation);
+
         void Rotate(const float angle, const glm::vec3& axis);
 
         bool AddChild(Object_ptr child);
