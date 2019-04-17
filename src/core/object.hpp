@@ -24,7 +24,7 @@ class Object : public std::enable_shared_from_this<Object> {
 
         void Rotate(const float angle, const glm::vec3& axis);
 
-        bool AddChild(Object_ptr child);
+        bool AddChild(const Object_ptr& child);
         void UnParent();
 
         const Object_ptr GetParent() const;

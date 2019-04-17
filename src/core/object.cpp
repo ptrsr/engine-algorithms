@@ -27,7 +27,7 @@ void Object::Rotate(const float angle, const glm::vec3& axis) {
     transform = glm::rotate(transform, angle, axis);
 }
 
-bool Object::AddChild(Object_ptr child) {
+bool Object::AddChild(const Object_ptr& child) {
     if (child->parent != nullptr) {
         if (child->parent.get() == this) {
             throw std::runtime_error("Cannot add child: already childed to this object.");
@@ -72,16 +72,26 @@ void Object::Remove(bool recursive) {
             (*it)->Remove(true);
         }
         // after removing all children, remove this from parent
-        if (parent) {
+        children.clear();
+        parent = nullptr;
+    } else {
+        // get temporary reference to avoid extra searching afterwards
+        Object_ptr tmp_parent = parent;
+        if (tmp_parent) {
             UnParent();
         }
-    } else {
         // move children to parent
         for (auto it = children.rbegin(); it != children.rend(); ++it) {
-            parent->AddChild(*it);
+            Object_ptr child = *it;
+            // manually set parent to nullptr to prevent search during AddChild step
+            child->parent = nullptr;
+
+            if (tmp_parent) {
+                // add child to parent
+                tmp_parent->AddChild(child);
+            }
         }
-        // remove this from parent
-        UnParent();
+        children.clear();
     }
 }
 
@@ -97,7 +107,6 @@ Object_ptr Object::Clone(const bool recursive) const {
     if (!recursive) {
         return clone;
     }
-
     for (auto it = children.begin(); it != children.end(); ++it) {
         Object_ptr clonedChild = (*it)->Clone(true);
         clone->AddChild(clonedChild);

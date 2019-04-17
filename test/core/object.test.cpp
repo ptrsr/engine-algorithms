@@ -171,7 +171,9 @@ TEST(Object, Remove) {
     // not able to remove (non recursively) without parent
     ASSERT_THROW(obj4->Remove(), std::runtime_error);
 
+
     // object is deleted after all pointers are lost
+    std::cout << obj3.use_count() << std::endl;
     std::weak_ptr<Object> weakptr = obj3;
     obj3 = nullptr;
     ASSERT_TRUE(weakptr.expired());
