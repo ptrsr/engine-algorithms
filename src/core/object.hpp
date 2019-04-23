@@ -8,13 +8,13 @@
 #include <glm.hpp>
 
 class Object;
+class World;
+
 typedef std::shared_ptr<Object> Object_ptr;
 
 class Object : public std::enable_shared_from_this<Object> {
+    friend class World;
     public:
-        // constructor
-        Object(const glm::mat4& transform = glm::mat4(1));
-
         // position
         const glm::mat4& GetTransform();
         glm::vec3 GetPosition();
@@ -33,16 +33,25 @@ class Object : public std::enable_shared_from_this<Object> {
         void Remove(const bool recursive = false);
         Object_ptr Clone(const bool recursive = false) const;
 
+        void SendMessage(const Message& message);
+
         friend std::ostream& operator<< (std::ostream& os, const Object& object) {
             return os << object.transform;
         }
 
+    protected:
+        World& world;
+
     private:
+        // private constructor
+        Object(World& world);
+
         virtual Object* RawClone() const;
 
         // members
-        glm::mat4 transform;
         Object_ptr parent;
+        
+        glm::mat4 transform;
         std::vector<Object_ptr> children;
 };
 
