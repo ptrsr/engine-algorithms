@@ -1,13 +1,18 @@
 #include <gtest/gtest.h>
-#include <core/object.hpp>
-#include <iostream>
-#include <exception>
+#include <gmock/gmock.h>
 
+#include <core/world.hpp>
+#include <core/object.hpp>
+#include <core/message.hpp>
 #include <auxiliary/mat.aux.hpp>
 
+#include <exception>
+
 TEST(Object, Init) {
+    World world;
+
     // init with no parameters means unit mat4
-    Object object = Object();
+    Object object = world.CreateObject();
     ASSERT_EQ(object.GetTransform(), glm::mat4(1));
 
     // init with mat
@@ -16,7 +21,10 @@ TEST(Object, Init) {
 }
 
 TEST(Object, Position) {
-    Object_ptr object = std::make_shared<Object>();
+    World world;
+    Object_ptr object = world.CreateObject();
+    
+    // initial position is (0, 0, 0)
     ASSERT_EQ(object->GetPosition(), glm::vec3());
 
     // position is set
@@ -37,8 +45,10 @@ TEST(Object, Position) {
 }
 
 TEST(Object, Translate) {
-    Object_ptr object = std::make_shared<Object>();
+    World world;
+    Object_ptr object = world.CreateObject();
 
+    // translating adds vector to position
     object->Translate(glm::vec3(1, 2, 3));
     ASSERT_EQ(object->GetPosition(), glm::vec3(1, 2, 3));
 
@@ -56,7 +66,8 @@ TEST(Object, Translate) {
 }
 
 TEST(Object, rotation) {
-    Object_ptr object = std::make_shared<Object>();
+    World world;
+    Object_ptr object = world.CreateObject();
     
     // new object should have identity matrix
     ASSERT_TRUE(CompareMats(object->GetTransform(), glm::mat4(1), TRIG_DIF));
@@ -83,8 +94,9 @@ TEST(Object, rotation) {
 }
 
 TEST(Object, Parent) {
+    World world;
     // throw while unparenting when object has no parent
-    Object_ptr parent = std::make_shared<Object>();
+    Object_ptr parent = world.CreateObject();
     ASSERT_THROW(parent->UnParent(), std::runtime_error);
 
     // no children after init
@@ -92,7 +104,7 @@ TEST(Object, Parent) {
     ASSERT_TRUE(children.empty());
 
     // adding child results in correct parent
-    Object_ptr child = std::make_shared<Object>();
+    Object_ptr child = world.CreateObject();
     parent->AddChild(child);
     ASSERT_EQ(child->GetParent(), parent);
 
@@ -109,9 +121,10 @@ TEST(Object, Parent) {
 }
 
 TEST(Object, Unparent) {
-    Object_ptr parent = std::make_shared<Object>();
-    Object_ptr child1 = std::make_shared<Object>(); 
-    Object_ptr child2 = std::make_shared<Object>();
+    World world;    
+    Object_ptr parent = world.CreateObject();
+    Object_ptr child1 = world.CreateObject(); 
+    Object_ptr child2 = world.CreateObject();
 
     parent->AddChild(child1);
     parent->AddChild(child2);
@@ -129,9 +142,10 @@ TEST(Object, Unparent) {
 }
 
 TEST(Object, Switch_parent) {
-    Object_ptr original = std::make_shared<Object>(); 
-    Object_ptr other = std::make_shared<Object>(); 
-    Object_ptr child = std::make_shared<Object>();
+    World world;
+    Object_ptr original = world.CreateObject(); 
+    Object_ptr other = world.CreateObject(); 
+    Object_ptr child = world.CreateObject();
 
     original->AddChild(child);
     other->AddChild(child);
@@ -144,10 +158,11 @@ TEST(Object, Switch_parent) {
 }
 
 TEST(Object, Remove) {
-    Object_ptr obj1 = std::make_shared<Object>();
-    Object_ptr obj2 = std::make_shared<Object>();
-    Object_ptr obj3 = std::make_shared<Object>();
-    Object_ptr obj4 = std::make_shared<Object>();
+    World world;
+    Object_ptr obj1 = world.CreateObject();
+    Object_ptr obj2 = world.CreateObject();
+    Object_ptr obj3 = world.CreateObject();
+    Object_ptr obj4 = world.CreateObject();
 
     // add two children to obj3
     obj3->AddChild(obj1);
@@ -171,15 +186,13 @@ TEST(Object, Remove) {
     // not able to remove (non recursively) without parent
     ASSERT_THROW(obj4->Remove(), std::runtime_error);
 
-
     // object is deleted after all pointers are lost
-    std::cout << obj3.use_count() << std::endl;
     std::weak_ptr<Object> weakptr = obj3;
     obj3 = nullptr;
     ASSERT_TRUE(weakptr.expired());
 
     // recreate obj3
-    obj3 = std::make_shared<Object>();
+    obj3 = world.CreateObject();
     obj3->AddChild(obj1);
     obj3->AddChild(obj2);
     obj4->AddChild(obj3);
@@ -196,7 +209,8 @@ TEST(Object, Remove) {
 }
 
 TEST(Object, Clone) {
-    Object_ptr original = std::make_shared<Object>();
+    World world;
+    Object_ptr original = world.CreateObject();
     original->SetPosition(glm::vec3(1, 2, 3));
 
     Object_ptr clone = original->Clone();
@@ -214,7 +228,7 @@ TEST(Object, Clone) {
 
     // add two children to original
     for (uint i = 0; i < 2; i++) {
-        original->AddChild(std::make_shared<Object>());
+        original->AddChild(world.CreateObject());
     }
     // new clone of original with children WITHOUT recursion
     clone = original->Clone(false);
@@ -234,4 +248,43 @@ TEST(Object, Clone) {
     for (uint i = 0; i < originalChildren.size(); i++) {
         ASSERT_NE(originalChildren[i], cloneChildren[i]);
     }
+}
+
+class ForwardMessage : public Message {
+    public:
+        virtual void Test() const { };
+        virtual void Execute(Object& object) const override {
+            // call mocked test function
+            Test();
+            
+            Object_ptr parent = object.GetParent();
+
+            // recurse on parent
+            if (parent) {
+                parent->SendMessage(*this);
+            }
+        }
+        virtual ~ForwardMessage() {};
+};
+
+class MockForwardMessage : public ForwardMessage {
+    public:
+        MOCK_CONST_METHOD0(Test, void());
+};
+
+TEST(Message, Execute) {
+    World world;
+    Object_ptr object1 = world.CreateObject();
+    MockForwardMessage msg;
+
+    // test is only called once
+    EXPECT_CALL(msg, Test());
+    object1->SendMessage(msg);
+
+    Object_ptr object2 = world.CreateObject();
+    object2->AddChild(object1);
+
+    // test is called from both object1 and object2
+    EXPECT_CALL(msg, Test()).Times(2);
+    object1->SendMessage(msg);
 }

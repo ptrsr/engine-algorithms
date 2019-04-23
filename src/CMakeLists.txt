@@ -17,10 +17,13 @@ list(APPEND SOURCES
 	glm.hpp
 
 	auxiliary/c_getopt.h
-	auxiliary/options.hpp
 	auxiliary/options.cpp
 
+	core/camera.cpp
 	core/object.cpp
+	core/world.cpp
+
+	core/messages/world-message.cpp
 )
 
 ## BUILDING

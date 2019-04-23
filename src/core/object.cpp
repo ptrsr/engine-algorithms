@@ -1,10 +1,14 @@
 #include "object.hpp"
+
+#include <core/message.hpp>
+
 #include <iostream>
 #include <exception>
 
-Object::Object(const glm::mat4& transform) 
-    : transform(transform) {
-
+Object::Object(World& world) 
+    : world(world)
+    , transform(glm::mat4(1)) {
+    
 }
 
 const glm::mat4& Object::GetTransform() {
@@ -112,4 +116,8 @@ Object_ptr Object::Clone(const bool recursive) const {
         clone->AddChild(clonedChild);
     }
     return clone;
+}
+
+void Object::SendMessage(const Message& message) {
+    message.Execute(*this);
 }
