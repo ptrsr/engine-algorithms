@@ -11,11 +11,9 @@ add_executable(test-engine engine-algorithms.test.cpp
 	# tests are run in following order
 	input/options.test.cpp
 
-	core/object.test.cpp
 	core/world.test.cpp
-	core/camera.test.cpp
-
-	core/messages/world-message.test.cpp
+	core/object.test.cpp
+	#core/camera.test.cpp
 )
 
 target_link_libraries(test-engine framework)

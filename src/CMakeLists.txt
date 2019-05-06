@@ -19,11 +19,9 @@ list(APPEND SOURCES
 	auxiliary/c_getopt.h
 	auxiliary/options.cpp
 
-	core/camera.cpp
-	core/object.cpp
 	core/world.cpp
-
-	core/messages/world-message.cpp
+	core/object.cpp
+	#core/camera.cpp
 )
 
 ## BUILDING

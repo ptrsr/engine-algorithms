@@ -1,8 +1,8 @@
-#include "world.hpp"
 #include <core/object.hpp>
+#include "world.hpp"
 
 Object_ptr World::CreateObject() {
-    Object_ptr object = std::make_shared<Object>(*this);
+    return std::make_shared<Object>(*this);
 }
 
 const std::vector<Object_ptr> World::GetChildren() const {

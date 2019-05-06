@@ -19,7 +19,6 @@ class World {
 
     private:
         std::vector<Object_ptr> children;
-        //std::vector<Light_ptr> lights;
 
         std::shared_ptr<Camera> main_camera;
 

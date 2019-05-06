@@ -6,6 +6,8 @@
 #include <iostream>
 
 #include <glm.hpp>
+//#include <core/world.hpp>
+
 
 class Object;
 class World;
@@ -13,8 +15,9 @@ class World;
 typedef std::shared_ptr<Object> Object_ptr;
 
 class Object : public std::enable_shared_from_this<Object> {
-    friend class World;
     public:
+        friend class World;
+
         // position
         const glm::mat4& GetTransform();
         glm::vec3 GetPosition();
@@ -33,18 +36,21 @@ class Object : public std::enable_shared_from_this<Object> {
         void Remove(const bool recursive = false);
         Object_ptr Clone(const bool recursive = false) const;
 
-        void SendMessage(const Message& message);
+        //void SendMessage(const Message& message);
 
         friend std::ostream& operator<< (std::ostream& os, const Object& object) {
             return os << object.transform;
         }
 
     protected:
+
+        // protected constructor
+        friend class World;
+        Object(World& world);
+
         World& world;
 
     private:
-        // private constructor
-        Object(World& world);
 
         virtual Object* RawClone() const;
 

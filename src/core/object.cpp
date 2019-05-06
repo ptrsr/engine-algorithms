@@ -118,6 +118,6 @@ Object_ptr Object::Clone(const bool recursive) const {
     return clone;
 }
 
-void Object::SendMessage(const Message& message) {
-    message.Execute(*this);
-}
+// void Object::SendMessage(const Message& message) {
+//     message.Execute(*this);
+// }

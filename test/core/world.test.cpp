@@ -2,12 +2,19 @@
 #include <core/world.hpp>
 #include <core/object.hpp>
 
-TEST(World, Add) {
+TEST(World, CreateObject) {
     World world = World();
-    Object_ptr object = std::make_shared<Object>();
 
-    // adding an object to the world
-    world.Add(object);
+    // create 2 objects    
+    Object_ptr obj1 = world.CreateObject();
+    Object_ptr obj2 = world.CreateObject();
 
-    ASSERT_EQ(world.GetChildren().size(), 1);
+    // world has 2 objects as children
+    auto children = world.GetChildren();
+    ASSERT_EQ(children.size(), 2);
+
+    // objects are added to children list in same order of creation
+    ASSERT_EQ(children[0], obj1);
+    ASSERT_EQ(children[1], obj1);
 }
+

@@ -12,12 +12,8 @@ TEST(Object, Init) {
     World world;
 
     // init with no parameters means unit mat4
-    Object object = world.CreateObject();
-    ASSERT_EQ(object.GetTransform(), glm::mat4(1));
-
-    // init with mat
-    object = Object(glm::mat4(2));
-    ASSERT_EQ(object.GetTransform(), glm::mat4(2));
+    Object_ptr object = world.CreateObject();
+    ASSERT_EQ(object->GetTransform(), glm::mat4(1));
 }
 
 TEST(Object, Position) {
@@ -250,41 +246,41 @@ TEST(Object, Clone) {
     }
 }
 
-class ForwardMessage : public Message {
-    public:
-        virtual void Test() const { };
-        virtual void Execute(Object& object) const override {
-            // call mocked test function
-            Test();
+// class ForwardMessage : public Message {
+//     public:
+//         virtual void Test() const { };
+//         virtual void Execute(Object& object) const override {
+//             // call mocked test function
+//             Test();
             
-            Object_ptr parent = object.GetParent();
+//             Object_ptr parent = object.GetParent();
 
-            // recurse on parent
-            if (parent) {
-                parent->SendMessage(*this);
-            }
-        }
-        virtual ~ForwardMessage() {};
-};
+//             // recurse on parent
+//             if (parent) {
+//                 parent->SendMessage(*this);
+//             }
+//         }
+//         virtual ~ForwardMessage() {};
+// };
 
-class MockForwardMessage : public ForwardMessage {
-    public:
-        MOCK_CONST_METHOD0(Test, void());
-};
+// class MockForwardMessage : public ForwardMessage {
+//     public:
+//         MOCK_CONST_METHOD0(Test, void());
+// };
 
-TEST(Message, Execute) {
-    World world;
-    Object_ptr object1 = world.CreateObject();
-    MockForwardMessage msg;
+// TEST(Message, Execute) {
+//     World world;
+//     Object_ptr object1 = world.CreateObject();
+//     MockForwardMessage msg;
 
-    // test is only called once
-    EXPECT_CALL(msg, Test());
-    object1->SendMessage(msg);
+//     // test is only called once
+//     EXPECT_CALL(msg, Test());
+//     object1->SendMessage(msg);
 
-    Object_ptr object2 = world.CreateObject();
-    object2->AddChild(object1);
+//     Object_ptr object2 = world.CreateObject();
+//     object2->AddChild(object1);
 
-    // test is called from both object1 and object2
-    EXPECT_CALL(msg, Test()).Times(2);
-    object1->SendMessage(msg);
-}
+//     // test is called from both object1 and object2
+//     EXPECT_CALL(msg, Test()).Times(2);
+//     object1->SendMessage(msg);
+// }
