@@ -1,7 +1,5 @@
 #include "object.hpp"
 
-#include <core/message.hpp>
-
 #include <iostream>
 #include <exception>
 

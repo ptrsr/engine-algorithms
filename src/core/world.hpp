@@ -4,8 +4,10 @@
 #include <vector>
 #include <memory>
 
+//#include <core/object.hpp>
+
 class Object;
-class Camera;
+//class Camera;
 //class Light;
 
 typedef std::shared_ptr<Object> Object_ptr;
@@ -14,13 +16,10 @@ typedef std::shared_ptr<Object> Object_ptr;
 class World {
     public:
         Object_ptr CreateObject();
-
         const std::vector<Object_ptr> GetChildren() const;
 
     private:
         std::vector<Object_ptr> children;
-
-        std::shared_ptr<Camera> main_camera;
 
 };
 

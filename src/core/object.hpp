@@ -6,18 +6,13 @@
 #include <iostream>
 
 #include <glm.hpp>
-//#include <core/world.hpp>
-
 
 class Object;
-class World;
-
 typedef std::shared_ptr<Object> Object_ptr;
 
+class World;
 class Object : public std::enable_shared_from_this<Object> {
     public:
-        friend class World;
-
         // position
         const glm::mat4& GetTransform();
         glm::vec3 GetPosition();
@@ -43,10 +38,9 @@ class Object : public std::enable_shared_from_this<Object> {
         }
 
     protected:
-
         // protected constructor
-        friend class World;
-        Object(World& world);
+        friend World;
+        Object(World&);
 
         World& world;
 

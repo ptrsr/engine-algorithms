@@ -19,8 +19,8 @@ list(APPEND SOURCES
 	auxiliary/c_getopt.h
 	auxiliary/options.cpp
 
-	core/world.cpp
 	core/object.cpp
+	core/world.cpp
 	#core/camera.cpp
 )
 

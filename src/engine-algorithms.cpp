@@ -6,9 +6,5 @@
 int main(int argc, char** argv) {
 
     Options opts = Options::ParseOptions(argc, argv);
-
-    Object obj = Object();
-    std::cout << obj << std::endl;
-
     return 0;
 }
