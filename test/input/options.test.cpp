@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
-#include <input/options.hpp>
+
+#include <engine/input/options.hpp>
 
 TEST(Options, Default_Init) {
 	Options opts = Options();

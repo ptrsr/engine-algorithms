@@ -1,12 +1,13 @@
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 
-#include <core/world.hpp>
-#include <core/object.hpp>
-#include <core/message.hpp>
+#include <engine/core/world.hpp>
+#include <engine/core/object.hpp>
+#include <engine/core/message.hpp>
 #include <auxiliary/mat.aux.hpp>
 
 #include <exception>
+#include <iostream>
 
 TEST(Object, Init) {
     World world;

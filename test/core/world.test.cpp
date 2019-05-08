@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
-#include <core/world.hpp>
-#include <core/object.hpp>
+
+#include <engine/core/world.hpp>
+#include <engine/core/object.hpp>
 
 TEST(World, CreateObject) {
     World world = World();

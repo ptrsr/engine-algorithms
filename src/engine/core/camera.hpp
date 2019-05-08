@@ -1,7 +1,7 @@
 #ifndef CAMERA_HPP_
 #define CAMERA_HPP_
 
-#include <core/object.hpp>
+#include <engine/core/object.hpp>
 
 class Camera : Object {
     public:
