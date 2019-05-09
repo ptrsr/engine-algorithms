@@ -1,28 +1,24 @@
 #ifndef COMPONENT_HPP_
 #define COMPONENT_HPP_
 
-#include <engine/core/fields.hpp>
+#include <unordered_map>
+#include <string>
+#include <any>
+
+typedef std::unordered_map<std::string, std::any> Fields;
 
 class Component {
+    protected:
+        template<typename T>
+        T& AddField(std::string name, T initvalue = T()) {
+            auto pair = fields.insert(std::pair<std::string, std::any>(name, initvalue));
+            return std::any_cast<T&>(pair.first->second);
+        }
 
-    // protected:
-    //     Component(Fields& fields);
-
-    //     template<typename T>
-    //     T& NewField(Fields field) {
-    //         auto pair = fields.find(field);
-
-    //         // if the field already exist, return ref to value
-    //         if (pair != fields.end()) {
-    //             return pair->second;
-    //         }
-
-    //         // return new field
-    //         return fields.insert(std::pair<Field, std::any>(field, T())).second;
-    //     }
-
-    // private:
-    //     Fields& fields;
+        Component(Fields& fields)
+            : fields(fields) { };
+    private:
+        Fields& fields;
 };
 
 #endif//COMPONENT_HPP_

@@ -1,15 +1,15 @@
 #ifndef ENGINE_HPP_
 #define ENGINE_HPP_
 
-#include <vector>
-#include <list>
 #include <unordered_map>
-#include <memory>
-#include <utility>
+#include <functional>
+#include <exception>
 #include <typeindex>
 #include <typeinfo>
-#include <exception>
-#include <functional>
+#include <utility>
+#include <vector>
+#include <memory>
+#include <list>
 
 #include <engine/core/entity.hpp>
 //class System;

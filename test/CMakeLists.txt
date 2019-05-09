@@ -12,8 +12,8 @@ add_executable(test-engine engine-algorithms.test.cpp
 	input/options.test.cpp
 
 	core/engine.test.cpp
-	core/fields.test.cpp
 	core/entity.test.cpp
+	core/component.test.cpp
 	#core/world.test.cpp
 	#core/object.test.cpp
 	#core/camera.test.cpp
