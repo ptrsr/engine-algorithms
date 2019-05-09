@@ -8,6 +8,8 @@
 #include <typeindex>
 #include <typeinfo>
 #include <exception>
+#include <functional>
+#include <iostream>
 
 #include <engine/core/entity.hpp>
 //class System;
@@ -18,6 +20,25 @@ typedef std::list<Entity_ptr> Entity_list;
 //typedef std::unique_ptr<System> System_ptr;
 
 class Engine {
+    private:
+        unsigned int current_id = 0;
+        std::unordered_map<std::type_index, Entity_list> entity_map;
+        //std::vector<Entity_ptr> entities;
+        //std::vector<System_ptr> systems;
+
+        template<typename T>
+        Entity_list& GetEntityList() {
+            // search map for entity type
+            auto map_it = entity_map.find(typeid(T));
+            if (map_it == entity_map.end()) {
+                // entity list does not exist
+                throw new std::runtime_error("No existing entity of type: " + std::string(typeid(T).name()));
+            }
+            return map_it->second;
+        }
+
+    protected:
+
     public:
         template<typename T, class... U>
         T& AddEntity(U&&... u) {
@@ -42,32 +63,58 @@ class Engine {
             // assert if T is derived from entity
             static_assert(std::is_base_of<Entity, T>::value, "T must derived from entity");
             
-            // search map for entity type
-            auto map_it = entity_map.find(typeid(T));
+            // get list of entity type
+            Entity_list& entity_list = GetEntityList<T>();
 
-            // entity list does not exist
-            if (map_it == entity_map.end()) {
-                throw new std::runtime_error("accessing non existing entity");
-            }
-
-            Entity_list& entity_list = map_it->second;
-            // entity index doesnt exist
             if (index >= entity_list.size()) {
-                throw new std::runtime_error("accessing non existing entity");
+                // entity index doesnt exist
+                throw new std::runtime_error("Accessing non existing entity of type: " + std::string(typeid(T).name()));
             }
             auto list_it = entity_list.begin();
             std::advance(list_it, index);
             return *(static_cast<T*>((*list_it).get()));
         }
 
-    protected:
-    private:
-        unsigned int current_id = 0;
+        template<typename T>
+        std::vector<std::reference_wrapper<T>> GetEntities() {
+            // assert if T is derived from entity
+            static_assert(std::is_base_of<Entity, T>::value, "T must derived from entity");
 
-        std::unordered_map<std::type_index, Entity_list> entity_map;
-        //std::vector<Entity_ptr> entities;
-        //std::vector<System_ptr> systems;
+            // get list of entity type
+            Entity_list& entity_list = GetEntityList<T>();
 
+            // create reference vector to entities
+            std::vector<std::reference_wrapper<T>> ref_vec;
+            ref_vec.reserve(entity_list.size());
+
+            // fill vector with references from list and return
+            for (auto it = entity_list.begin(); it != entity_list.end(); ++it) {
+                 ref_vec.push_back(*(static_cast<T*>((*it).get())));
+            }
+            return ref_vec;
+        }
+
+        template<typename T>
+        void DeleteEntity(T& entity) {
+            // assert if T is derived from entity
+            static_assert(std::is_base_of<Entity, T>::value, "T must derived from entity");
+
+            // get list of entity type
+            Entity_list& entity_list = GetEntityList<T>();
+
+            for (auto it = entity_list.begin(); it != entity_list.end(); ++it) {
+                 if (static_cast<T*>((*it).get()) != &entity) {
+                     continue;
+                 }
+                 entity_list.erase(it);
+                 return;
+            }
+            throw new std::runtime_error(
+                "Deleting non existing entity of type: " + 
+                std::string(typeid(T).name()) +
+                ". Did you already delete it?"
+            );
+        }
 };
 
 #endif//ENGINE_HPP_
