@@ -1,15 +1,14 @@
 #ifndef ENTITY_HPP_
 #define ENTITY_HPP_
 
-#include <engine/core/field.hpp>
+#include <engine/core/fields.hpp>
 #include <engine/core/component.hpp>
 
 #include <vector>
 #include <memory>
+#include <utility>
 #include <map>
 #include <any>
-
-typedef std::unique_ptr<Component> Component_ptr;
 
 class Entity {
     friend class Engine;
@@ -18,15 +17,16 @@ class Entity {
     protected:
         Entity() { };
 
-        template<typename T>
-        std::unique_ptr<T>& AddComponent() {
+        template<typename T, class... P>
+        T& AddComponent(P&&... p) {
             static_assert(std::is_base_of<Component, T>::value, "T must derived from component");
-            return components.emplace_back(std::make_unique<T>(fields));
+            std::unique_ptr<Component>& component = components.emplace_back(std::make_unique<T>(fields, std::forward<P>(p)...));
+            return *(static_cast<T*>(component.get()));
         }
 
     private:
         unsigned int id;
-        std::vector<Component_ptr> components;
+        std::vector<std::unique_ptr<Component>> components;
         Fields fields;
 };
 

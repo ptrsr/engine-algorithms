@@ -5,11 +5,11 @@
 #include <list>
 #include <unordered_map>
 #include <memory>
+#include <utility>
 #include <typeindex>
 #include <typeinfo>
 #include <exception>
 #include <functional>
-#include <iostream>
 
 #include <engine/core/entity.hpp>
 //class System;
@@ -40,8 +40,8 @@ class Engine {
     protected:
 
     public:
-        template<typename T, class... U>
-        T& AddEntity(U&&... u) {
+        template<typename T, class... P>
+        T& AddEntity(P&&... p) {
             // assert if T is derived from entity
             static_assert(std::is_base_of<Entity, T>::value, "T must derived from entity");
 
@@ -51,7 +51,7 @@ class Engine {
             Entity_list& entity_list = (*inserted_pair.first).second;
 
             // create new entity in list
-            Entity_ptr& entity = entity_list.emplace_back(std::make_unique<T>(std::forward<U>(u)...));
+            Entity_ptr& entity = entity_list.emplace_back(std::make_unique<T>(std::forward<P>(p)...));
             entity->id = current_id++;
 
             // cast to a reference
