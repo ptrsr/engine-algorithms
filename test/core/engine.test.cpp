@@ -5,52 +5,68 @@
 
 #include <iostream>
 
-class TestEntity : public Entity { 
+class MockEntity : public Entity { 
     public:
-        TestEntity(const int testnr = 0)
+        MockEntity(const int testnr = 0)
             : testnr(testnr) { }
 
         int testnr;
 
 };
 
-class NullEntity : public Entity { };
+class EmtyEntity : public Entity { };
 
 TEST(Engine, AddEntity) {
     Engine engine = Engine();
     
     // add test entity
-    TestEntity& testEntity = engine.AddEntity<TestEntity>(1);
-    ASSERT_EQ(typeid(TestEntity), typeid(testEntity));
+    MockEntity& testEntity = engine.AddEntity<MockEntity>(1);
+    ASSERT_EQ(typeid(MockEntity), typeid(testEntity));
     ASSERT_EQ(testEntity.testnr, 1);
+}
+
+TEST(Engine, CheckEntity) {
+    Engine engine = Engine();
+
+    // CheckEntity returns true after adding Entity
+    ASSERT_FALSE(engine.CheckEntity<MockEntity>());
+    MockEntity& testEntity = engine.AddEntity<MockEntity>();
+    ASSERT_TRUE(engine.CheckEntity<MockEntity>());
+
+    // CheckEntity checks index
+    ASSERT_FALSE(engine.CheckEntity<EmtyEntity>());
+    EmtyEntity& null_entity0 = engine.AddEntity<EmtyEntity>();
+    ASSERT_FALSE(engine.CheckEntity<EmtyEntity>(1));
+    EmtyEntity& null_entity1 = engine.AddEntity<EmtyEntity>();
+    ASSERT_TRUE(engine.CheckEntity<EmtyEntity>(1));
 }
 
 TEST(Engine, GetEntity) {
     Engine engine = Engine();
 
     // GetEntity should get same reference back to original entity
-    TestEntity& ref0 = engine.AddEntity<TestEntity>();
-    TestEntity& ref1 = engine.GetEntity<TestEntity>();
+    MockEntity& ref0 = engine.AddEntity<MockEntity>();
+    MockEntity& ref1 = engine.GetEntity<MockEntity>();
     ASSERT_EQ(&ref0, &ref1);
 
     // GetEntity with index should get right entity
-    TestEntity& ref2 = engine.AddEntity<TestEntity>();
-    TestEntity& ref3 = engine.GetEntity<TestEntity>(1);
+    MockEntity& ref2 = engine.AddEntity<MockEntity>();
+    MockEntity& ref3 = engine.GetEntity<MockEntity>(1);
     ASSERT_EQ(&ref2, &ref3);
 
     // cannot get nonexistent entity
-    ASSERT_ANY_THROW(engine.GetEntity<NullEntity>());
+    ASSERT_ANY_THROW(engine.GetEntity<EmtyEntity>());
 }
 
 TEST(Engine, GetEntities) {
     Engine engine = Engine();
 
     // add two entities
-    TestEntity& ref0 = engine.AddEntity<TestEntity>();
-    TestEntity& ref1 = engine.AddEntity<TestEntity>();
+    MockEntity& ref0 = engine.AddEntity<MockEntity>();
+    MockEntity& ref1 = engine.AddEntity<MockEntity>();
 
     // reference vector should contain 2 references
-    auto test_entities = engine.GetEntities<TestEntity>();
+    auto test_entities = engine.GetEntities<MockEntity>();
     ASSERT_EQ(test_entities.size(), 2);
 
     // reference vector should contain correct references
@@ -58,18 +74,18 @@ TEST(Engine, GetEntities) {
     ASSERT_EQ(&test_entities[1].get(), &ref1);
 
     // cannot get nonexistent entities
-    ASSERT_ANY_THROW(engine.GetEntities<NullEntity>());
+    ASSERT_ANY_THROW(engine.GetEntities<EmtyEntity>());
 }
 
 TEST(Engine, DeleteEntity) {
     Engine engine = Engine();
 
     // create ref and delete it
-    TestEntity& ref0 = engine.AddEntity<TestEntity>();
+    MockEntity& ref0 = engine.AddEntity<MockEntity>();
     engine.DeleteEntity(ref0);
 
     // list contains no more references
-    auto test_entities = engine.GetEntities<TestEntity>();
+    auto test_entities = engine.GetEntities<MockEntity>();
     ASSERT_EQ(test_entities.size(), 0);
 
     // throw when trying to delete ref twice

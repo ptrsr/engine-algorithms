@@ -59,6 +59,24 @@ class Engine {
         }
 
         template<typename T>
+        bool CheckEntity(const unsigned int index = 0) {
+            // assert if T is derived from entity
+            static_assert(std::is_base_of<Entity, T>::value, "T must derived from entity");
+
+            // get entity list. return false if no entity of type T exists at all
+            auto map_it = entity_map.find(typeid(T));
+            if (map_it == entity_map.end()) {
+                return false;
+            }
+            // check if index is exists in list
+            Entity_list& Entity_list = map_it->second;
+            if (index >= Entity_list.size()) {
+                return false;
+            }
+            return true;
+        }
+
+        template<typename T>
         T& GetEntity(const unsigned int index = 0) {
             // assert if T is derived from entity
             static_assert(std::is_base_of<Entity, T>::value, "T must derived from entity");
