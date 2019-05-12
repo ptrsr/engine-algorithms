@@ -34,7 +34,6 @@ private:
         if (map_it == entity_map.end()) {
             return nullptr;
         }
-
         /* NOTE: raw pointer because we're pointing to an element in an stl container,
                     only for internal usage */
         return &map_it->second;
@@ -56,7 +55,9 @@ public:
         entity->id = current_id++;
 
         // cast to a reference
-        return *(static_cast<T*>(entity.get()));
+        T* entity_ptr = static_cast<T*>(entity.get());
+        T& entity_ref = *entity_ptr;
+        return entity_ref;
     }
 
     template<typename T>
@@ -78,11 +79,13 @@ public:
         auto list_it = entity_list->begin();
         std::advance(list_it, index);
 
-        T& t_ref = *(static_cast<T*>((*list_it).get()));
+        // cast to a reference
+        T* entity_ptr = static_cast<T*>((*list_it).get());
+        T& entity_ref = *entity_ptr;
 
         /* NOTE: using an optional reference_wrapper, as it's the easiest 
                     way to be able to return null without raw pointers. */
-        return std::optional(std::ref(t_ref));
+        return std::optional(std::ref(entity_ref));
     }
 
     template<typename T>
@@ -100,12 +103,14 @@ public:
             // return empty vec
             return ref_vec;
         }
-
         ref_vec.reserve(entity_list->size());
 
         // fill vector with references from list and return
         for (auto it = entity_list->begin(); it != entity_list->end(); ++it) {
-            ref_vec.push_back(*(static_cast<T*>((*it).get())));
+            Entity* entity = (*it).get();
+            T* entity_ptr = static_cast<T*>(entity);
+            T& entity_ref = *entity_ptr;
+            ref_vec.push_back(entity_ref);
         }
         return ref_vec;
     }
@@ -118,13 +123,25 @@ public:
         // get list of entity type
         Entity_list* entity_list = GetEntityList<T>();
 
+        // entity list doesn't even exist (entity has never been added to engine)
+        if (!entity_list) {
+            throw new std::runtime_error(
+                "Deleting non existing entity of type: " + 
+                std::string(typeid(T).name()) +
+                ". Did you already delete it?"
+            );
+        }
+        // find entity by iterating over list
         for (auto it = entity_list->begin(); it != entity_list->end(); ++it) {
-            if (static_cast<T*>((*it).get()) != &entity) {
+            if ((*it).get() != &entity) {
+                // continue searching if not found
                 continue;
             }
+            // remove entity
             entity_list->erase(it);
             return;
         }
+        // entity wasn't found at all
         throw new std::runtime_error(
             "Deleting non existing entity of type: " + 
             std::string(typeid(T).name()) +

@@ -1,35 +1,26 @@
-#include "object.hpp"
+#include "transform.hpp"
 
-#include <iostream>
-#include <exception>
+Transform::Transform(glm::mat4 init_mat) 
+    : glm::mat4(init_mat)
+    , transform(*this) { }
 
-Object::Object(World& world) 
-    : world(world)
-    , transform(glm::mat4(1)) {
-    
-}
-
-const glm::mat4& Object::GetTransform() {
-    return transform;
-}
-
-glm::vec3 Object::GetPosition() {
+glm::vec3 Transform::GetPosition() const {
     return glm::vec3(transform[3]);
 }
 
-void Object::SetPosition(const glm::vec3& position) {
+void Transform::SetPosition(const glm::vec3& position) {
     transform[3] = glm::vec4(position, 1);
 }
 
-void Object::Translate(const glm::vec3& translation) {
+void Transform::Translate(const glm::vec3& translation) {
     transform[3] += glm::vec4(translation, 0);
 }
 
-void Object::Rotate(const float angle, const glm::vec3& axis) {
+void Transform::Rotate(const float angle, const glm::vec3& axis) {
     transform = glm::rotate(transform, angle, axis);
 }
 
-bool Object::AddChild(const Object_ptr& child) {
+bool Transform::AddChild(const Transform_ptr& child) {
     if (child->parent != nullptr) {
         if (child->parent.get() == this) {
             throw std::runtime_error("Cannot add child: already childed to this object.");
@@ -42,7 +33,7 @@ bool Object::AddChild(const Object_ptr& child) {
     children.push_back(child);
 }
 
-void Object::UnParent() {
+void Transform::UnParent() {
     if (parent == nullptr) {
         throw std::runtime_error("Cannot unparent: no parent.");
     }
@@ -56,15 +47,15 @@ void Object::UnParent() {
     parent = nullptr;
 }
 
-const Object_ptr Object::GetParent() const {
+const Transform_ptr Transform::GetParent() const {
     return parent;
 }
 
-const std::vector<Object_ptr>& Object::GetChildren() const {
+const std::vector<Transform_ptr>& Transform::GetChildren() const {
     return children;
 }
 
-void Object::Remove(bool recursive) {
+void Transform::Remove(bool recursive) {
     if (!parent && !recursive) {
         throw std::runtime_error("Cannot remove without recursion: no parent to reattach children to");
     }
@@ -78,13 +69,13 @@ void Object::Remove(bool recursive) {
         parent = nullptr;
     } else {
         // get temporary reference to avoid extra searching afterwards
-        Object_ptr tmp_parent = parent;
+        Transform_ptr tmp_parent = parent;
         if (tmp_parent) {
             UnParent();
         }
         // move children to parent
         for (auto it = children.rbegin(); it != children.rend(); ++it) {
-            Object_ptr child = *it;
+            Transform_ptr child = *it;
             // manually set parent to nullptr to prevent search during AddChild step
             child->parent = nullptr;
 
@@ -97,12 +88,12 @@ void Object::Remove(bool recursive) {
     }
 }
 
-Object* Object::RawClone() const {
-    return new Object(*this);
+Transform* Transform::RawClone() const {
+    return new Transform(*this);
 }
 
-Object_ptr Object::Clone(const bool recursive) const {
-    Object_ptr clone = Object_ptr(RawClone());
+Transform_ptr Transform::Clone(const bool recursive) const {
+    Transform_ptr clone = Transform_ptr(RawClone());
     clone->parent = nullptr;
     clone->children.clear();
     
@@ -110,12 +101,12 @@ Object_ptr Object::Clone(const bool recursive) const {
         return clone;
     }
     for (auto it = children.begin(); it != children.end(); ++it) {
-        Object_ptr clonedChild = (*it)->Clone(true);
+        Transform_ptr clonedChild = (*it)->Clone(true);
         clone->AddChild(clonedChild);
     }
     return clone;
 }
 
-// void Object::SendMessage(const Message& message) {
+// void Transform::SendMessage(const Message& message) {
 //     message.Execute(*this);
 // }

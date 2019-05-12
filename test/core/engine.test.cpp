@@ -6,12 +6,12 @@
 #include <iostream>
 
 class MockEntity : public Entity { 
-    public:
-        MockEntity(const int testnr = 0)
-            : testnr(testnr) { }
+public:
+    MockEntity(const int testnr = 0)
+        : testnr(testnr) 
+        { }
 
-        int testnr;
-
+    int testnr;
 };
 
 class EmtyEntity : public Entity { };
@@ -84,14 +84,20 @@ TEST(Engine, GetEntities) {
 TEST(Engine, DeleteEntity) {
     Engine engine = Engine();
 
-    // create ref and delete it
-    MockEntity& ref0 = engine.AddEntity<MockEntity>();
-    engine.DeleteEntity(ref0);
+    // create a mock_entity
+    MockEntity& mock_entity = engine.AddEntity<MockEntity>();
+
+    { // other engine (with no knowledge of mock_entity) throws on wrong removal
+        Engine tmp_engine = Engine();
+        ASSERT_ANY_THROW(tmp_engine.DeleteEntity(mock_entity));
+    }
+    // delete mock_entity
+    engine.DeleteEntity(mock_entity);
 
     // list contains no more references
     auto test_entities = engine.GetEntities<MockEntity>();
     ASSERT_EQ(test_entities.size(), 0);
 
     // throw when trying to delete ref twice
-    ASSERT_ANY_THROW(engine.DeleteEntity(ref0));
+    ASSERT_ANY_THROW(engine.DeleteEntity(mock_entity));
 }

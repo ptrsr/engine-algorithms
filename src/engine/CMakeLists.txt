@@ -7,11 +7,15 @@ list(APPEND SOURCES
 	auxiliary/c_getopt.h
 	auxiliary/options.cpp
 
-	core/object.cpp
-	core/world.cpp
-
 	core/engine.cpp
 	core/entity.cpp
+	
+	#components/transform.cpp
+	#components/hierarchical.cpp
+	
+	#core/object.cpp
+	#core/world.cpp
+
 	#core/camera.cpp
 )
 

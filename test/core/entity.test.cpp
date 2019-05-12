@@ -2,52 +2,56 @@
 
 #include <engine/core/engine.hpp>
 
-// test component class that adds a shared test_int field
-class TestComponent : public Component {
-    public:
-        TestComponent(Fields& fields, int test_int)
-            : Component(fields)
-            , test_int(test_int) { }
+// test component with field
+class MockComponent : public Component {
+public:
+    MockComponent(int test_int)
+        : test_int(test_int) 
+        { }
 
-        int test_int;
+    int test_int;
 };
 
-// test entity class that adds a TestComponent
-class TestEntity : public Entity { 
-    public:
-        TestEntity(int test_int = 0)
-            : test_component(AddComponent<TestComponent>(test_int)) { }
+// test entity class that adds a MockComponent
+class MockEntity : public Entity { 
+public:
+    MockEntity(int test_int = 0)
+        : mock_component(AddComponent<MockComponent>(test_int))
+        , test_component(AddComponent<MockComponent>(0))
+        { }
     
-    TestComponent& test_component;
+    MockComponent& mock_component;
+    MockComponent& test_component;
 };
 
 // test entity to check non existance of component
-class NullEntity : public Entity { };
+class NullComponent : public Component { };
 
 TEST(Entity, AddComponent) {
     Engine engine = Engine();
 
     // forwarding arguments to component constructor
-    TestEntity& test_entity = engine.AddEntity<TestEntity>(1);
-    ASSERT_EQ(test_entity.test_component.test_int, 1);
-}
+    MockEntity& mock_entity = engine.AddEntity<MockEntity>(1);
+    ASSERT_EQ(mock_entity.mock_component.test_int, 1);
 
-TEST(Entity, CheckComponent) {
-    Engine engine = Engine();
-    
-    // NullEntity has no TestComponent
-    ASSERT_FALSE(engine.AddEntity<NullEntity>().CheckComponent<TestComponent>());
-    // TestEntity has TestComponent
-    ASSERT_TRUE(engine.AddEntity<TestEntity>().CheckComponent<TestComponent>());
+    /* each entity can only have one component of a single type.
+       adding another one returns a reference to the original.*/
+    ASSERT_EQ(&mock_entity.mock_component, &mock_entity.test_component);
+
+    // the second (ignored) addition does not change the original component
+    ASSERT_EQ(mock_entity.test_component.test_int, 1);
 }
 
 TEST(Entity, GetComponent) {
     Engine engine = Engine();
+    MockEntity& mock_entity = engine.AddEntity<MockEntity>();
 
-    TestEntity& test_entity = engine.AddEntity<TestEntity>();
+    // MockEntity has no NullComponent, returns empty optional
+    ASSERT_FALSE(mock_entity.GetComponent<NullComponent>().has_value());
 
-    // GetComponent returns same component that was previously added
-    TestComponent& ref0 = test_entity.test_component;
-    TestComponent& ref1 = test_entity.GetComponent<TestComponent>();
-    ASSERT_EQ(&ref0, &ref1);
+    auto component_wrap = mock_entity.GetComponent<MockComponent>();
+
+    // MockEntity has MockComponent, same as the added field
+    ASSERT_TRUE(component_wrap.has_value());
+    ASSERT_EQ(&component_wrap->get(), &mock_entity.mock_component);
 }

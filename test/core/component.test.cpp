@@ -5,9 +5,8 @@
 // test component class that adds a shared test_int field
 class TestComponent : public Component {
     public:
-        TestComponent(Fields& fields, int test_int)
-            : Component(fields)
-            , test_int0(AddField("test_int", test_int)) { } 
+        TestComponent(int test_int)
+            , test_int0() { } 
 
         // note the ref
         int& test_int0;
