@@ -19,47 +19,51 @@ class EmtyEntity : public Entity { };
 TEST(Engine, AddEntity) {
     Engine engine = Engine();
     
-    // add test entity
-    MockEntity& testEntity = engine.AddEntity<MockEntity>(1);
-    ASSERT_EQ(typeid(MockEntity), typeid(testEntity));
-    ASSERT_EQ(testEntity.testnr, 1);
-}
-
-TEST(Engine, CheckEntity) {
-    Engine engine = Engine();
-
-    // CheckEntity returns true after adding Entity
-    ASSERT_FALSE(engine.CheckEntity<MockEntity>());
-    MockEntity& testEntity = engine.AddEntity<MockEntity>();
-    ASSERT_TRUE(engine.CheckEntity<MockEntity>());
-
-    // CheckEntity checks index
-    ASSERT_FALSE(engine.CheckEntity<EmtyEntity>());
-    EmtyEntity& null_entity0 = engine.AddEntity<EmtyEntity>();
-    ASSERT_FALSE(engine.CheckEntity<EmtyEntity>(1));
-    EmtyEntity& null_entity1 = engine.AddEntity<EmtyEntity>();
-    ASSERT_TRUE(engine.CheckEntity<EmtyEntity>(1));
+    // add test entity and assert parameter forwarding
+    MockEntity& mock_entity = engine.AddEntity<MockEntity>(1);
+    ASSERT_EQ(typeid(MockEntity), typeid(mock_entity));
+    ASSERT_EQ(mock_entity.testnr, 1);
 }
 
 TEST(Engine, GetEntity) {
     Engine engine = Engine();
 
-    // GetEntity should get same reference back to original entity
-    MockEntity& ref0 = engine.AddEntity<MockEntity>();
-    MockEntity& ref1 = engine.GetEntity<MockEntity>();
-    ASSERT_EQ(&ref0, &ref1);
+    // MockEntity does not exist yet, GetEntity returns empty optional
+    ASSERT_FALSE(engine.GetEntity<MockEntity>().has_value());
 
-    // GetEntity with index should get right entity
-    MockEntity& ref2 = engine.AddEntity<MockEntity>();
-    MockEntity& ref3 = engine.GetEntity<MockEntity>(1);
-    ASSERT_EQ(&ref2, &ref3);
+    { // GetEntity returns an optional with a reference_wrapper for mock_entity
+        MockEntity& mock_entity = engine.AddEntity<MockEntity>();
 
-    // cannot get nonexistent entity
-    ASSERT_ANY_THROW(engine.GetEntity<EmtyEntity>());
+        auto mock_wrapper = engine.GetEntity<MockEntity>();
+        ASSERT_TRUE(mock_wrapper.has_value());
+
+        // both references point to the same MockEntity
+        MockEntity& mock_ref = mock_wrapper->get();
+        ASSERT_EQ(&mock_entity, &mock_ref);
+
+        // GetEntity without index is the same as index 0
+        ASSERT_EQ(&mock_entity, &engine.GetEntity<MockEntity>(0)->get());
+
+        // index 1 is empty
+        ASSERT_FALSE(engine.GetEntity<MockEntity>(1).has_value());
+    }
+    { // adding new entity results in index 1 having a value
+        MockEntity& mock_entity = engine.AddEntity<MockEntity>();
+
+        auto mock_wrapper = engine.GetEntity<MockEntity>(1);
+        ASSERT_TRUE(mock_wrapper.has_value());
+
+        // both references point to the same MockEntity
+        MockEntity& mock_ref = mock_wrapper->get();
+        ASSERT_EQ(&mock_entity, &mock_ref);
+    }
 }
 
 TEST(Engine, GetEntities) {
     Engine engine = Engine();
+
+    // no entities at init
+    ASSERT_EQ(engine.GetEntities<MockEntity>().size(), 0);
 
     // add two entities
     MockEntity& ref0 = engine.AddEntity<MockEntity>();
@@ -73,8 +77,8 @@ TEST(Engine, GetEntities) {
     ASSERT_EQ(&test_entities[0].get(), &ref0);
     ASSERT_EQ(&test_entities[1].get(), &ref1);
 
-    // cannot get nonexistent entities
-    ASSERT_ANY_THROW(engine.GetEntities<EmtyEntity>());
+    // no entities for EmptyEntity
+    ASSERT_EQ(engine.GetEntities<EmtyEntity>().size(), 0);
 }
 
 TEST(Engine, DeleteEntity) {
