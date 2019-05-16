@@ -50,14 +50,18 @@ public:
         // insert returns pair with <iterator, found>
         Entity_list& entity_list = (*inserted_pair.first).second;
 
-        // create new entity in list
-        Entity_ptr& entity = entity_list.emplace_back(std::make_unique<T>(std::forward<P>(p)...));
-        entity->id = current_id++;
+        /* NOTE: manual creation of entity, so the smart pointer doesn't have to
+                 be friended by derived classes of Entity. */
+        T* new_entity = new T(std::forward<P>(p)...);
+        Entity_ptr entity_unique;
+        entity_unique.reset(static_cast<Entity*>(new_entity));
 
-        // cast to a reference
-        T* entity_ptr = static_cast<T*>(entity.get());
-        T& entity_ref = *entity_ptr;
-        return entity_ref;
+        // save unique pointer to entity    
+        entity_list.push_back(std::move(entity_unique));
+        new_entity->id = current_id++;
+
+        // return reference
+        return *new_entity;
     }
 
     template<typename T>

@@ -11,9 +11,9 @@ add_executable(test-engine engine-algorithms.test.cpp
 	# tests are run in given order
 	input/options.test.cpp
 
-	core/engine.test.cpp
+	#core/engine.test.cpp
 	core/entity.test.cpp
-	#core/component.test.cpp
+	core/component.test.cpp
 	
 	components/transform.test.cpp
 	components/hierarchical.test.cpp

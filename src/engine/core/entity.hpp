@@ -11,24 +11,32 @@
 
 #include <engine/core/component.hpp>
 
+typedef std::unique_ptr<Component> Component_ptr;
+
 class Entity {
     friend class Engine;
+    friend std::unique_ptr<Entity>::deleter_type;
 
 private:
     unsigned int id;
-    std::map<std::type_index, std::unique_ptr<Component>> components;
+    std::map<std::type_index, Component_ptr> components;
 
 protected:
-    Entity() { };
+    virtual ~Entity() = default;
+    Entity() = default;
 
     template<typename T, class... P>
     T& AddComponent(P&&... p) {
         // assert if T is derived from component
         static_assert(std::is_base_of<Component, T>::value, "T must derived from component");
         
+        T* new_component = new T(std::forward<P>(p)...);
+        Component_ptr component_unique;
+        component_unique.reset(static_cast<Component*>(new_component));
+
         // insert component. discards and returns previous if already exists
-        auto pair = components.insert(std::make_pair<std::type_index, std::unique_ptr<T>>(
-            typeid(T), std::make_unique<T>(std::forward<P>(p)...)
+        auto pair = components.insert(std::make_pair<std::type_index, std::unique_ptr<Component>>(
+            typeid(T), std::move(component_unique)
         ));
         
         // cast to reference
