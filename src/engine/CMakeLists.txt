@@ -10,8 +10,8 @@ list(APPEND SOURCES
 	core/engine.cpp
 	core/entity.cpp
 	
-	#components/transform.cpp
-	#components/hierarchical.cpp
+	components/transform.cpp
+	components/hierarchical.cpp
 	
 	#core/object.cpp
 	#core/world.cpp

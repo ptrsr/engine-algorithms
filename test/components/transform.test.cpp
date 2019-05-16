@@ -9,12 +9,12 @@
 
 TEST(Transform, Init) {
     { // init with no parameters means unit mat4
-        Transform transform();
-        ASSERT_EQ(transform, glm::mat4(1));
+        Transform transform = Transform();
+        ASSERT_TRUE(CompareMats(transform, glm::mat4(1), 0.f));
     }
     {
-        Transform transform(glm::mat4(2));
-        ASSERT_EQ(transform, glm::mat4(2));
+        Transform transform = Transform(glm::mat4(2));
+        ASSERT_TRUE(CompareMats(transform, glm::mat4(2), 0.f));
     }
 }
 

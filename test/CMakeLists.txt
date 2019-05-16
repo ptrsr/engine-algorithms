@@ -8,14 +8,16 @@ include_directories(
 )
 
 add_executable(test-engine engine-algorithms.test.cpp
-	# tests are run in following order
+	# tests are run in given order
 	input/options.test.cpp
 
 	core/engine.test.cpp
 	core/entity.test.cpp
-	#components/transform.test.cpp
-	#components/hierarchical.test.cpp
 	#core/component.test.cpp
+	
+	components/transform.test.cpp
+	components/hierarchical.test.cpp
+	
 	#core/world.test.cpp
 	#core/object.test.cpp
 	#core/camera.test.cpp

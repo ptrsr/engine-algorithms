@@ -19,8 +19,10 @@ void Hierarchical::UnParent() {
     if (parent == nullptr) {
         throw std::runtime_error("Cannot unparent: no parent.");
     }
+    // remove this from parent children list
     for (auto i = parent->children.begin(); i != parent->children.end(); ++i) {
-        if ((*i) != this) {
+        Hierarchical& child = (*i).get();
+        if (&child != this) {
             continue;
         }
         parent->children.erase(i);
@@ -29,10 +31,10 @@ void Hierarchical::UnParent() {
     parent = nullptr;
 }
 
-const Hierarchical* Hierarchical::GetParent() const {
+Hierarchical* const Hierarchical::GetParent() const {
     return parent;
 }
 
-const std::vector<Hierarchical&>& Hierarchical::GetChildren() const {
+const std::vector<std::reference_wrapper<Hierarchical>>& Hierarchical::GetChildren() const {
     return children;
 }

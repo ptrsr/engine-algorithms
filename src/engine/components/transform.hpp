@@ -14,7 +14,7 @@ typedef std::shared_ptr<Transform> Transform_ptr;
 class World;
 class Transform : public Component, public glm::mat4 {
     public:
-        Transform(glm::mat4 init_mat = glm::mat4());
+        Transform(glm::mat4 init_mat = glm::mat4(1));
 
         // position
         glm::vec3 GetPosition() const;

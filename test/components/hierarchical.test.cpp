@@ -2,11 +2,8 @@
 
 #include <engine/components/hierarchical.hpp>
 
-TEST(Transform, Parent) {
+TEST(Hierarchical, AddChild) {
     Hierarchical parent = Hierarchical();
-
-    // throw while unparenting when object has no parent
-    ASSERT_ANY_THROW(parent.UnParent());
 
     // no children after init
     auto& children = parent.GetChildren();
@@ -25,8 +22,25 @@ TEST(Transform, Parent) {
     ASSERT_EQ(children.size(), 1);
 
     // child in children list is indeed same child
-    ASSERT_EQ(children[0], child);
-    ASSERT_EQ(children[0].GetParent(), parent);
+    ASSERT_EQ(&children[0].get(), &child);
+    ASSERT_EQ(children[0].get().GetParent(), &parent);
+}
+
+TEST(Hierarchical, UnParent) {
+    Hierarchical parent = Hierarchical();
+
+    // throw while unparenting when object has no parent
+    ASSERT_ANY_THROW(parent.UnParent());
+
+    // add child
+    Hierarchical child = Hierarchical();
+    parent.AddChild(child);
+    ASSERT_EQ(parent.GetChildren().size(), 1);
+
+    // parent has no more children after unparenting child
+    child.UnParent();
+    ASSERT_EQ(parent.GetChildren().size(), 0);
+    ASSERT_EQ(child.GetParent(), nullptr);
 }
 
 // TEST(Transform, Unparent) {
