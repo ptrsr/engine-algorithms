@@ -7,8 +7,7 @@ project(engine-algorithms
 option(BUILD_TESTS "Build tests" ON)
 option(BUILD_HEAD "Build with graphics" ON)
 
-
-# Set C++ version to 17
+# C++17
 set(CMAKE_CXX_STANDARD 17) 
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
@@ -20,8 +19,8 @@ if(CMAKE_BUILD_TYPE)
 	string(TOUPPER ${FIRST_CHARACTER} FIRST_CHARACTER)
     string(CONCAT CMAKE_BUILD_TYPE ${FIRST_CHARACTER} ${LAST_CHARACTER})
 else()
-    # default to release
-    set(CMAKE_BUILD_TYPE Release)
+    # default
+    set(CMAKE_BUILD_TYPE Debug)
 endif()
 
 # include lib directory for importing (library) modules
@@ -42,6 +41,9 @@ include(glbinding)
 include(glm)
 include(sfml)
 
+# preprocessor variable for debugging
+add_compile_options("$<$<CONFIG:DEBUG>:-DDEBUG>")
+
 # build project
 add_subdirectory(src/)
 
@@ -53,3 +55,11 @@ if (${BUILD_TESTS})
     # test project
     add_subdirectory(test/)
 endif()
+
+# build overview
+message("
+### ENGINE ALGORITHMS
+- Build: ${CMAKE_BUILD_TYPE}
+- Tests: ${BUILD_TESTS}
+###
+")

@@ -3,7 +3,6 @@
 
 #include <typeindex>
 #include <typeinfo>
-#include <optional>
 #include <utility>
 #include <memory>
 #include <map>
@@ -22,8 +21,11 @@ private:
     std::map<std::type_index, Component_ptr> components;
 
 protected:
-    virtual ~Entity() = default;
     Entity() = default;
+
+    // prohibit manual deletion
+    virtual ~Entity() = default;
+    void operator delete(void*) { }
 
     template<typename T, class... P>
     T& AddComponent(P&&... p) {

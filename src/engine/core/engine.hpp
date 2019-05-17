@@ -2,11 +2,9 @@
 #define ENGINE_HPP_
 
 #include <unordered_map>
-#include <functional>
 #include <exception>
 #include <typeindex>
 #include <typeinfo>
-#include <optional>
 #include <utility>
 #include <vector>
 #include <memory>

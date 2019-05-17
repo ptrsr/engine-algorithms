@@ -4,8 +4,11 @@
 
 void Hierarchical::AddChild(Hierarchical& child) {
     if (child.parent != nullptr) {
-        if (child.parent == this) {
+        if (child.parent != this) {
+#ifdef DEBUG
             throw std::runtime_error("Cannot add child: already childed to this object.");
+#endif
+            return;
         } else {
             // unparent if already attached
             child.UnParent();
@@ -17,7 +20,10 @@ void Hierarchical::AddChild(Hierarchical& child) {
 
 void Hierarchical::UnParent() {
     if (parent == nullptr) {
+#ifdef DEBUG
         throw std::runtime_error("Cannot unparent: no parent.");
+#endif
+        return;
     }
     // remove this from parent children list
     for (auto i = parent->children.begin(); i != parent->children.end(); ++i) {
