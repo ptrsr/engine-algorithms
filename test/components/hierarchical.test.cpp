@@ -3,24 +3,30 @@
 #include <engine/components/hierarchical.hpp>
 
 namespace {
+    /* Hierarchical has protected destructor.
+       Creating a mock for testing. */
+    class MockHierarchical : public Hierarchical {
+    public:
+        ~MockHierarchical() = default;
+     };
+
     TEST(Hierarchical, AddChild) {
-        Hierarchical parent = Hierarchical();
+        MockHierarchical parent = MockHierarchical();
 
         // no children after init
         auto& children = parent.GetChildren();
         ASSERT_TRUE(children.empty());
 
         // adding child results in correct parent
-        Hierarchical child = Hierarchical();
+        MockHierarchical child = MockHierarchical();
         parent.AddChild(child);
         ASSERT_EQ(&parent, child.GetParent());
 
-#ifdef DEBUG
+        #ifdef DEBUG
         // child cannot be added again
         ASSERT_ANY_THROW(parent.AddChild(child));
-#endif
+        #endif
         // child is in children list
-        // (GetChildren returned a const ref)
         ASSERT_EQ(1, children.size());
 
         // child in children list is indeed same child
@@ -28,15 +34,27 @@ namespace {
         ASSERT_EQ(&parent, children[0].get().GetParent());
     }
 
-    TEST(Hierarchical, UnParent) {
-        Hierarchical parent = Hierarchical();
+    TEST(Hierarchical, GetChild) {
+        MockHierarchical parent = MockHierarchical();
+        MockHierarchical child = MockHierarchical();
 
-#ifdef DEBUG
+        parent.AddChild(child);
+
+        ASSERT_EQ(&child, parent.GetChild());
+
+        // index 1 doesn't exist, returns nullpointer
+        ASSERT_FALSE(parent.GetChild(1));
+    }
+
+    TEST(Hierarchical, UnParent) {
+        MockHierarchical parent = MockHierarchical();
+
+        #ifdef DEBUG
         // throw while unparenting when object has no parent
         ASSERT_ANY_THROW(parent.UnParent());
-#endif
+        #endif
         // add child
-        Hierarchical child = Hierarchical();
+        MockHierarchical child = MockHierarchical();
         parent.AddChild(child);
         ASSERT_EQ(1, parent.GetChildren().size());
 
@@ -45,41 +63,31 @@ namespace {
         ASSERT_EQ(0, parent.GetChildren().size());
         ASSERT_EQ(nullptr, child.GetParent());
     }
+
+    TEST(Hierarchical, SwitchParent) {
+        MockHierarchical parent1 = MockHierarchical();
+        MockHierarchical parent2 = MockHierarchical();
+        MockHierarchical child = MockHierarchical();
+
+        parent1.AddChild(child);
+        parent2.AddChild(child);
+
+        // adding same child to other parent switches parent
+        ASSERT_EQ(&parent2, child.GetParent());
+        ASSERT_EQ(0, parent1.GetChildren().size());
+        ASSERT_EQ(&child, parent2.GetChild());
+    }
+
+    TEST(Hierarchical, Destructor) {
+        MockHierarchical root = MockHierarchical();
+        MockHierarchical child = MockHierarchical();
+        {
+            MockHierarchical middle = MockHierarchical();
+            root.AddChild(middle);
+            middle.AddChild(child);
+        }
+        // child switched to parent's parent when original parent got deleted
+        ASSERT_EQ(&root, child.GetParent());
+        ASSERT_EQ(&child, root.GetChild());
+    }
 }
-
-// TEST(Transform, Unparent) {
-//     World world;    
-//     Transform_ptr parent = world.CreateTransform();
-//     Transform_ptr child1 = world.CreateTransform(); 
-//     Transform_ptr child2 = world.CreateTransform();
-
-//     parent->AddChild(child1);
-//     parent->AddChild(child2);
-//     child1->UnParent();
-
-//     // child1 has no more parent
-//     ASSERT_FALSE(child1->GetParent());
-
-//     // proper child was removed
-//     ASSERT_EQ(parent->GetChildren().size(), 1);
-//     ASSERT_EQ(parent->GetChildren()[0], child2);
-
-//     // child2 kept parent
-//     ASSERT_EQ(child2->GetParent(), parent);
-// }
-
-// TEST(Transform, Switch_parent) {
-//     World world;
-//     Transform_ptr original = world.CreateTransform(); 
-//     Transform_ptr other = world.CreateTransform(); 
-//     Transform_ptr child = world.CreateTransform();
-
-//     original->AddChild(child);
-//     other->AddChild(child);
-
-//     // original does not have the child anymore
-//     ASSERT_TRUE(original->GetChildren().empty());
-
-//     // child on other parent switched correctly
-//     ASSERT_EQ(other->GetChildren()[0], child);
-// }
