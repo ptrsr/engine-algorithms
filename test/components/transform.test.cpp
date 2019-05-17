@@ -10,11 +10,11 @@
 TEST(Transform, Init) {
     { // init with no parameters means unit mat4
         Transform transform = Transform();
-        ASSERT_TRUE(CompareMats(transform, glm::mat4(1), 0.f));
+        ASSERT_TRUE(CompareMats(glm::mat4(1), transform, 0.f));
     }
     {
         Transform transform = Transform(glm::mat4(2));
-        ASSERT_TRUE(CompareMats(transform, glm::mat4(2), 0.f));
+        ASSERT_TRUE(CompareMats(glm::mat4(2), transform, 0.f));
     }
 }
 
@@ -22,11 +22,11 @@ TEST(Transform, Position) {
     Transform transform = Transform();
 
     // initial position is (0, 0, 0)
-    ASSERT_EQ(transform.GetPosition(), glm::vec3(0, 0, 0));
+    ASSERT_EQ(glm::vec3(0, 0, 0), transform.GetPosition());
 
     // position is set
     transform.SetPosition(glm::vec3(1, 2, 3));
-    ASSERT_EQ(transform.GetPosition(), glm::vec3(1, 2, 3));
+    ASSERT_EQ(glm::vec3(1, 2, 3), transform.GetPosition());
 
     // right column is set
     ASSERT_EQ(transform[3], glm::vec4(transform.GetPosition(), 1));
@@ -46,10 +46,10 @@ TEST(Transform, Translate) {
 
     // translating adds vector to position
     transform.Translate(glm::vec3(1, 2, 3));
-    ASSERT_EQ(transform.GetPosition(), glm::vec3(1, 2, 3));
+    ASSERT_EQ(glm::vec3(1, 2, 3), transform.GetPosition());
 
     transform.Translate(glm::vec3(3, 2, 1));
-    ASSERT_EQ(transform.GetPosition(), glm::vec3(4, 4, 4));
+    ASSERT_EQ(glm::vec3(4, 4, 4), transform.GetPosition());
 
     // rest of matrix is not adjusted
     // (transpose because input is column major)
@@ -65,7 +65,7 @@ TEST(Transform, rotation) {
     Transform transform = Transform();
     
     // new object should have identity matrix
-    ASSERT_TRUE(CompareMats(transform, glm::mat4(1), TRIG_DIF));
+    ASSERT_TRUE(CompareMats(glm::mat4(1), transform, TRIG_DIF));
     
     // rotating by pi should negate x and z vectors
     transform.Rotate(glm::pi<float>(), glm::vec3(0, 1, 0));

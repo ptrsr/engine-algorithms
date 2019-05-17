@@ -38,7 +38,7 @@ namespace {
         // add test entity and assert parameter forwarding
         MockEntity& mock_entity = engine.AddEntity<MockEntity>(1);
         ASSERT_EQ(typeid(MockEntity), typeid(mock_entity));
-        ASSERT_EQ(mock_entity.testnr, 1);
+        ASSERT_EQ(1, mock_entity.testnr);
     }
 
     TEST(Engine, GetEntity) {
@@ -77,7 +77,7 @@ namespace {
         Engine engine = Engine();
 
         // no entities at init
-        ASSERT_EQ(engine.GetEntities<MockEntity>().size(), 0);
+        ASSERT_EQ(0, engine.GetEntities<MockEntity>().size());
 
         // add two entities
         MockEntity& ref0 = engine.AddEntity<MockEntity>();
@@ -85,14 +85,14 @@ namespace {
 
         // reference vector should contain 2 references
         auto test_entities = engine.GetEntities<MockEntity>();
-        ASSERT_EQ(test_entities.size(), 2);
+        ASSERT_EQ(2, test_entities.size());
 
         // reference vector should contain correct references
-        ASSERT_EQ(&test_entities[0].get(), &ref0);
-        ASSERT_EQ(&test_entities[1].get(), &ref1);
+        ASSERT_EQ(&ref0, &test_entities[0].get());
+        ASSERT_EQ(&ref1, &test_entities[1].get());
 
         // no entities for EmptyEntity
-        ASSERT_EQ(engine.GetEntities<EmtyEntity>().size(), 0);
+        ASSERT_EQ(0, engine.GetEntities<EmtyEntity>().size());
     }
 
     TEST(Engine, DeleteEntity) {
@@ -112,7 +112,7 @@ namespace {
 
         // list contains no more references
         auto test_entities = engine.GetEntities<RemovedEntity>();
-        ASSERT_EQ(test_entities.size(), 0);
+        ASSERT_EQ(0, test_entities.size());
 
         // throw when trying to delete ref twice
         ASSERT_ANY_THROW(engine.DeleteEntity(mock_entity));

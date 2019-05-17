@@ -33,14 +33,14 @@ namespace {
 
         // forwarding arguments to component constructor
         MockEntity& mock_entity = engine.AddEntity<MockEntity>(1);
-        ASSERT_EQ(mock_entity.mock_component.test_int, 1);
+        ASSERT_EQ(1, mock_entity.mock_component.test_int);
 
         /* each entity can only have one component of a single type.
         adding another one returns a reference to the original.*/
         ASSERT_EQ(&mock_entity.mock_component, &mock_entity.test_component);
 
         // the second (ignored) addition does not change the original component
-        ASSERT_EQ(mock_entity.test_component.test_int, 1);
+        ASSERT_EQ(1, mock_entity.test_component.test_int);
     }
 
     TEST(Entity, GetComponent) {
@@ -54,6 +54,6 @@ namespace {
 
         // MockEntity has MockComponent, same as the added field
         ASSERT_TRUE(component_wrap.has_value());
-        ASSERT_EQ(&component_wrap->get(), &mock_entity.mock_component);
+        ASSERT_EQ(&mock_entity.mock_component, &component_wrap->get());
     }
 }

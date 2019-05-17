@@ -12,18 +12,18 @@ TEST(Hierarchical, AddChild) {
     // adding child results in correct parent
     Hierarchical child = Hierarchical();
     parent.AddChild(child);
-    ASSERT_EQ(child.GetParent(), &parent);
+    ASSERT_EQ(&parent, child.GetParent());
 
     // child cannot be added again
     ASSERT_ANY_THROW(parent.AddChild(child));
 
     // child is in children list
     // (GetChildren returned a const ref)
-    ASSERT_EQ(children.size(), 1);
+    ASSERT_EQ(1, children.size());
 
     // child in children list is indeed same child
-    ASSERT_EQ(&children[0].get(), &child);
-    ASSERT_EQ(children[0].get().GetParent(), &parent);
+    ASSERT_EQ(&child, &children[0].get());
+    ASSERT_EQ(&parent, children[0].get().GetParent());
 }
 
 TEST(Hierarchical, UnParent) {
@@ -35,12 +35,12 @@ TEST(Hierarchical, UnParent) {
     // add child
     Hierarchical child = Hierarchical();
     parent.AddChild(child);
-    ASSERT_EQ(parent.GetChildren().size(), 1);
+    ASSERT_EQ(1, parent.GetChildren().size());
 
     // parent has no more children after unparenting child
     child.UnParent();
-    ASSERT_EQ(parent.GetChildren().size(), 0);
-    ASSERT_EQ(child.GetParent(), nullptr);
+    ASSERT_EQ(0, parent.GetChildren().size());
+    ASSERT_EQ(nullptr, child.GetParent());
 }
 
 // TEST(Transform, Unparent) {
