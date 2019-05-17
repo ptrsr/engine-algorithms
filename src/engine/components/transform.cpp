@@ -20,6 +20,10 @@ void Transform::Rotate(const float angle, const glm::vec3& axis) {
     transform = glm::rotate(transform, angle, axis);
 }
 
+Component* Transform::Clone() {
+    return new Transform(*this);
+}
+
 // void Transform::Remove(bool recursive) {
 //     if (!parent && !recursive) {
 //         throw std::runtime_error("Cannot remove without recursion: no parent to reattach children to");

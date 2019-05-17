@@ -17,6 +17,7 @@ private:
 
 protected:
     ~Transform() = default;
+    virtual Component* Clone() override;
 
 public:
     Transform(glm::mat4 init_mat = glm::mat4(1));

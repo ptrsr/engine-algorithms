@@ -73,7 +73,7 @@ namespace {
         )), transform, 0.f));
     }
 
-    TEST(Transform, rotation) {
+    TEST(Transform, Rotate) {
         MockTransform transform = MockTransform();
         
         // new object should have identity matrix

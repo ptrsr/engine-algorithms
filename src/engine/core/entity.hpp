@@ -10,7 +10,7 @@
 
 #include <engine/core/component.hpp>
 
-typedef std::unique_ptr<Component> Component_ptr;
+typedef std::map<std::type_index, Component_ptr> Components;
 
 class Entity {
     friend class Engine;
@@ -18,7 +18,10 @@ class Entity {
 
 private:
     unsigned int id;
-    std::map<std::type_index, Component_ptr> components;
+    Components components;
+
+    Entity(const Entity& entity);
+    Components CloneComponents() const;
 
 protected:
     Entity() = default;

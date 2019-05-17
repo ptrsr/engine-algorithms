@@ -9,6 +9,10 @@ namespace {
         MockComponent(int test_int)
             : test_int(test_int) 
             { }
+            
+        virtual Component* Clone() override {
+            return new MockComponent(*this);
+        }
 
         int test_int;
     };

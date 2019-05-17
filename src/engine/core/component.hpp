@@ -3,14 +3,19 @@
 
 #include <memory>
 
+class Component;
+typedef std::unique_ptr<Component> Component_ptr;
+
 class Component { 
     friend class Entity;
-    friend std::unique_ptr<Component>::deleter_type;
+    friend Component_ptr::deleter_type;
 
 protected:
     // prohibit manual deletion
     virtual ~Component() = default;
     void operator delete(void*) { }
+
+    virtual Component* Clone() = 0;
 };
 
 #endif//COMPONENT_HPP_

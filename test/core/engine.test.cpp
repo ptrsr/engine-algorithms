@@ -18,13 +18,12 @@ namespace {
     class EmtyEntity : public Entity { };
 
     class RemovedEntity : public Entity {
-
     public:
+        bool& on_removal;
+        
         RemovedEntity(bool& on_removal)
             : on_removal(on_removal) 
             { }
-
-        bool& on_removal;
 
     protected:
         ~RemovedEntity() {
@@ -119,5 +118,24 @@ namespace {
 
         // removed has been set to true on deletion of RemovedEntity
         ASSERT_TRUE(removed);
+    }
+
+    TEST(Engine, CloneEntity) {
+        Engine engine = Engine();
+
+        MockEntity& mock_entity = engine.AddEntity<MockEntity>(123);
+        MockEntity& clone_entity = engine.CloneEntity(mock_entity);
+
+        // cloned entity has different address
+        ASSERT_NE(&mock_entity, &clone_entity);
+
+        // cloned entity has same field values however
+        ASSERT_EQ(mock_entity.testnr, clone_entity.testnr);
+
+        // clone has been added to engine
+        ASSERT_EQ(2, engine.GetEntities<MockEntity>().size());
+
+        // correct address of clone has been added 
+        ASSERT_EQ(&clone_entity, engine.GetEntity<MockEntity>(1));
     }
 }

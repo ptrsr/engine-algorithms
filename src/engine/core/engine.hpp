@@ -147,6 +147,31 @@ public:
             ". Did you already delete it?"
         );
     }
+
+    template<typename T>
+    T& CloneEntity(T& entity) {
+        // assert if T is derived from entity
+        static_assert(std::is_base_of<Entity, T>::value, "T must derived from entity");
+        
+        Entity* clone = new Entity(entity);
+
+        // convert to unique pointer
+        Entity_ptr clone_ptr = Entity_ptr();
+        clone_ptr.reset(clone);
+        clone_ptr->id = current_id++;
+
+        Entity_list* list = GetEntityList<T>();
+        #ifdef DEBUG
+        if (!list) {
+            throw new std::runtime_error("List of type T does not exist. Are you mixing entity managers?");
+        }
+        #endif
+        list->push_back(std::move(clone_ptr));
+        
+        // return reference
+        T* entity_ptr = static_cast<T*>(clone);
+        return *entity_ptr;
+    }
 };
 
 #endif//ENGINE_HPP_

@@ -23,6 +23,9 @@ public:
     Hierarchical* const GetChild(const unsigned int index = 0) const;
     const std::vector<std::reference_wrapper<Hierarchical>>& GetChildren() const;
 
+    virtual Component* Clone() override {
+        return new Hierarchical(*this);
+    }
     //void Remove(const bool recursive = false);
     //Transform_ptr Clone(const bool recursive = false) const;
 };
