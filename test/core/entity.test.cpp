@@ -48,12 +48,12 @@ namespace {
         MockEntity& mock_entity = engine.AddEntity<MockEntity>();
 
         // MockEntity has no NullComponent, returns empty optional
-        ASSERT_FALSE(mock_entity.GetComponent<NullComponent>().has_value());
+        ASSERT_FALSE(mock_entity.GetComponent<NullComponent>());
 
-        auto component_wrap = mock_entity.GetComponent<MockComponent>();
+        MockComponent* const component_ptr = mock_entity.GetComponent<MockComponent>();
 
         // MockEntity has MockComponent, same as the added field
-        ASSERT_TRUE(component_wrap.has_value());
-        ASSERT_EQ(&mock_entity.mock_component, &component_wrap->get());
+        ASSERT_TRUE(component_ptr);
+        ASSERT_EQ(&mock_entity.mock_component, component_ptr);
     }
 }

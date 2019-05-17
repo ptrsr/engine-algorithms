@@ -56,7 +56,7 @@ protected:
 
 public:
     template<typename T>
-    std::optional<std::reference_wrapper<T>> GetComponent() {
+    T* const GetComponent() {
         // assert if T is derived from component
         static_assert(std::is_base_of<Component, T>::value, "T must derived from component");
         
@@ -64,12 +64,10 @@ public:
         auto map_it = components.find(typeid(T));
         if (map_it == components.end()) {
             // component does not exist, return empty optional
-            return std::nullopt;
+            return nullptr;
         }
         Component* component_ptr = map_it->second.get();
-        T& component_ref = *(static_cast<T*>(component_ptr));
-        // ref_wrapper and optional 
-        return std::optional(std::ref(component_ref));
+        return static_cast<T*>(component_ptr);
     }
 };
 
