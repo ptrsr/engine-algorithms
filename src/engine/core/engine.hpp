@@ -65,7 +65,7 @@ public:
     }
 
     template<typename T>
-    std::optional<std::reference_wrapper<T>> GetEntity(const unsigned int index = 0) {
+    T* const GetEntity(const unsigned int index = 0) {
         // assert if T is derived from entity
         static_assert(std::is_base_of<Entity, T>::value, "T must derived from entity");
         
@@ -74,22 +74,19 @@ public:
 
         if (!entity_list) {
             // no entities of type T exist at all
-            return std::nullopt;
+            return nullptr;
         }
         if (index >= entity_list->size()) {
             // index is outside of list
-            return std::nullopt;
+            return nullptr;
         }
         auto list_it = entity_list->begin();
         std::advance(list_it, index);
 
         // cast to a reference
         T* entity_ptr = static_cast<T*>((*list_it).get());
-        T& entity_ref = *entity_ptr;
 
-        /* NOTE: using an optional reference_wrapper, as it's the easiest 
-                    way to be able to return null without raw pointers. */
-        return std::optional(std::ref(entity_ref));
+        return entity_ptr;
     }
 
     template<typename T>

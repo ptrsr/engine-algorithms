@@ -27,20 +27,29 @@ protected:
 
     template<typename T, class... P>
     T& AddComponent(P&&... p) {
-        // assert if T is derived from component
+        //  T should be derived from component
         static_assert(std::is_base_of<Component, T>::value, "T must derived from component");
         
-        T* new_component = new T(std::forward<P>(p)...);
-        Component_ptr component_unique;
-        component_unique.reset(static_cast<Component*>(new_component));
+        Component* component_ptr;
+        auto map_it = components.find(typeid(T));
 
-        // insert component. discards and returns previous if already exists
-        auto pair = components.insert(std::make_pair<std::type_index, std::unique_ptr<Component>>(
-            typeid(T), std::move(component_unique)
-        ));
+        // when found
+        if (map_it != components.end()) {
+            component_ptr = map_it->second.get();
+        } else {
+            // create and insert new component
+            T* new_component = new T(std::forward<P>(p)...);
+            Component_ptr component_unique;
+            component_unique.reset(static_cast<Component*>(new_component));
+
+             // insert component. discards and returns previous if already exists
+            auto pair = components.insert(
+                std::make_pair<std::type_index, Component_ptr>(
+                typeid(T), std::move(component_unique)));
         
+            component_ptr = pair.first->second.get();
+        }
         // cast to reference
-        Component* component_ptr = pair.first->second.get();
         T& component_ref = *(static_cast<T*>(component_ptr));
         return component_ref;
     }

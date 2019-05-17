@@ -13,7 +13,7 @@ namespace {
         ~MockComponent() {
             on_removal = true;
         }
-        
+
         bool& on_removal;
     };
 
@@ -27,9 +27,10 @@ namespace {
     TEST(Component, Destructor) {
         Engine engine = Engine();
 
-        // removed equals true after calling deconstructor of MockEntity
         bool removed = false;
         MockEntity& entity = engine.AddEntity<MockEntity>(removed);
+        
+        // removed equals true after calling destructor of MockEntity
         engine.DeleteEntity(entity);
         ASSERT_TRUE(removed);
     }

@@ -45,33 +45,31 @@ namespace {
         Engine engine = Engine();
 
         // MockEntity does not exist yet, GetEntity returns empty optional
-        ASSERT_FALSE(engine.GetEntity<MockEntity>().has_value());
+        ASSERT_FALSE(engine.GetEntity<MockEntity>());
 
         { // GetEntity returns an optional with a reference_wrapper for mock_entity
             MockEntity& mock_entity = engine.AddEntity<MockEntity>();
 
-            auto mock_wrapper = engine.GetEntity<MockEntity>();
-            ASSERT_TRUE(mock_wrapper.has_value());
+            MockEntity* const mock_ptr = engine.GetEntity<MockEntity>();
+            ASSERT_TRUE(mock_ptr);
 
             // both references point to the same MockEntity
-            MockEntity& mock_ref = mock_wrapper->get();
-            ASSERT_EQ(&mock_entity, &mock_ref);
+            ASSERT_EQ(&mock_entity, mock_ptr);
 
             // GetEntity without index is the same as index 0
-            ASSERT_EQ(&mock_entity, &engine.GetEntity<MockEntity>(0)->get());
+            ASSERT_EQ(&mock_entity, engine.GetEntity<MockEntity>(0));
 
             // index 1 is empty
-            ASSERT_FALSE(engine.GetEntity<MockEntity>(1).has_value());
+            ASSERT_FALSE(engine.GetEntity<MockEntity>(1));
         }
         { // adding new entity results in index 1 having a value
             MockEntity& mock_entity = engine.AddEntity<MockEntity>();
 
-            auto mock_wrapper = engine.GetEntity<MockEntity>(1);
-            ASSERT_TRUE(mock_wrapper.has_value());
+            MockEntity* const mock_ptr = engine.GetEntity<MockEntity>(1);
+            ASSERT_TRUE(mock_ptr);
 
             // both references point to the same MockEntity
-            MockEntity& mock_ref = mock_wrapper->get();
-            ASSERT_EQ(&mock_entity, &mock_ref);
+            ASSERT_EQ(&mock_entity, mock_ptr);
         }
     }
 
