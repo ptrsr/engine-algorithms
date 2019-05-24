@@ -1,13 +1,14 @@
 #include <gtest/gtest.h>
 
-#include <engine/core/engine.hpp>
+#include <engine/core/entity.hpp>
 
 namespace {
     // test component with field
     class MockComponent : public Component {
     public:
-        MockComponent(int test_int)
-            : test_int(test_int) 
+        MockComponent(Entity* entity, int test_int)
+            : Component(entity)
+            , test_int(test_int) 
             { }
             
         virtual Component* Clone() override {
@@ -32,11 +33,9 @@ namespace {
     // test entity to check non existance of component
     class NullComponent : public Component { };
 
-    TEST(Entity, AddComponent) {
-        Engine engine = Engine();
-
+    TEST(EntityTest, AddComponent) {
         // forwarding arguments to component constructor
-        MockEntity& mock_entity = engine.AddEntity<MockEntity>(1);
+        MockEntity mock_entity = MockEntity(1);
         ASSERT_EQ(1, mock_entity.mock_component.test_int);
 
         /* each entity can only have one component of a single type.
@@ -47,9 +46,8 @@ namespace {
         ASSERT_EQ(1, mock_entity.test_component.test_int);
     }
 
-    TEST(Entity, GetComponent) {
-        Engine engine = Engine();
-        MockEntity& mock_entity = engine.AddEntity<MockEntity>();
+    TEST(EntityTest, GetComponent) {
+        MockEntity mock_entity = MockEntity();
 
         // MockEntity has no NullComponent, returns empty optional
         ASSERT_FALSE(mock_entity.GetComponent<NullComponent>());

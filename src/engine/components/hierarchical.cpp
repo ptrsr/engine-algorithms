@@ -16,7 +16,7 @@ void Hierarchical::AddChild(Hierarchical& child) {
         }
     }
     child.parent = this;
-    children.push_back(child);
+    children.push_back(&child);
 }
 
 void Hierarchical::UnParent() {
@@ -28,8 +28,8 @@ void Hierarchical::UnParent() {
     }
     // remove this from parent children list
     for (auto i = parent->children.begin(); i != parent->children.end(); ++i) {
-        Hierarchical& child = (*i).get();
-        if (&child != this) {
+        Hierarchical* child = *i;
+        if (child != this) {
             continue;
         }
         parent->children.erase(i);
@@ -46,10 +46,10 @@ Hierarchical* const Hierarchical::GetChild(const unsigned int index) const {
     if (index >= children.size()) {
         return nullptr;
     }
-    return &children[index].get();
+    return children[index];
 }
 
-const std::vector<std::reference_wrapper<Hierarchical>>& Hierarchical::GetChildren() const {
+const std::vector<Hierarchical*>& Hierarchical::GetChildren() const {
     return children;
 }
 
@@ -62,8 +62,8 @@ Hierarchical::~Hierarchical() {
 
     // re-parent children to this parent 
     for (auto i = children.begin(); i != children.end(); ++i) {
-        Hierarchical& child = (*i).get();
-        child.parent = tmp_parent;
+        Hierarchical* child = *i;
+        child->parent = tmp_parent;
         tmp_parent->children.push_back(child);
     }
 }

@@ -1,7 +1,12 @@
 #include "entity.hpp"
 
-Entity::Entity(const Entity& entity)
-    : components(entity.CloneComponents()) 
+Entity::Entity(const Entity& entity, const unsigned int id)
+    : id(id)
+    , components(entity.CloneComponents())
+    { }
+
+Entity::Entity(const unsigned int new_id)
+    : id(new_id)
     { }
 
 Components Entity::CloneComponents() const {

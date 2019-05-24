@@ -5,20 +5,15 @@
 namespace {
     /* Hierarchical has protected destructor.
        Creating a mock for testing. */
-    class MockHierarchical : public Hierarchical {
-    public:
-        ~MockHierarchical() = default;
-     };
-
-    TEST(Hierarchical, AddChild) {
-        MockHierarchical parent = MockHierarchical();
+    TEST(HierarchicalTest, AddChild) {
+        Hierarchical parent = Hierarchical();
 
         // no children after init
         auto& children = parent.GetChildren();
         ASSERT_TRUE(children.empty());
 
         // adding child results in correct parent
-        MockHierarchical child = MockHierarchical();
+        Hierarchical child = Hierarchical();
         parent.AddChild(child);
         ASSERT_EQ(&parent, child.GetParent());
 
@@ -30,13 +25,13 @@ namespace {
         ASSERT_EQ(1, children.size());
 
         // child in children list is indeed same child
-        ASSERT_EQ(&child, &children[0].get());
-        ASSERT_EQ(&parent, children[0].get().GetParent());
+        ASSERT_EQ(&child, children[0]);
+        ASSERT_EQ(&parent, children[0]->GetParent());
     }
 
-    TEST(Hierarchical, GetChild) {
-        MockHierarchical parent = MockHierarchical();
-        MockHierarchical child = MockHierarchical();
+    TEST(HierarchicalTest, GetChild) {
+        Hierarchical parent = Hierarchical();
+        Hierarchical child = Hierarchical();
 
         parent.AddChild(child);
 
@@ -46,15 +41,30 @@ namespace {
         ASSERT_FALSE(parent.GetChild(1));
     }
 
-    TEST(Hierarchical, UnParent) {
-        MockHierarchical parent = MockHierarchical();
+    TEST(HierarchicalTest, GetChildren) {
+        Hierarchical parent = Hierarchical();
+        Hierarchical child0 = Hierarchical();
+        Hierarchical child1 = Hierarchical();
+
+        parent.AddChild(child0);
+        parent.AddChild(child1);
+
+        auto children_list = parent.GetChildren();
+
+        ASSERT_EQ(&child0, children_list[0]);
+        ASSERT_EQ(&child1, children_list[1]);
+
+    }
+
+    TEST(HierarchicalTest, UnParent) {
+        Hierarchical parent = Hierarchical();
 
         #ifdef DEBUG
         // throw while unparenting when object has no parent
         ASSERT_ANY_THROW(parent.UnParent());
         #endif
         // add child
-        MockHierarchical child = MockHierarchical();
+        Hierarchical child = Hierarchical();
         parent.AddChild(child);
         ASSERT_EQ(1, parent.GetChildren().size());
 
@@ -64,10 +74,10 @@ namespace {
         ASSERT_EQ(nullptr, child.GetParent());
     }
 
-    TEST(Hierarchical, SwitchParent) {
-        MockHierarchical parent1 = MockHierarchical();
-        MockHierarchical parent2 = MockHierarchical();
-        MockHierarchical child = MockHierarchical();
+    TEST(HierarchicalTest, SwitchParent) {
+        Hierarchical parent1 = Hierarchical();
+        Hierarchical parent2 = Hierarchical();
+        Hierarchical child = Hierarchical();
 
         parent1.AddChild(child);
         parent2.AddChild(child);
@@ -78,11 +88,11 @@ namespace {
         ASSERT_EQ(&child, parent2.GetChild());
     }
 
-    TEST(Hierarchical, Destructor) {
-        MockHierarchical root = MockHierarchical();
-        MockHierarchical child = MockHierarchical();
+    TEST(HierarchicalTest, Destructor) {
+        Hierarchical root = Hierarchical();
+        Hierarchical child = Hierarchical();
         {
-            MockHierarchical middle = MockHierarchical();
+            Hierarchical middle = Hierarchical();
             root.AddChild(middle);
             middle.AddChild(child);
         }

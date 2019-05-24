@@ -1,7 +1,8 @@
 #include "transform.hpp"
 
-Transform::Transform(glm::mat4 init_mat) 
-    : glm::mat4(init_mat)
+Transform::Transform(Entity* const entity, glm::mat4 init_mat) 
+    : Component(entity)
+    , glm::mat4(init_mat)
     , transform(*this) { }
 
 glm::vec3 Transform::GetPosition() const {

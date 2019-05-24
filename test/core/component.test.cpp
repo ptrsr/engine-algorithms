@@ -1,6 +1,9 @@
 #include <gtest/gtest.h>
 
 #include <engine/core/engine.hpp>
+#include <engine/core/component.hpp>
+#include <engine/core/entity.hpp>
+
 #include <iostream>
 
 namespace {
@@ -9,12 +12,18 @@ namespace {
         ~MockComponent() {
             on_removal = true;
         }
-
+        
         bool& on_removal;
 
     public:
-        MockComponent(bool& on_removal)
-            : on_removal(on_removal)
+        MockComponent(Entity* const entity, bool& on_removal)
+            : Component(entity)
+            , on_removal(on_removal)
+            { }
+
+        MockComponent(MockComponent& original)
+            : Component(original.entity)
+            , on_removal(original.on_removal)
             { }
 
         virtual Component* Clone() override {
@@ -26,16 +35,19 @@ namespace {
     public:
         MockComponent& mock_component;
 
-        MockEntity(bool& on_removal)
-            : mock_component(AddComponent<MockComponent>(on_removal)) 
+        MockEntity(const unsigned int id, bool& on_removal)
+            : Entity(id)
+            , mock_component(AddComponent<MockComponent>(on_removal)) 
             { }
 
-        MockEntity(const MockEntity& mock_entity)
-            : mock_component(mock_entity.mock_component)
+        MockEntity(const unsigned int id, MockEntity& original)
+            : Entity(id) 
+            , mock_component(*GetComponent<MockComponent>())
             { }
+
     };
 
-    TEST(Component, Destructor) {
+    TEST(ComponentTest, Destructor) {
         Engine engine = Engine();
         bool removed = false;
 
@@ -46,7 +58,7 @@ namespace {
         ASSERT_TRUE(removed);
     }
 
-    TEST(Component, Clone) {
+    TEST(ComponentTest, Clone) {
         Engine engine = Engine();
         bool removed = false;
 

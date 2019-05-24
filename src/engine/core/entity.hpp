@@ -17,14 +17,14 @@ class Entity {
     friend std::unique_ptr<Entity>::deleter_type;
 
 private:
-    unsigned int id;
     Components components;
 
-    Entity(const Entity& entity);
+    // copy constructor
+    Entity(const Entity& entity, const unsigned int new_id);
     Components CloneComponents() const;
 
 protected:
-    Entity() = default;
+    Entity(const unsigned int id = 0);
 
     // prohibit manual deletion
     virtual ~Entity() = default;
@@ -43,7 +43,8 @@ protected:
             component_ptr = map_it->second.get();
         } else {
             // create and insert new component
-            T* new_component = new T(std::forward<P>(p)...);
+            T* new_component = new T(this, std::forward<P>(p)...);
+
             Component_ptr component_unique;
             component_unique.reset(static_cast<Component*>(new_component));
 
@@ -60,6 +61,8 @@ protected:
     }
 
 public:
+    const unsigned int id;
+
     template<typename T>
     T* const GetComponent() {
         // assert if T is derived from component

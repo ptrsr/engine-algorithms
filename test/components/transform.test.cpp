@@ -2,37 +2,60 @@
 #include <gmock/gmock.h>
 
 #include <engine/components/transform.hpp>
+#include <engine/core/engine.hpp>
 #include <auxiliary/mat.aux.hpp>
 
 #include <exception>
 #include <iostream>
 
 namespace {
-    /* Transform has protected destructor.
-       Creating a mock for testing. */
-    class MockTransform : public Transform {
-    public:
-        MockTransform(glm::mat4 init_mat = glm::mat4(1))
-            : Transform(init_mat) 
+    // test entity that has a transform
+    class TransformEntity : public Entity {
+        // let engine be able to call constructors
+        friend Engine;
+
+        // constructor for testing with init mat
+        TransformEntity(const unsigned int id, glm::mat4 initMat)
+            : Entity(id)
+            , transform(AddComponent<Transform>(initMat))
             { }
-            
-        ~MockTransform() = default;
+
+        // constructor for testing default init mat
+        TransformEntity(const unsigned int id)
+            : Entity(id)
+            , transform(AddComponent<Transform>())
+            { }
+
+    public:
+        Transform& transform;
     };
 
-    TEST(Transform, Init) {
-        { // init with no parameters means unit mat4
-            MockTransform transform = MockTransform();
-            ASSERT_TRUE(CompareMats(glm::mat4(1), transform, 0.f));
-        }
-        {
-            MockTransform transform = MockTransform(glm::mat4(2));
-            ASSERT_TRUE(CompareMats(glm::mat4(2), transform, 0.f));
-        }
+    // transform test setup
+    class TransformTest : public ::testing::Test {
+    protected:
+        TransformTest()
+            : entity(engine.AddEntity<TransformEntity>())
+            , transform(entity.transform)
+            { }
+
+        Engine engine;
+        TransformEntity& entity;
+        Transform& transform;
+    };
+
+    TEST_F(TransformTest, Init) {
+        // init with no parameters means unit mat4
+        ASSERT_TRUE(CompareMats(glm::mat4(1), transform, 0.f));
+
+
+        // test init with given mat
+        Transform& i_transform = *engine.AddEntity<TransformEntity>(glm::mat4(2))
+            .GetComponent<Transform>();
+
+        ASSERT_TRUE(CompareMats(glm::mat4(2), i_transform, 0.f));
     }
 
-    TEST(Transform, Position) {
-        MockTransform transform = MockTransform();
-
+    TEST_F(TransformTest, Position) {
         // initial position is (0, 0, 0)
         ASSERT_EQ(glm::vec3(0, 0, 0), transform.GetPosition());
 
@@ -53,9 +76,7 @@ namespace {
             )), transform, 0.f));
     }
 
-    TEST(Transform, Translate) {
-        MockTransform transform = MockTransform();
-
+    TEST_F(TransformTest, Translate) {
         // translating adds vector to position
         transform.Translate(glm::vec3(1, 2, 3));
         ASSERT_EQ(glm::vec3(1, 2, 3), transform.GetPosition());
@@ -73,9 +94,7 @@ namespace {
         )), transform, 0.f));
     }
 
-    TEST(Transform, Rotate) {
-        MockTransform transform = MockTransform();
-        
+    TEST_F(TransformTest, Rotate) {
         // new object should have identity matrix
         ASSERT_TRUE(CompareMats(glm::mat4(1), transform, TRIG_DIF));
         

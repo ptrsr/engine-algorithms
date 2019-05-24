@@ -1,15 +1,24 @@
 #include <gtest/gtest.h>
 
 #include <engine/core/engine.hpp>
-#include <engine/core/entity.hpp>
-
-#include <iostream>
 
 namespace {
+    // engine test setup
+    class EngineTest : public ::testing::Test {
+    protected:
+        Engine engine;
+    };
+
     class MockEntity : public Entity { 
     public:
-        MockEntity(const int testnr = 0)
-            : testnr(testnr) 
+        MockEntity(const unsigned int id, const int testnr = 0)
+            : Entity(id)
+            , testnr(testnr) 
+            { }
+
+        MockEntity(const unsigned int id, const MockEntity& original)
+            : Entity(id)
+            , testnr(original.testnr)
             { }
 
         int testnr;
@@ -21,8 +30,9 @@ namespace {
     public:
         bool& on_removal;
         
-        RemovedEntity(bool& on_removal)
-            : on_removal(on_removal) 
+        RemovedEntity(const unsigned int id, bool& on_removal)
+            : Entity(id)
+            , on_removal(on_removal) 
             { }
 
     protected:
@@ -31,18 +41,30 @@ namespace {
         }
     };
 
-    TEST(Engine, AddEntity) {
-        Engine engine = Engine();
-        
-        // add test entity and assert parameter forwarding
-        MockEntity& mock_entity = engine.AddEntity<MockEntity>(1);
-        ASSERT_EQ(typeid(MockEntity), typeid(mock_entity));
-        ASSERT_EQ(1, mock_entity.testnr);
+    TEST_F(EngineTest, AddEntity) {
+        {
+            // add test entity and assert parameter forwarding
+            MockEntity& mock_entity = engine.AddEntity<MockEntity>(1);
+            ASSERT_EQ(typeid(MockEntity), typeid(mock_entity));
+            ASSERT_EQ(1, mock_entity.id);
+
+            // first entity added to engine has ID of 1
+            ASSERT_EQ(1, mock_entity.testnr);
+        }
+        { // test if AddEntity works without parameters
+            MockEntity& mock_entity = engine.AddEntity<MockEntity>();
+            ASSERT_EQ(0, mock_entity.testnr);
+
+            // each entity gets a unique ID that increments
+            ASSERT_EQ(2, mock_entity.id);
+        }
+        { // not forwarding id results in id of 0 (null)
+            EmtyEntity empty_entity;
+            ASSERT_EQ(0, empty_entity.id);
+        }
     }
 
-    TEST(Engine, GetEntity) {
-        Engine engine = Engine();
-
+    TEST_F(EngineTest, GetEntity) {
         // MockEntity does not exist yet, GetEntity returns empty optional
         ASSERT_FALSE(engine.GetEntity<MockEntity>());
 
@@ -72,9 +94,7 @@ namespace {
         }
     }
 
-    TEST(Engine, GetEntities) {
-        Engine engine = Engine();
-
+    TEST_F(EngineTest, GetEntities) {
         // no entities at init
         ASSERT_EQ(0, engine.GetEntities<MockEntity>().size());
 
@@ -94,9 +114,7 @@ namespace {
         ASSERT_EQ(0, engine.GetEntities<EmtyEntity>().size());
     }
 
-    TEST(Engine, DeleteEntity) {
-        Engine engine = Engine();
-
+    TEST_F(EngineTest, DeleteEntity) {
         bool removed = false;
 
         // create a RemovedEntity
@@ -120,14 +138,16 @@ namespace {
         ASSERT_TRUE(removed);
     }
 
-    TEST(Engine, CloneEntity) {
-        Engine engine = Engine();
-
+    TEST_F(EngineTest, CloneEntity) {
         MockEntity& mock_entity = engine.AddEntity<MockEntity>(123);
         MockEntity& clone_entity = engine.CloneEntity(mock_entity);
 
         // cloned entity has different address
         ASSERT_NE(&mock_entity, &clone_entity);
+
+        // cloned entity has incremented id
+        ASSERT_EQ(1, mock_entity.id);
+        ASSERT_EQ(2, clone_entity.id);
 
         // cloned entity has same field values however
         ASSERT_EQ(mock_entity.testnr, clone_entity.testnr);

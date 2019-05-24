@@ -7,6 +7,8 @@
 #include <engine/glm.hpp>
 #include <engine/core/component.hpp>
 
+#include <iostream>
+
 class Transform;
 typedef std::shared_ptr<Transform> Transform_ptr;
 
@@ -20,7 +22,7 @@ protected:
     virtual Component* Clone() override;
 
 public:
-    Transform(glm::mat4 init_mat = glm::mat4(1));
+    Transform(Entity* entity, glm::mat4 init_mat = glm::mat4(1));
 
     // position
     glm::vec3 GetPosition() const;

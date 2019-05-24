@@ -2,7 +2,6 @@
 #define HIERARCHICAL_HPP_
 
 #include <vector>
-#include <functional>
 
 #include <engine/core/component.hpp>
 
@@ -10,18 +9,19 @@ class Hierarchical : public Component {
 private:
     // members
     Hierarchical* parent;
-    std::vector<std::reference_wrapper<Hierarchical>> children;
-
-protected:
-    virtual ~Hierarchical();
+    std::vector<Hierarchical*> children;
 
 public:
+    virtual ~Hierarchical();
+
+    using Component::Component;
+
     void AddChild(Hierarchical& child);
     void UnParent();
 
     Hierarchical* const GetParent() const;
     Hierarchical* const GetChild(const unsigned int index = 0) const;
-    const std::vector<std::reference_wrapper<Hierarchical>>& GetChildren() const;
+    const std::vector<Hierarchical*>& GetChildren() const;
 
     virtual Component* Clone() override {
         return new Hierarchical(*this);

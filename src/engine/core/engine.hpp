@@ -50,13 +50,12 @@ public:
 
         /* NOTE: manual creation of entity, so the smart pointer doesn't have to
                  be friended by derived classes of Entity. */
-        T* new_entity = new T(std::forward<P>(p)...);
+        T* new_entity = new T(++current_id, std::forward<P>(p)...);
         Entity_ptr entity_unique;
         entity_unique.reset(static_cast<Entity*>(new_entity));
 
         // save unique pointer to entity    
         entity_list.push_back(std::move(entity_unique));
-        new_entity->id = current_id++;
 
         // return reference
         return *new_entity;
@@ -153,12 +152,11 @@ public:
         // assert if T is derived from entity
         static_assert(std::is_base_of<Entity, T>::value, "T must derived from entity");
         
-        Entity* clone = new Entity(entity);
+        Entity* clone = new T(++current_id, entity);
 
         // convert to unique pointer
         Entity_ptr clone_ptr = Entity_ptr();
         clone_ptr.reset(clone);
-        clone_ptr->id = current_id++;
 
         Entity_list* list = GetEntityList<T>();
         #ifdef DEBUG
