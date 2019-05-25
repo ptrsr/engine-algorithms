@@ -7,12 +7,21 @@ class Scene;
 typedef Scene_ptr std::unique_ptr<Scene>;
 
 class System;
-typedef System_ptr std::unique_ptr<System>;
-typedef System_vec std::vector<System_ptr>;
+
+struct Context {
+    Scene& scene;
+    const unsigned int microseconds;
+
+    Context(Scene& scene, const unsigned int ms)
+        : scene(scene)
+        , microseconds(ms)
+        { }
+}
 
 class Engine : protected TypeContainer<System> {
-protected:
-
+public:
+    Scene_ptr scene;
+    
     template<typename T, class... P>
     T& AddSystem(P&&... p) {
         return AddBase<T>(std::forward<P>(p)...);
@@ -23,10 +32,14 @@ protected:
         return GetBase<T>();
     }
 
-    void UpdateSystems();
+    template<typename T>
+    void UpdateSystems(T context) {
+        CheckType<Context, T>();
 
-public:
-
+        for (auto& pair : *this) {
+            pair.second->Update(context);
+        }
+    }
 };
 
 #endif//ENGINE_HPP_

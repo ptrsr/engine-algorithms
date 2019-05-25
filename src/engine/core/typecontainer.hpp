@@ -7,17 +7,16 @@
 #include <memory>
 #include <map>
 
+template<typename B, typename T>
+constexpr void CheckType() {
+    static_assert(std::is_base_of<B, T>::value, "T must derived from base");
+}
+
 template<class Base>
 class TypeContainer 
     : protected std::map<std::type_index, std::unique_ptr<Base>> {
     typedef std::unique_ptr<Base> Base_ptr;
     typedef std::map<std::type_index, Base_ptr> Base_map;
-
-private:
-    template<typename T>
-    constexpr void CheckType() {
-        static_assert(std::is_base_of<Base, T>::value, "T must derived from base");
-    }
 
 protected:
     // default constructor
@@ -30,7 +29,7 @@ protected:
 
     template<typename T, class... P>
     T& AddBase(P&&... p) {
-        CheckType<T>();
+        CheckType<Base, T>();
         
         Base* base_ptr;
         auto map_it = this->find(typeid(T));
@@ -59,7 +58,7 @@ protected:
 
     template<typename T>
     T* const GetBase() {
-        CheckType<T>();
+        CheckType<Base, T>();
 
         // find component and return reference
         auto map_it = this->find(typeid(T));

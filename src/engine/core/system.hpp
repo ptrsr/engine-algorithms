@@ -1,10 +1,14 @@
 #ifndef SYSTEM_HPP_
 #define SYSTEM_HPP_
 
-template <class... Ts>
+
+struct Context;
+
 class System {
 public:
-    virtual void Update(Ts... ts) = 0;
+    bool enabled;
+    virtual void Update(Context& scene) = 0;
+
 
 };
 
