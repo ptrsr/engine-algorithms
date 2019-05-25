@@ -2,20 +2,23 @@
 #define ENTITY_HPP_
 
 #include <engine/core/component.hpp>
-#include <engine/core/typecontainer.hpp>
+#include <engine/core/typemap.hpp>
 
-class Entity : protected TypeContainer<Component> {
+class Entity : protected TypeMap<Component> {
     friend class Scene;
     friend std::unique_ptr<Entity>::deleter_type;
-    typedef std::map<std::type_index, Component_ptr> Components;
 
 private:
     // copy constructor
-    Entity(const unsigned int new_id, const Entity& entity);
-    Components CloneComponents() const;
+    Entity(const unsigned int new_id, const Entity& original)
+        : id(id)
+        , TypeMap<Component>(original)
+        { }
 
 protected:
-    Entity(const unsigned int id = 0);
+    Entity(const unsigned int id = 0)
+        : id(id)
+        { }
 
     // prohibit manual deletion
     virtual ~Entity() = default;

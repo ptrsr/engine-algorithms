@@ -1,5 +1,5 @@
-#ifndef TYPECONTAINER_HPP_
-#define TYPECONTAINER_HPP_
+#ifndef TYPEMAP_HPP_
+#define TYPEMAP_HPP_
 
 #include <typeindex>
 #include <typeinfo>
@@ -7,25 +7,31 @@
 #include <memory>
 #include <map>
 
-template<typename B, typename T>
-constexpr void CheckType() {
-    static_assert(std::is_base_of<B, T>::value, "T must derived from base");
-}
+#include <engine/auxiliary/check.hpp>
 
 template<class Base>
-class TypeContainer 
-    : protected std::map<std::type_index, std::unique_ptr<Base>> {
+class TypeMap 
+    : public std::map<std::type_index, std::unique_ptr<Base>> {
     typedef std::unique_ptr<Base> Base_ptr;
     typedef std::map<std::type_index, Base_ptr> Base_map;
 
 protected:
-    // default constructor
-    TypeContainer() = default;
-
     // copy constructor
-    TypeContainer(Base_map container)
-        : Base_map(std::move(container))
-        { }
+    TypeMap(const TypeMap& original) { 
+        for (auto& pair : original) {
+            Base* clone = pair.second->Clone();
+
+            // move raw pointer into unique pointer
+            Base_ptr clone_ptr;
+            clone_ptr.reset(clone);
+
+            // insert cloned component into cloned entity's components map
+            this->insert(std::make_pair<std::type_index, Base_ptr>(
+                    std::type_index(pair.first), std::move(clone_ptr)
+                )
+            );
+        }
+    }
 
     template<typename T, class... P>
     T& AddBase(P&&... p) {
@@ -44,7 +50,7 @@ protected:
             Base_ptr base_u_ptr;
             base_u_ptr.reset(static_cast<Base*>(new_t));
 
-             // insert component. discards and returns previous if already exists
+            // insert component
             auto pair = this->insert(
                 std::make_pair<std::type_index, Base_ptr>(
                 typeid(T), std::move(base_u_ptr)));
@@ -69,6 +75,10 @@ protected:
         Base* base_ptr = map_it->second.get();
         return static_cast<T*>(base_ptr);
     }
+
+public:
+    // default constructor
+    TypeMap() = default;
 };
 
-#endif//TYPECONTAINER_HPP_
+#endif//TYPEMAP_HPP_

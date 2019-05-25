@@ -7,7 +7,6 @@ list(APPEND SOURCES
 	auxiliary/c_getopt.h
 	auxiliary/options.cpp
 
-	core/entity.cpp
 	core/system.cpp
 
 	components/transform.cpp

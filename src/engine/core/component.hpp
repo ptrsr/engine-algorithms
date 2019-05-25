@@ -2,7 +2,7 @@
 #define COMPONENT_HPP_
 
 #include <memory>
-#include <engine/core/typecontainer.hpp>
+#include <engine/core/typemap.hpp>
 
 class Component;
 typedef std::unique_ptr<Component> Component_ptr;
@@ -10,7 +10,7 @@ typedef std::unique_ptr<Component> Component_ptr;
 class Entity;
 class Component {
     friend class Entity;
-    friend TypeContainer<Component>;
+    friend TypeMap<Component>;
     friend Component_ptr::deleter_type;
 
 protected:

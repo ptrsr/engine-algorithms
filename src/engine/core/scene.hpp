@@ -9,6 +9,7 @@
 #include <memory>
 #include <list>
 
+#include <engine/auxiliary/check.hpp>
 #include <engine/core/entity.hpp>
 
 typedef std::unique_ptr<Entity> Entity_ptr;
@@ -35,8 +36,7 @@ private:
 public:
     template<typename T, class... P>
     T& AddEntity(P&&... p) {
-        // assert if T is derived from entity
-        static_assert(std::is_base_of<Entity, T>::value, "T must derived from entity");
+        CheckType<Entity, T>();
 
         // get entity list specific to type. insert new one if non existent
         auto inserted_pair = entity_map.insert(std::pair<std::type_index, Entity_list>(typeid(T), Entity_list()));
@@ -58,8 +58,7 @@ public:
 
     template<typename T>
     T* const GetEntity(const unsigned int index = 0) {
-        // assert if T is derived from entity
-        static_assert(std::is_base_of<Entity, T>::value, "T must derived from entity");
+        CheckType<Entity, T>();
         
         // get list of entity type
         Entity_list* entity_list = GetEntityList<T>();
@@ -82,8 +81,7 @@ public:
 
     template<typename T>
     const std::vector<T*> GetEntities() {
-        // assert if T is derived from entity
-        static_assert(std::is_base_of<Entity, T>::value, "T must derived from entity");
+        CheckType<Entity, T>();
 
         // get list of entity type
         Entity_list* entity_list = GetEntityList<T>();
@@ -107,8 +105,7 @@ public:
 
     template<typename T>
     void DeleteEntity(T& entity) {
-        // assert if T is derived from entity
-        static_assert(std::is_base_of<Entity, T>::value, "T must derived from entity");
+        CheckType<Entity, T>();
 
         // get list of entity type
         Entity_list* entity_list = GetEntityList<T>();
@@ -141,8 +138,7 @@ public:
 
     template<typename T>
     T& CloneEntity(T& entity) {
-        // assert if T is derived from entity
-        static_assert(std::is_base_of<Entity, T>::value, "T must derived from entity");
+        CheckType<Entity, T>();
         
         Entity* clone = new T(++current_id, entity);
 

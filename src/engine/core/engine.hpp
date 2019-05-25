@@ -1,7 +1,7 @@
 #ifndef ENGINE_HPP_
 #define ENGINE_HPP_
 
-#include <engine/core/typecontainer.hpp>
+#include <engine/core/typemap.hpp>
 
 class Scene;
 typedef Scene_ptr std::unique_ptr<Scene>;
@@ -18,7 +18,7 @@ struct Context {
         { }
 }
 
-class Engine : protected TypeContainer<System> {
+class Engine : protected TypeMap<System> {
 public:
     Scene_ptr scene;
     
