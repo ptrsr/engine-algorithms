@@ -1,8 +1,6 @@
 #ifndef SYSTEM_HPP_
 #define SYSTEM_HPP_
 
-#include <iostream>
-
 template <class... Ts>
 class System {
 public:

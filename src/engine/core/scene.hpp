@@ -75,9 +75,8 @@ public:
         auto list_it = entity_list->begin();
         std::advance(list_it, index);
 
-        // cast to a reference
+        // return a pointer (since return is not guaranteed)
         T* entity_ptr = static_cast<T*>((*list_it).get());
-
         return entity_ptr;
     }
 
@@ -160,8 +159,8 @@ public:
         list->push_back(std::move(clone_ptr));
         
         // return reference
-        T* entity_ptr = static_cast<T*>(clone);
-        return *entity_ptr;
+        T& entity_ptr = *static_cast<T*>(clone);
+        return entity_ptr;
     }
 };
 

@@ -2,16 +2,16 @@
 
 Entity::Entity(const unsigned int id, const Entity& entity)
     : id(id)
-    , components(entity.CloneComponents())
+    , TypeContainer(entity.CloneComponents())
     { }
 
 Entity::Entity(const unsigned int id)
     : id(id)
     { }
 
-Components Entity::CloneComponents() const {
-    Components copy;
-    for (auto& pair : components) {
+Entity::Components Entity::CloneComponents() const {
+    Entity::Components copy;
+    for (auto& pair : *this) {
         Component* clone = pair.second->Clone();
 
         // move raw pointer into unique pointer

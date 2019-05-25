@@ -9,10 +9,6 @@
 namespace {
     class MockComponent : public Component {
     private:
-        ~MockComponent() {
-            on_removal = true;
-        }
-        
         bool& on_removal;
 
     public:
@@ -25,6 +21,10 @@ namespace {
             : Component(original.entity)
             , on_removal(original.on_removal)
             { }
+
+        ~MockComponent() {
+            on_removal = true;
+        }
 
         virtual Component* Clone() override {
             return new MockComponent(*this);
