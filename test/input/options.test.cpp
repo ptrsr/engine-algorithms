@@ -2,13 +2,13 @@
 
 #include <engine/input/options.hpp>
 
-TEST(Options, Default_Init) {
+TEST(OptionsTest, Init) {
 	Options opts = Options();
 	EXPECT_FALSE(opts.verbose);
 	EXPECT_FALSE(opts.track_timing);
 }
 
-TEST(Options, Parse) {
+TEST(OptionsTest, Parse) {
 	const char* args[3] = {"app_name", "-t", "-v" };
 	Options opts = Options::ParseOptions(3, (char**)args);
 	EXPECT_TRUE(opts.verbose);

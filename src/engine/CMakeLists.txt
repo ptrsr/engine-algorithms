@@ -7,9 +7,9 @@ list(APPEND SOURCES
 	auxiliary/c_getopt.h
 	auxiliary/options.cpp
 
-	core/engine.cpp
 	core/entity.cpp
-	
+	core/system.cpp
+
 	components/transform.cpp
 	components/hierarchical.cpp
 	

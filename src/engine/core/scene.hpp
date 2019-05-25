@@ -1,25 +1,20 @@
-#ifndef ENGINE_HPP_
-#define ENGINE_HPP_
+#ifndef SCENE_HPP_
+#define SCENE_HPP_
 
 #include <unordered_map>
 #include <exception>
 #include <typeindex>
 #include <typeinfo>
-#include <utility>
 #include <vector>
 #include <memory>
 #include <list>
 
 #include <engine/core/entity.hpp>
 
-//class System;
-
 typedef std::unique_ptr<Entity> Entity_ptr;
 typedef std::list<Entity_ptr> Entity_list;
 
-//typedef std::unique_ptr<System> System_ptr;
-
-class Engine {
+class Scene {
 private:
     unsigned int current_id = 0;
     std::unordered_map<std::type_index, Entity_list> entity_map;
@@ -87,7 +82,7 @@ public:
     }
 
     template<typename T>
-    std::vector<std::reference_wrapper<T>> GetEntities() {
+    const std::vector<T*> GetEntities() {
         // assert if T is derived from entity
         static_assert(std::is_base_of<Entity, T>::value, "T must derived from entity");
 
@@ -95,7 +90,7 @@ public:
         Entity_list* entity_list = GetEntityList<T>();
 
         // create reference vector to entities
-        std::vector<std::reference_wrapper<T>> ref_vec;
+        std::vector<T*> ref_vec;
 
         if (!entity_list) {
             // return empty vec
@@ -104,11 +99,9 @@ public:
         ref_vec.reserve(entity_list->size());
 
         // fill vector with references from list and return
-        for (auto it = entity_list->begin(); it != entity_list->end(); ++it) {
-            Entity* entity = (*it).get();
-            T* entity_ptr = static_cast<T*>(entity);
-            T& entity_ref = *entity_ptr;
-            ref_vec.push_back(entity_ref);
+        for (Entity_ptr& entity : *entity_list) {
+            T* entity_ptr = static_cast<T*>(entity.get());
+            ref_vec.push_back(entity_ptr);
         }
         return ref_vec;
     }
@@ -121,7 +114,7 @@ public:
         // get list of entity type
         Entity_list* entity_list = GetEntityList<T>();
 
-        // entity list doesn't even exist (entity has never been added to engine)
+        // entity list doesn't even exist (entity has never been added to scebe)
         if (!entity_list) {
             throw new std::runtime_error(
                 "Deleting non existing entity of type: " + 
@@ -172,4 +165,4 @@ public:
     }
 };
 
-#endif//ENGINE_HPP_
+#endif//SCENE_HPP_

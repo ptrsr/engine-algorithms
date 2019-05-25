@@ -13,14 +13,14 @@
 typedef std::map<std::type_index, Component_ptr> Components;
 
 class Entity {
-    friend class Engine;
+    friend class Scene;
     friend std::unique_ptr<Entity>::deleter_type;
 
 private:
     Components components;
 
     // copy constructor
-    Entity(const Entity& entity, const unsigned int new_id);
+    Entity(const unsigned int new_id, const Entity& entity);
     Components CloneComponents() const;
 
 protected:

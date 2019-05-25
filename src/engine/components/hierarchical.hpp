@@ -12,9 +12,11 @@ private:
     std::vector<Hierarchical*> children;
 
 public:
-    virtual ~Hierarchical();
-
+    // use component constructor
     using Component::Component;
+
+    // destructor
+    ~Hierarchical();
 
     void AddChild(Hierarchical& child);
     void UnParent();

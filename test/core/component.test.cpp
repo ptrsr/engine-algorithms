@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-#include <engine/core/engine.hpp>
+#include <engine/core/scene.hpp>
 #include <engine/core/component.hpp>
 #include <engine/core/entity.hpp>
 
@@ -48,22 +48,22 @@ namespace {
     };
 
     TEST(ComponentTest, Destructor) {
-        Engine engine = Engine();
+        Scene scene = Scene();
         bool removed = false;
 
-        MockEntity& entity = engine.AddEntity<MockEntity>(removed);
+        MockEntity& entity = scene.AddEntity<MockEntity>(removed);
         
         // removed equals true after calling destructor of MockEntity
-        engine.DeleteEntity(entity);
+        scene.DeleteEntity(entity);
         ASSERT_TRUE(removed);
     }
 
     TEST(ComponentTest, Clone) {
-        Engine engine = Engine();
+        Scene scene = Scene();
         bool removed = false;
 
-        MockEntity& original = engine.AddEntity<MockEntity>(removed);
-        MockEntity& copy = engine.CloneEntity(original);
+        MockEntity& original = scene.AddEntity<MockEntity>(removed);
+        MockEntity& copy = scene.CloneEntity(original);
 
         ASSERT_NE(&original.mock_component, &copy.mock_component);
     }

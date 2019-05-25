@@ -1,7 +1,6 @@
 #include "hierarchical.hpp"
 
 #include <stdexcept>
-#include <iostream>
 
 void Hierarchical::AddChild(Hierarchical& child) {
     if (child.parent != nullptr) {
@@ -27,12 +26,12 @@ void Hierarchical::UnParent() {
         return;
     }
     // remove this from parent children list
-    for (auto i = parent->children.begin(); i != parent->children.end(); ++i) {
-        Hierarchical* child = *i;
+    for (auto it = parent->children.begin(); it != parent->children.end(); ++it) {
+        Hierarchical* child = *it;
         if (child != this) {
             continue;
         }
-        parent->children.erase(i);
+        parent->children.erase(it);
         break;
     }
     parent = nullptr;
@@ -61,8 +60,7 @@ Hierarchical::~Hierarchical() {
     UnParent();
 
     // re-parent children to this parent 
-    for (auto i = children.begin(); i != children.end(); ++i) {
-        Hierarchical* child = *i;
+    for (Hierarchical* child : children) {
         child->parent = tmp_parent;
         tmp_parent->children.push_back(child);
     }

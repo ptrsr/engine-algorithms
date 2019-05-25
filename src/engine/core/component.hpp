@@ -2,7 +2,7 @@
 #define COMPONENT_HPP_
 
 #include <memory>
-#include <iostream>
+
 class Component;
 typedef std::unique_ptr<Component> Component_ptr;
 

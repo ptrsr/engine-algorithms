@@ -53,7 +53,6 @@ namespace {
 
         ASSERT_EQ(&child0, children_list[0]);
         ASSERT_EQ(&child1, children_list[1]);
-
     }
 
     TEST(HierarchicalTest, UnParent) {

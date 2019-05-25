@@ -9,20 +9,16 @@
 
 #include <iostream>
 
-class Transform;
-typedef std::shared_ptr<Transform> Transform_ptr;
-
-class World;
 class Transform : public Component, public glm::mat4 {
 private:
     glm::mat4& transform;
 
 protected:
-    ~Transform() = default;
     virtual Component* Clone() override;
 
 public:
-    Transform(Entity* entity, glm::mat4 init_mat = glm::mat4(1));
+    ~Transform() = default;
+    Transform(glm::mat4 init_mat = glm::mat4(1), Entity* const entity = nullptr);
 
     // position
     glm::vec3 GetPosition() const;

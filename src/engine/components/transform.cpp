@@ -1,6 +1,6 @@
 #include "transform.hpp"
 
-Transform::Transform(Entity* const entity, glm::mat4 init_mat) 
+Transform::Transform(glm::mat4 init_mat, Entity* const entity) 
     : Component(entity)
     , glm::mat4(init_mat)
     , transform(*this) { }
