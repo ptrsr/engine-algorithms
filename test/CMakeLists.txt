@@ -12,6 +12,7 @@ add_executable(test-engine engine-algorithms.test.cpp
 	input/options.test.cpp
 
 	core/scene.test.cpp
+	core/typemap.test.cpp
 	core/entity.test.cpp
 	core/component.test.cpp
 	core/system.test.cpp

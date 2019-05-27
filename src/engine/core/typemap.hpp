@@ -15,24 +15,7 @@ class TypeMap
     typedef std::unique_ptr<Base> Base_ptr;
     typedef std::map<std::type_index, Base_ptr> Base_map;
 
-protected:
-    // copy constructor
-    TypeMap(const TypeMap& original) { 
-        for (auto& pair : original) {
-            Base* clone = pair.second->Clone();
-
-            // move raw pointer into unique pointer
-            Base_ptr clone_ptr;
-            clone_ptr.reset(clone);
-
-            // insert cloned component into cloned entity's components map
-            this->insert(std::make_pair<std::type_index, Base_ptr>(
-                    std::type_index(pair.first), std::move(clone_ptr)
-                )
-            );
-        }
-    }
-
+public:
     template<typename T, class... P>
     T& AddBase(P&&... p) {
         CheckType<Base, T>();
@@ -44,13 +27,13 @@ protected:
         if (map_it != this->end()) {
             base_ptr = map_it->second.get();
         } else {
-            // create and insert new component
+            // create new unique pointer to base
             T* new_t = new T(std::forward<P>(p)...);
 
             Base_ptr base_u_ptr;
             base_u_ptr.reset(static_cast<Base*>(new_t));
 
-            // insert component
+            // insert base
             auto pair = this->insert(
                 std::make_pair<std::type_index, Base_ptr>(
                 typeid(T), std::move(base_u_ptr)));
@@ -74,6 +57,23 @@ protected:
         }
         Base* base_ptr = map_it->second.get();
         return static_cast<T*>(base_ptr);
+    }
+
+    // copy constructor
+    TypeMap(const TypeMap& original) { 
+        for (auto& pair : original) {
+            Base* clone = pair.second->Clone();
+
+            // move raw pointer into unique pointer
+            Base_ptr clone_ptr;
+            clone_ptr.reset(clone);
+
+            // insert cloned bases into new typemap
+            this->insert(std::make_pair<std::type_index, Base_ptr>(
+                    std::type_index(pair.first), std::move(clone_ptr)
+                )
+            );
+        }
     }
 
 public:

@@ -19,9 +19,18 @@ struct Context {
 }
 
 class Engine : protected TypeMap<System> {
+private:
+    bool running = false;
+
+protected:
+    virtual void Update();
+
 public:
     Scene_ptr scene;
-    
+
+    void Run();
+    void Stop();
+
     template<typename T, class... P>
     T& AddSystem(P&&... p) {
         return AddBase<T>(std::forward<P>(p)...);

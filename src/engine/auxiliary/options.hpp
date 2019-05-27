@@ -18,4 +18,4 @@ typedef struct Options { Options() :
 
 } Options;
 
-#endif // OPTIONS_HPP_
+#endif//OPTIONS_HPP_

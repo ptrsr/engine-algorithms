@@ -2,14 +2,15 @@
 #define COMPONENT_HPP_
 
 #include <memory>
-#include <engine/core/typemap.hpp>
 
-class Component;
-typedef std::unique_ptr<Component> Component_ptr;
-
+template<class>
+class TypeMap;
 class Entity;
+
 class Component {
-    friend class Entity;
+    typedef std::unique_ptr<Component> Component_ptr;
+
+    friend Entity;
     friend TypeMap<Component>;
     friend Component_ptr::deleter_type;
 
