@@ -2,8 +2,11 @@
 
 #include <engine/core/entity.hpp>
 
+/* NOTE: since Entity is based on TypeMap, most functionality will be tested
+   in typemap.test.cpp . here we will test the possiblities of multi inheritance
+   for entities. */
+
 namespace {
-    // test component with field
     class MockComponent : public Component {
     public:
         MockComponent(Entity* entity, int test_int)
@@ -18,44 +21,28 @@ namespace {
         int test_int;
     };
 
-    // test entity class that adds a MockComponent
-    class MockEntity : public Entity { 
+    class MockEntityA : virtual public Entity { 
     public:
-        MockEntity(int test_int = 0)
-            : mock_component(AddComponent<MockComponent>(test_int))
-            , test_component(AddComponent<MockComponent>(0))
+        MockEntityA(int test_int = 0)
+            : mock_component_a(AddComponent<MockComponent>(test_int))
             { }
         
-        MockComponent& mock_component;
-        MockComponent& test_component;
+        MockComponent& mock_component_a;
     };
 
-    // test entity to check non existance of component
-    class NullComponent : public Component { };
+    class MockEntityB : virtual public Entity { 
+    public:
+        MockEntityB(int test_int = 0)
+            : mock_component_b(AddComponent<MockComponent>(test_int))
+            { }
+        
+        MockComponent& mock_component_b;
+    };
 
-    TEST(EntityTest, AddComponent) {
-        // forwarding arguments to component constructor
-        MockEntity mock_entity = MockEntity(1);
-        ASSERT_EQ(1, mock_entity.mock_component.test_int);
+    class MockEntityC : public MockEntityA, public MockEntityB { };
 
-        /* each entity can only have one component of a single type.
-        adding another one returns a reference to the original.*/
-        ASSERT_EQ(&mock_entity.mock_component, &mock_entity.test_component);
-
-        // the second (ignored) addition does not change the original component
-        ASSERT_EQ(1, mock_entity.test_component.test_int);
-    }
-
-    TEST(EntityTest, GetComponent) {
-        MockEntity mock_entity = MockEntity();
-
-        // MockEntity has no NullComponent, returns empty optional
-        ASSERT_FALSE(mock_entity.GetComponent<NullComponent>());
-
-        MockComponent* const component_ptr = mock_entity.GetComponent<MockComponent>();
-
-        // MockEntity has MockComponent, same as the added field
-        ASSERT_TRUE(component_ptr);
-        ASSERT_EQ(&mock_entity.mock_component, component_ptr);
+    TEST(Entity, MultiBase) {
+        MockEntityC test_entity = MockEntityC();
+        ASSERT_EQ(&test_entity.mock_component_a, &test_entity.mock_component_b);
     }
 }
