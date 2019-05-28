@@ -1,6 +1,9 @@
 #include "engine.hpp"
+#include <iostream>
 
-void Engine::Update() { }
+void Engine::Update() { 
+    std::cout << "test" << std::endl;
+}
 
 void Engine::Run() {
     if (running) {
@@ -15,7 +18,3 @@ void Engine::Run() {
 void Engine::Stop() {
     running = false;
 }
-
-// void quitproc() {
-// 	exit(0);
-// }

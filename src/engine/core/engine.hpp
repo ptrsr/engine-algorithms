@@ -2,11 +2,12 @@
 #define ENGINE_HPP_
 
 #include <engine/core/typemap.hpp>
+#include <engine/core/system.hpp>
+#include <engine/core/scene.hpp>
 
 class Scene;
-typedef Scene_ptr std::unique_ptr<Scene>;
+typedef std::unique_ptr<Scene> Scene_ptr;
 
-class System;
 
 struct Context {
     Scene& scene;
@@ -16,7 +17,7 @@ struct Context {
         : scene(scene)
         , microseconds(ms)
         { }
-}
+};
 
 class Engine : protected TypeMap<System> {
 private:
@@ -50,5 +51,7 @@ public:
         }
     }
 };
+
+typedef std::unique_ptr<Engine> Engine_ptr;
 
 #endif//ENGINE_HPP_

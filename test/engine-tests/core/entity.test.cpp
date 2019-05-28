@@ -9,22 +9,19 @@
 namespace {
     class MockComponent : public Component {
     public:
-        MockComponent(Entity* entity, int test_int)
+        MockComponent(Entity* entity)
             : Component(entity)
-            , test_int(test_int) 
             { }
             
         virtual Component* Clone() override {
             return new MockComponent(*this);
         }
-
-        int test_int;
     };
 
     class MockEntityA : virtual public Entity { 
     public:
-        MockEntityA(int test_int = 0)
-            : mock_component_a(AddComponent<MockComponent>(test_int))
+        MockEntityA()
+            : mock_component_a(AddComponent<MockComponent>())
             { }
         
         MockComponent& mock_component_a;
@@ -32,8 +29,8 @@ namespace {
 
     class MockEntityB : virtual public Entity { 
     public:
-        MockEntityB(int test_int = 0)
-            : mock_component_b(AddComponent<MockComponent>(test_int))
+        MockEntityB()
+            : mock_component_b(AddComponent<MockComponent>())
             { }
         
         MockComponent& mock_component_b;
@@ -43,6 +40,8 @@ namespace {
 
     TEST(Entity, MultiBase) {
         MockEntityC test_entity = MockEntityC();
+
+        // MockEntityC's MockComponents point to the same MockComponent
         ASSERT_EQ(&test_entity.mock_component_a, &test_entity.mock_component_b);
     }
 }
