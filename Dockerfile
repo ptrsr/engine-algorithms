@@ -1,21 +1,31 @@
 
-# Get the base Ubuntu image from Docker Hub
+# get the base Ubuntu image from Docker Hub
 FROM ubuntu:18.04
 
-EXPOSE 80
-
-# Update apps on the base image
+# update apps on the base image
 RUN apt-get -y update && apt-get install -y
 
-# Install the Clang compiler
-#RUN apt-get -y install clang
+# install dependencies
+RUN apt-get -y install git cmake g++
 
-# Copy the current folder which contains C++ source code to the Docker image under /usr/src
-COPY ["./", "/usr/src/engine-algorithms/"]
+# specify project directory in image
+ENV PROJECT_DIR /usr/src/engine-algorithms/
 
-# Specify the working directory
-WORKDIR /usr/src/engine-algorithms
+# copy local source files to image
+COPY ./ ${PROJECT_DIR}
 
-# Run bootstrap
-# - infinite jobs, do not prompt, headless, test
-CMD ["./bootstrap.sh", "-ji", "-y", "-e", "-t"]
+# create build dir
+RUN mkdir ${PROJECT_DIR}/build
+
+# set working directory to build for cmake
+WORKDIR ${PROJECT_DIR}/build
+
+# specify build args for cmake
+ENV BUILD_ARGS=-DCMAKE_BUILD_TYPE=Release
+
+RUN cmake ${BUILD_ARGS} -DBUILD_HEAD=OFF ..
+RUN make -j
+
+WORKDIR ${PROJECT_DIR}/bin
+
+CMD ./tests

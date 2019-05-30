@@ -45,7 +45,7 @@ test_script:
 - cmd: |-
     cd ..
     cd bin
-    .\test-engine%dpostf%.exe
+    .\tests%dpostf%.exe
 
 only_commits:
   files:

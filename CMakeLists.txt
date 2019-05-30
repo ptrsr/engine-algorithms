@@ -37,9 +37,12 @@ if(MSVC)
 endif()
 
 # dependencies
-include(glbinding)
 include(glm)
-include(sfml)
+
+if(${BUILD_HEAD})
+    include(glbinding)
+    include(sfml)
+endif()
 
 # preprocessor variable for debugging
 add_compile_options("$<$<CONFIG:DEBUG>:-DDEBUG>")

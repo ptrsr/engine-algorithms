@@ -3,21 +3,23 @@ cmake_minimum_required(VERSION 3.0)
 # add engine-tests folder
 target_include_directories(tests PUBLIC ./)
 
-# policy for converting local to global paths in target_sources
-cmake_policy(SET CMP0076 NEW)
+if(${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.13.0")
+	# policy for converting local to global paths in target_sources
+	cmake_policy(SET CMP0076 OLD)
+endif()
 
 # specify source files
 target_sources(tests
 PUBLIC
 	# tests are run in given order
-	input/options.test.cpp
+	engine-tests/input/options.test.cpp
 
-	core/scene.test.cpp
-	core/typemap.test.cpp
-	core/entity.test.cpp
-	core/component.test.cpp
-	core/system.test.cpp
+	engine-tests/core/scene.test.cpp
+	engine-tests/core/typemap.test.cpp
+	engine-tests/core/entity.test.cpp
+	engine-tests/core/component.test.cpp
+	engine-tests/core/system.test.cpp
 
-	components/transform.test.cpp
-    components/hierarchical.test.cpp
+	engine-tests/components/transform.test.cpp
+    engine-tests/components/hierarchical.test.cpp
 )

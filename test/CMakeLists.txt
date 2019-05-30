@@ -9,6 +9,9 @@ include_directories(
 # create tests executable
 add_executable(tests main.test.cpp)
 
+# wait for googletest before building tests
+add_dependencies(tests googletest)
+
 # add engine and game tests seperately
 add_subdirectory(engine-tests)
 add_subdirectory(game-tests)

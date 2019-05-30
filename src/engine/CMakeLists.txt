@@ -16,11 +16,12 @@ add_library(engine
 	components/hierarchical.cpp
 )
 
-add_dependencies(engine 
-    glbinding 
-    glm 
-    sfml
-)
+# wait for glm before building engine
+add_dependencies(engine glm)
+
+if (${BUILD_HEAD})
+	add_dependencies(engine glbinding sfml)
+endif()
 
 # because the libraries do not exist during configuration time,
 # predetermine the library language (to avoid a warning)

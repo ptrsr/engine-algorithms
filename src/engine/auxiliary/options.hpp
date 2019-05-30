@@ -4,10 +4,11 @@
 #include <string>
 #include <stdio.h>
 
-typedef struct Options { Options() :
-	// default values
-	track_timing(false),
-	verbose(false) { }
+typedef struct Options { 
+	Options() // default options
+		: track_timing(false)
+		, verbose(false) 
+		{ }
 
 	// options
 	bool track_timing;
