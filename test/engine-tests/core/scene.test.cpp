@@ -11,7 +11,7 @@ namespace {
 
     class MockEntity : public Entity { 
     public:
-        MockEntity(const unsigned int id, const int testnr = 0)
+        MockEntity(const unsigned int id = 0, const int testnr = 0)
             : Entity(id)
             , testnr(testnr) 
             { }

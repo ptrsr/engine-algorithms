@@ -1,10 +1,23 @@
 # Engine Algorithms
 
 [![Build Status](https://travis-ci.com/ptrsr/engine-algorithms.svg?branch=master)](https://travis-ci.com/ptrsr/engine-algorithms)
-[![Build status](https://ci.appveyor.com/api/projects/status/pcbnu8k67ex163e0/branch/master?svg=true)](https://ci.appveyor.com/project/ptrsr/engine-algorithms/branch/master)
+[![Build status](https://ci.appveyor.com/api/projects/status/pcbnu8k67ex163e0/branch/master?svg=true)](https://ci.appveyor.com/project/ptrsr/engine-algorithms/branch/master)  
 
 
+## Building
+### Linux
+Build using:
+```
+mkdir build
+cd build
+cmake ..
+make -j
+```
+And the binaries will be built under ``engine-algorithms/bin``.
 
+### Windows
+Create a project for your IDE using CMake and everything is automatically set up.
+Note that only Visual Studio 2017 has been confirmed to work. 
 
 ## Versions
 ### Libraries

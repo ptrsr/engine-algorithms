@@ -6,7 +6,8 @@
 class Options;
 
 class Game : public Engine {
-    Game(Options& options);
+public:
+    Game(const Options& options);
 
 };
 

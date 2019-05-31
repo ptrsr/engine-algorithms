@@ -18,6 +18,7 @@ protected:
 
 public:
     ~Transform() = default;
+    Transform(Entity* const entity);
     Transform(glm::mat4 init_mat = glm::mat4(1), Entity* const entity = nullptr);
 
     // position

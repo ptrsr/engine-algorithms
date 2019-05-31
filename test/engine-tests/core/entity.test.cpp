@@ -38,7 +38,7 @@ namespace {
 
     class MockEntityC : public MockEntityA, public MockEntityB { };
 
-    TEST(Entity, MultiBase) {
+    TEST(EntityTest, MultiBase) {
         MockEntityC test_entity = MockEntityC();
 
         // MockEntityC's MockComponents point to the same MockComponent

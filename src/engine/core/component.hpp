@@ -2,6 +2,7 @@
 #define COMPONENT_HPP_
 
 #include <memory>
+#include <stdexcept>
 
 template<class>
 class TypeMap;
@@ -28,7 +29,10 @@ protected:
         { }
 
 private:
-    virtual Component* Clone() = 0;
+    virtual Component* Clone() {
+        throw new std::runtime_error("Clone function not implemented in derived class");
+        return nullptr;
+    };
 
 public:
     Entity* const entity;

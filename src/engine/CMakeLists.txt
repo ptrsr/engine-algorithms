@@ -14,6 +14,7 @@ add_library(engine
 
 	components/transform.cpp
 	components/hierarchical.cpp
+	components/projector.cpp
 )
 
 # wait for glm before building engine

@@ -12,7 +12,7 @@ namespace {
         bool& on_removal;
 
     public:
-        MockComponent(Entity* const entity, bool& on_removal)
+        MockComponent(bool& on_removal, Entity* const entity)
             : Component(entity)
             , on_removal(on_removal)
             { }

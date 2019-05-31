@@ -21,5 +21,6 @@ PUBLIC
 	engine-tests/core/system.test.cpp
 
 	engine-tests/components/transform.test.cpp
-    engine-tests/components/hierarchical.test.cpp
+	engine-tests/components/hierarchical.test.cpp
+    engine-tests/components/projector.test.cpp
 )

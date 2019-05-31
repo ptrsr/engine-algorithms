@@ -10,8 +10,8 @@ class Entity : protected TypeMap<Component> {
 
 private:
     // copy constructor
-    Entity(const unsigned int new_id, const Entity& original)
-        : id(id)
+    Entity(const Entity& original, const unsigned int new_id)
+        : id(new_id)
         , TypeMap<Component>(original)
         { }
 
@@ -26,7 +26,7 @@ protected:
 
     template<typename T, class... P>
     T& AddComponent(P&&... p) {
-        return AddBase<T>(this, std::forward<P>(p)...);
+        return AddBase<T>(std::forward<P>(p)..., this);
     }
 
 public:

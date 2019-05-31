@@ -3,7 +3,14 @@
 Transform::Transform(glm::mat4 init_mat, Entity* const entity) 
     : Component(entity)
     , glm::mat4(init_mat)
-    , transform(*this) { }
+    , transform(*this) 
+    { }
+
+Transform::Transform(Entity* const entity)
+    : Component(entity)
+    , glm::mat4(1)
+    , transform(*this)
+    { }
 
 glm::vec3 Transform::GetPosition() const {
     return glm::vec3(transform[3]);

@@ -1,7 +1,9 @@
 cmake_minimum_required(VERSION 3.0)
 
 # create game executable
-add_executable(game main.cpp)
+add_executable(game main.cpp
+	game.cpp
+)
 
 # link game executable to engine library
 target_link_libraries(game engine)

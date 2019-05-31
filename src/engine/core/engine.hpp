@@ -8,7 +8,6 @@
 class Scene;
 typedef std::unique_ptr<Scene> Scene_ptr;
 
-
 struct Context {
     Scene& scene;
     const unsigned int microseconds;
@@ -19,7 +18,7 @@ struct Context {
         { }
 };
 
-class Engine : protected TypeMap<System> {
+class Engine : private TypeMap<System> {
 private:
     bool running = false;
 
@@ -28,6 +27,8 @@ protected:
 
 public:
     Scene_ptr scene;
+
+    Engine() = default;
 
     void Run();
     void Stop();
