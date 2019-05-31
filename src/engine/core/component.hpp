@@ -17,8 +17,9 @@ class Component {
 
 protected:
     // prohibit manual deletion
-    virtual ~Component() = default;
     void operator delete(void*) { }
+    // proper deletion by Component pointer
+    virtual ~Component() = default;
 
     Component(Entity* const entity = nullptr)
         : entity(entity)

@@ -1,8 +1,8 @@
-#include "hierarchical.hpp"
+#include "hierarchy.hpp"
 
 #include <stdexcept>
 
-void Hierarchical::AddChild(Hierarchical& child) {
+void Hierarchy::AddChild(Hierarchy& child) {
     if (child.parent != nullptr) {
         if (child.parent == this) {
             #ifdef DEBUG
@@ -18,7 +18,7 @@ void Hierarchical::AddChild(Hierarchical& child) {
     children.push_back(&child);
 }
 
-void Hierarchical::UnParent() {
+void Hierarchy::UnParent() {
     if (parent == nullptr) {
         #ifdef DEBUG
         throw std::runtime_error("Cannot unparent: no parent.");
@@ -27,7 +27,7 @@ void Hierarchical::UnParent() {
     }
     // remove this from parent children list
     for (auto it = parent->children.begin(); it != parent->children.end(); ++it) {
-        Hierarchical* child = *it;
+        Hierarchy* child = *it;
         if (child != this) {
             continue;
         }
@@ -37,30 +37,30 @@ void Hierarchical::UnParent() {
     parent = nullptr;
 }
 
-Hierarchical* const Hierarchical::GetParent() const {
+Hierarchy* const Hierarchy::GetParent() const {
     return parent;
 }
 
-Hierarchical* const Hierarchical::GetChild(const unsigned int index) const {
+Hierarchy* const Hierarchy::GetChild(const unsigned int index) const {
     if (index >= children.size()) {
         return nullptr;
     }
     return children[index];
 }
 
-const std::vector<Hierarchical*>& Hierarchical::GetChildren() const {
+const std::vector<Hierarchy*>& Hierarchy::GetChildren() const {
     return children;
 }
 
-Hierarchical::~Hierarchical() {
+Hierarchy::~Hierarchy() {
     if (children.size() == 0 || !parent) {
         return;
     }
-    Hierarchical* tmp_parent = parent;
+    Hierarchy* tmp_parent = parent;
     UnParent();
 
     // re-parent children to this parent 
-    for (Hierarchical* child : children) {
+    for (Hierarchy* child : children) {
         child->parent = tmp_parent;
         tmp_parent->children.push_back(child);
     }

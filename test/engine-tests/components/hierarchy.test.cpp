@@ -1,19 +1,19 @@
 #include <gtest/gtest.h>
 
-#include <engine/components/hierarchical.hpp>
+#include <engine/components/hierarchy.hpp>
 
 namespace {
-    /* Hierarchical has protected destructor.
+    /* Hierarchy has protected destructor.
        Creating a mock for testing. */
-    TEST(HierarchicalTest, AddChild) {
-        Hierarchical parent = Hierarchical();
+    TEST(HierarchyTest, AddChild) {
+        Hierarchy parent = Hierarchy();
 
         // no children after init
         auto& children = parent.GetChildren();
         ASSERT_TRUE(children.empty());
 
         // adding child results in correct parent
-        Hierarchical child = Hierarchical();
+        Hierarchy child = Hierarchy();
         parent.AddChild(child);
         ASSERT_EQ(&parent, child.GetParent());
 
@@ -29,9 +29,9 @@ namespace {
         ASSERT_EQ(&parent, children[0]->GetParent());
     }
 
-    TEST(HierarchicalTest, GetChild) {
-        Hierarchical parent = Hierarchical();
-        Hierarchical child = Hierarchical();
+    TEST(HierarchyTest, GetChild) {
+        Hierarchy parent = Hierarchy();
+        Hierarchy child = Hierarchy();
 
         parent.AddChild(child);
 
@@ -41,10 +41,10 @@ namespace {
         ASSERT_FALSE(parent.GetChild(1));
     }
 
-    TEST(HierarchicalTest, GetChildren) {
-        Hierarchical parent = Hierarchical();
-        Hierarchical child0 = Hierarchical();
-        Hierarchical child1 = Hierarchical();
+    TEST(HierarchyTest, GetChildren) {
+        Hierarchy parent = Hierarchy();
+        Hierarchy child0 = Hierarchy();
+        Hierarchy child1 = Hierarchy();
 
         parent.AddChild(child0);
         parent.AddChild(child1);
@@ -55,15 +55,15 @@ namespace {
         ASSERT_EQ(&child1, children_list[1]);
     }
 
-    TEST(HierarchicalTest, UnParent) {
-        Hierarchical parent = Hierarchical();
+    TEST(HierarchyTest, UnParent) {
+        Hierarchy parent = Hierarchy();
 
         #ifdef DEBUG
         // throw while unparenting when object has no parent
         ASSERT_ANY_THROW(parent.UnParent());
         #endif
         // add child
-        Hierarchical child = Hierarchical();
+        Hierarchy child = Hierarchy();
         parent.AddChild(child);
         ASSERT_EQ(1, parent.GetChildren().size());
 
@@ -73,10 +73,10 @@ namespace {
         ASSERT_EQ(nullptr, child.GetParent());
     }
 
-    TEST(HierarchicalTest, SwitchParent) {
-        Hierarchical parent1 = Hierarchical();
-        Hierarchical parent2 = Hierarchical();
-        Hierarchical child = Hierarchical();
+    TEST(HierarchyTest, SwitchParent) {
+        Hierarchy parent1 = Hierarchy();
+        Hierarchy parent2 = Hierarchy();
+        Hierarchy child = Hierarchy();
 
         parent1.AddChild(child);
         parent2.AddChild(child);
@@ -87,11 +87,11 @@ namespace {
         ASSERT_EQ(&child, parent2.GetChild());
     }
 
-    TEST(HierarchicalTest, Destructor) {
-        Hierarchical root = Hierarchical();
-        Hierarchical child = Hierarchical();
+    TEST(HierarchyTest, Destructor) {
+        Hierarchy root = Hierarchy();
+        Hierarchy child = Hierarchy();
         {
-            Hierarchical middle = Hierarchical();
+            Hierarchy middle = Hierarchy();
             root.AddChild(middle);
             middle.AddChild(child);
         }

@@ -21,8 +21,9 @@ protected:
         { }
 
     // prohibit manual deletion
-    virtual ~Entity() = default;
     void operator delete(void*) { }
+    // proper deletion by Entity pointer
+    virtual ~Entity() = default;
 
     template<typename T, class... P>
     T& AddComponent(P&&... p) {

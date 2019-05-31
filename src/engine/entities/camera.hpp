@@ -2,19 +2,19 @@
 #define CAMERA_HPP_
 
 #include <engine/core/entity.hpp>
-#include <engine/components/projector.hpp>
+#include <engine/components/projection.hpp>
 #include <engine/components/transform.hpp>
 
 class Camera : public Entity {
 public:
-    Camera(const unsigned int id, const Projector::Context& context)
+    Camera(const unsigned int id, const ProjectionContext& context)
         : Entity(id)
         , transform(AddComponent<Transform>())
-        , projector(AddComponent<Projector>(context))
+        , projection(AddComponent<Projection>(context))
         { }
     
     Transform& transform;
-    Projector& projector;
+    Projection& projection;
 };
 
 #endif//CAMERA_HPP_

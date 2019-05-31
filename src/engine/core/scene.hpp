@@ -110,7 +110,7 @@ public:
         // get list of entity type
         Entity_list* entity_list = GetEntityList<T>();
 
-        // entity list doesn't even exist (entity has never been added to scebe)
+        // entity list doesn't even exist (entity has never been added to scene)
         if (!entity_list) {
             throw new std::runtime_error(
                 "Deleting non existing entity of type: " + 

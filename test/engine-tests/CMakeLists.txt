@@ -21,6 +21,8 @@ PUBLIC
 	engine-tests/core/system.test.cpp
 
 	engine-tests/components/transform.test.cpp
-	engine-tests/components/hierarchical.test.cpp
-    engine-tests/components/projector.test.cpp
+	engine-tests/components/hierarchy.test.cpp
+	engine-tests/components/projection.test.cpp
+	
+	engine-tests/entities/camera.test.cpp
 )
