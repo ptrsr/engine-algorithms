@@ -5,18 +5,7 @@
 #include <engine/core/system.hpp>
 #include <engine/core/scene.hpp>
 
-class Scene;
 typedef std::unique_ptr<Scene> Scene_ptr;
-
-struct Context {
-    Scene& scene;
-    const unsigned int microseconds;
-
-    Context(Scene& scene, const unsigned int ms)
-        : scene(scene)
-        , microseconds(ms)
-        { }
-};
 
 class Engine : private TypeMap<System> {
 private:
@@ -45,7 +34,7 @@ public:
 
     template<typename T>
     void UpdateSystems(T context) {
-        CheckType<Context, T>();
+        CheckType<UpdateContext, T>();
 
         for (auto& pair : *this) {
             pair.second->Update(context);

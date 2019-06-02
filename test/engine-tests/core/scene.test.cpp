@@ -35,10 +35,19 @@ namespace {
             , on_removal(on_removal) 
             { }
 
-    protected:
         ~RemovedEntity() {
             on_removal = true;
         }
+    };
+
+    class BaseEntity : public Entity {
+        // forward constructor to Entity
+        using Entity::Entity;
+    };
+
+    class DerivedEntity : public BaseEntity {
+        // example of constructor linking
+        using BaseEntity::BaseEntity;
     };
 
     TEST_F(SceneTest, AddEntity) {
@@ -157,5 +166,14 @@ namespace {
 
         // correct address of clone has been added 
         ASSERT_EQ(&clone_entity, scene.GetEntity<MockEntity>(1));
+    }
+
+    TEST_F(SceneTest, RegisterEntity) {
+        DerivedEntity& derived_ref = scene.AddEntity<DerivedEntity>();
+        scene.RegisterEntity<BaseEntity>(derived_ref);
+        BaseEntity* base_ptr = scene.GetEntity<BaseEntity>();
+
+        // new shared pointer to base class has same adress
+        ASSERT_EQ(&derived_ref, base_ptr);
     }
 }

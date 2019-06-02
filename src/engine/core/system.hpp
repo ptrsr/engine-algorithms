@@ -3,18 +3,27 @@
 
 #include <memory>
 
-struct Context;
+class Scene;
+
+struct UpdateContext {
+    Scene& scene;
+    const unsigned int microseconds;
+
+    UpdateContext(Scene& scene, const unsigned int ms)
+        : scene(scene)
+        , microseconds(ms)
+        { }
+};
 
 class Engine;
 
 class System {
-friend class Engine;
-friend std::unique_ptr<System>::deleter_type;
+    friend class Engine;
+    friend std::unique_ptr<System>::deleter_type;
 
 public:
     bool enabled;
-    virtual void Update(Context& scene) = 0;
-
+    virtual void Update(UpdateContext& scene) = 0;
 
 };
 

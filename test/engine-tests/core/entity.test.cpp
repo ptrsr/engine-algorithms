@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 
+#include <engine/core/scene.hpp>
 #include <engine/core/entity.hpp>
 
 /* NOTE: since Entity is based on TypeMap, most functionality will be tested
@@ -38,10 +39,34 @@ namespace {
 
     class MockEntityC : public MockEntityA, public MockEntityB { };
 
+
+    class MockEntityD : public Entity {
+    private:
+        bool& registered;
+
+    public: 
+        MockEntityD(const unsigned int id, bool& registered)
+            : registered(registered)
+            { }
+
+        void OnRegister(Scene& scene) override {
+            registered = true;
+        }
+    };
+
     TEST(EntityTest, MultiBase) {
         MockEntityC test_entity = MockEntityC();
 
         // MockEntityC's MockComponents point to the same MockComponent
         ASSERT_EQ(&test_entity.mock_component_a, &test_entity.mock_component_b);
+    }
+
+    TEST(EntityTest, OnRegister) {
+        Scene scene = Scene();
+        
+        bool registered = false;
+        MockEntityD& d_ref = scene.AddEntity<MockEntityD>(registered);
+        
+        ASSERT_TRUE(registered);
     }
 }

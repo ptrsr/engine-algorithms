@@ -4,11 +4,14 @@
 #include <engine/core/component.hpp>
 #include <engine/core/typemap.hpp>
 
+class Scene;
+
 class Entity : protected TypeMap<Component> {
-    friend class Scene;
-    friend std::unique_ptr<Entity>::deleter_type;
+    friend Scene;
 
 private:
+    std::vector<std::type_index> type_register;
+
     // copy constructor
     Entity(const Entity& original, const unsigned int new_id)
         : id(new_id)
@@ -20,10 +23,7 @@ protected:
         : id(id)
         { }
 
-    // prohibit manual deletion
-    void operator delete(void*) { }
-    // proper deletion by Entity pointer
-    virtual ~Entity() = default;
+    virtual void OnRegister(Scene& scene) { }
 
     template<typename T, class... P>
     T& AddComponent(P&&... p) {
@@ -31,6 +31,9 @@ protected:
     }
 
 public:
+    // proper deletion by Entity pointer
+    virtual ~Entity() = default;
+
     const unsigned int id;
 
     template<typename T>

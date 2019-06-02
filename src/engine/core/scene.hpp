@@ -12,15 +12,15 @@
 #include <engine/auxiliary/check.hpp>
 #include <engine/core/entity.hpp>
 
-typedef std::unique_ptr<Entity> Entity_ptr;
+typedef std::shared_ptr<Entity> Entity_ptr;
 typedef std::list<Entity_ptr> Entity_list;
 
 class Scene {
 private:
     unsigned int current_id = 0;
     std::unordered_map<std::type_index, Entity_list> entity_map;
-    //std::vector<System_ptr> systems;
 
+    // get Entity_list of type T. return nullptr if non existant
     template<typename T>
     Entity_list* GetEntityList() {
         // search map for entity type
@@ -33,27 +33,62 @@ private:
         return &map_it->second;
     }
 
+    // get Entity_list of type T. create new one if non existant
+    template<typename T>
+    Entity_list& ForceEntityList() {
+        // if pair already exists, return reference. otherwise create new one and return reference
+        auto inserted_pair = entity_map.insert(std::pair<std::type_index, Entity_list>(typeid(T), Entity_list()));
+        // return ref to list
+        return (*inserted_pair.first).second;
+    }
+
 public:
     template<typename T, class... P>
     T& AddEntity(P&&... p) {
         CheckType<Entity, T>();
 
-        // get entity list specific to type. insert new one if non existent
-        auto inserted_pair = entity_map.insert(std::pair<std::type_index, Entity_list>(typeid(T), Entity_list()));
-        // insert returns pair with <iterator, found>
-        Entity_list& entity_list = (*inserted_pair.first).second;
+        Entity_list& entity_list = ForceEntityList<T>();
 
-        /* NOTE: manual creation of entity, so the smart pointer doesn't have to
-                 be friended by derived classes of Entity. */
+        // manual creation of entity, store in smart pointer
         T* new_entity = new T(++current_id, std::forward<P>(p)...);
-        Entity_ptr entity_unique;
-        entity_unique.reset(static_cast<Entity*>(new_entity));
+        Entity_ptr entity_ptr;
+        entity_ptr.reset(static_cast<Entity*>(new_entity));
 
-        // save unique pointer to entity    
-        entity_list.push_back(std::move(entity_unique));
+        // save shared pointer
+        entity_list.push_back(std::move(entity_ptr));
+        new_entity->OnRegister(*this);
 
         // return reference
         return *new_entity;
+    }
+
+    template<typename T, typename E>
+    void RegisterEntity(E& entity) {
+        CheckType<Entity, T>();
+        CheckType<T, E>();
+
+        Entity_list* derived_entity_list = GetEntityList<E>();
+
+    #ifdef DEBUG
+        if (!derived_entity_list) {
+            throw new std::runtime_error("List of type T does not exist.");
+        }
+    #endif
+    
+        for (auto it = derived_entity_list->rbegin(); it != derived_entity_list->rend(); ++it) {
+            Entity_ptr entity_ptr = *it;
+            if (&entity != entity_ptr.get()) {
+                continue;
+            }
+
+            // get list of new registery type
+            Entity_list& base_entity_list = ForceEntityList<T>();
+
+            base_entity_list.push_back(entity_ptr);
+            return;
+        }
+
+        // TODO: throw
     }
 
     template<typename T>
@@ -147,11 +182,11 @@ public:
         clone_ptr.reset(clone);
 
         Entity_list* list = GetEntityList<T>();
-        #ifdef DEBUG
+    #ifdef DEBUG
         if (!list) {
-            throw new std::runtime_error("List of type T does not exist. Are you mixing entity managers?");
+            throw new std::runtime_error("List of type T does not exist.");
         }
-        #endif
+    #endif
         list->push_back(std::move(clone_ptr));
         
         // return reference
