@@ -12,7 +12,6 @@ class Entity : protected TypeMap<Component> {
     friend Scene;
 
 private:
-
     // copy constructor
     Entity(const Entity& original, const unsigned int new_id)
         : id(new_id)
@@ -33,30 +32,34 @@ private:
     }
 
     bool UnRegister(const std::type_index& type) {
-        for (auto it = type_register.rbegin(); it != type_register.rend(); ++it) {
+        for (auto it = type_register.begin(); it != type_register.end(); ++it) {
             if ((*it) != type) {
                 continue;
             }
-            type_register.erase(std::next(it).base());
+            type_register.erase(it);
             return true;
         }
         return false;
     }
 
 protected:
-    Entity(const unsigned int id = 0)
-        : id(id)
-        { }
-
-    virtual void Init(Scene& scene) { }
+    virtual void Init(Scene& scene) {
+        for (auto& component_pair : *this) {
+            component_pair.second->Init(scene);
+        }
+     }
 
     template<typename T, class... P>
     T& AddComponent(P&&... p) {
-        return AddBase<T>(std::forward<P>(p)..., this);
+        return AddBase<T>(this, std::forward<P>(p)...);
     }
 
 public:
     std::vector<std::type_index> type_register;
+
+    Entity(const unsigned int id = 0)
+        : id(id)
+        { }
 
     // proper deletion by Entity pointer
     virtual ~Entity() = default;

@@ -15,12 +15,12 @@ namespace {
         Transform transform = Transform();
     };
 
-    TEST_F(TransformTest, Init) {
+    TEST_F(TransformTest, Constructor) {
         { // init with no parameters means unit mat4
             ASSERT_TRUE(CompareMats(glm::mat4(1), transform, 0.f));
         }
         { // init with given mat4
-            Transform transform_i = Transform(glm::mat4(2));
+            Transform transform_i = Transform(nullptr, glm::mat4(2));
             ASSERT_TRUE(CompareMats(glm::mat4(2), transform_i, 0.f));
         }
     }

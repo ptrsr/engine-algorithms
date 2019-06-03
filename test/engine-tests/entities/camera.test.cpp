@@ -2,7 +2,7 @@
 
 #include <engine/entities/camera.hpp>
 
-TEST(CameraTest, Init) {
+TEST(CameraTest, Constructor) {
 
     ProjectionContext context(glm::radians(60.f), glm::vec2(1280, 720), 1, 1000);
     Camera camera = Camera(0, context);

@@ -1,19 +1,17 @@
 #ifndef CAMERA_HPP_
 #define CAMERA_HPP_
 
-#include <engine/core/entity.hpp>
-#include <engine/components/projection.hpp>
+#include <engine/entities/gameobject.hpp>
 #include <engine/components/transform.hpp>
+#include <engine/components/projection.hpp>
 
-class Camera : public Entity {
+class Camera : public GameObject {
 public:
     Camera(const unsigned int id, const ProjectionContext& context)
-        : Entity(id)
-        , transform(AddComponent<Transform>())
+        : GameObject(id)
         , projection(AddComponent<Projection>(context))
         { }
     
-    Transform& transform;
     Projection& projection;
 };
 

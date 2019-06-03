@@ -2,30 +2,38 @@
 
 #include <stdexcept>
 
+#include <iostream>
+
+Hierarchy::Hierarchy(Entity* const entity, Hierarchy* const root)
+    : Component(entity)
+    , root(root) {
+    // add to root if given
+    parent = root;
+    if (root) {
+        root->children.push_back(this);
+    }
+}
+
 void Hierarchy::AddChild(Hierarchy& child) {
     if (child.parent != nullptr) {
         if (child.parent == this) {
-            #ifdef DEBUG
+        #ifdef DEBUG
             throw std::runtime_error("Cannot add child: already childed to this object.");
-            #endif
+        #endif
             return;
         } else {
             // unparent if already attached
-            child.UnParent();
+            child.RemoveFromParent();
         }
     }
     child.parent = this;
     children.push_back(&child);
 }
 
-void Hierarchy::UnParent() {
-    if (parent == nullptr) {
-        #ifdef DEBUG
-        throw std::runtime_error("Cannot unparent: no parent.");
-        #endif
+void Hierarchy::RemoveFromParent() {
+    if (!parent) {
         return;
     }
-    // remove this from parent children list
     for (auto it = parent->children.begin(); it != parent->children.end(); ++it) {
         Hierarchy* child = *it;
         if (child != this) {
@@ -34,7 +42,21 @@ void Hierarchy::UnParent() {
         parent->children.erase(it);
         break;
     }
-    parent = nullptr;
+}
+
+void Hierarchy::UnParent() {
+    // root can be either another hierarchical or a nullptr
+    if (parent == root) {
+        return;
+    } 
+    // remove this from parent children list
+    RemoveFromParent();
+
+    if (root) {
+        root->children.push_back(this);
+    }
+    // either root or nullptr 
+    parent = root;
 }
 
 Hierarchy* const Hierarchy::GetParent() const {

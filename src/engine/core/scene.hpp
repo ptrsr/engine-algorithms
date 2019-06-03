@@ -204,6 +204,9 @@ public:
     #endif
         list->push_back(std::move(clone_ptr));
         
+        // init called since clone is a new Entity
+        clone->Init(*this);
+
         // return reference
         T& entity_ptr = *static_cast<T*>(clone);
         return entity_ptr;

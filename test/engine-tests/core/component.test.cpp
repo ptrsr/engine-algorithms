@@ -1,10 +1,6 @@
 #include <gtest/gtest.h>
 
 #include <engine/core/scene.hpp>
-#include <engine/core/component.hpp>
-#include <engine/core/entity.hpp>
-
-#include <iostream>
 
 namespace {
     class MockComponent : public Component {
@@ -12,7 +8,9 @@ namespace {
         bool& on_removal;
 
     public:
-        MockComponent(bool& on_removal, Entity* const entity)
+        bool on_init = false;
+
+        MockComponent(Entity* const entity, bool& on_removal)
             : Component(entity)
             , on_removal(on_removal)
             { }
@@ -21,6 +19,10 @@ namespace {
             : Component(original.entity)
             , on_removal(original.on_removal)
             { }
+
+        void Init(Scene& scene) override {
+            on_init = true;
+        }
 
         ~MockComponent() {
             on_removal = true;
@@ -47,15 +49,16 @@ namespace {
 
     };
 
-    TEST(ComponentTest, Destructor) {
-        Scene scene = Scene();
-        bool removed = false;
+    TEST(ComponentTest, Init) {
+        // on init is false when instantiating Component directly
+        bool tmp = false;
+        ASSERT_FALSE(MockComponent(nullptr, tmp).on_init);
 
-        MockEntity& entity = scene.AddEntity<MockEntity>(removed);
-        
-        // removed equals true after calling destructor of MockEntity
-        scene.DeleteEntity(entity);
-        ASSERT_TRUE(removed);
+        Scene scene = Scene();
+        MockEntity& entity = scene.AddEntity<MockEntity>(tmp);
+
+        // Init is called through Entity during AddEntity
+        ASSERT_TRUE(entity.mock_component.on_init);
     }
 
     TEST(ComponentTest, Clone) {
@@ -66,5 +69,16 @@ namespace {
         MockEntity& copy = scene.CloneEntity(original);
 
         ASSERT_NE(&original.mock_component, &copy.mock_component);
+    }
+
+    TEST(ComponentTest, Destructor) {
+        Scene scene = Scene();
+        bool removed = false;
+
+        MockEntity& entity = scene.AddEntity<MockEntity>(removed);
+        
+        // removed equals true after calling destructor of MockEntity
+        scene.DeleteEntity(entity);
+        ASSERT_TRUE(removed);
     }
 }

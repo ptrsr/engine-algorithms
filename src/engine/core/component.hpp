@@ -6,6 +6,8 @@
 
 template<class>
 class TypeMap;
+
+class Scene;
 class Entity;
 
 class Component {
@@ -29,6 +31,8 @@ protected:
         : entity(component.entity)
         { }
 
+    virtual void Init(Scene& scene) { }
+    
 private:
     virtual Component* Clone() {
         throw new std::runtime_error("Clone function not implemented in derived class");

@@ -10,7 +10,7 @@
 namespace {
     class MockComponent : public Component {
     public:
-        MockComponent(Entity* entity)
+        MockComponent(Entity* const entity)
             : Component(entity)
             { }
             
@@ -42,31 +42,31 @@ namespace {
 
     class MockEntityD : public Entity {
     private:
-        bool& registered;
+        bool& init;
 
     public: 
-        MockEntityD(const unsigned int id, bool& registered)
-            : registered(registered)
+        MockEntityD(const unsigned int id, bool& init)
+            : init(init)
             { }
 
         void Init(Scene& scene) override {
-            registered = true;
+            init = true;
         }
     };
+
+    TEST(EntityTest, Init) {
+        Scene scene = Scene();
+        
+        bool init = false;
+        MockEntityD& d_ref = scene.AddEntity<MockEntityD>(init);
+        
+        ASSERT_TRUE(init);
+    }
 
     TEST(EntityTest, MultiBase) {
         MockEntityC test_entity = MockEntityC();
 
         // MockEntityC's MockComponents point to the same MockComponent
         ASSERT_EQ(&test_entity.mock_component_a, &test_entity.mock_component_b);
-    }
-
-    TEST(EntityTest, OnRegister) {
-        Scene scene = Scene();
-        
-        bool registered = false;
-        MockEntityD& d_ref = scene.AddEntity<MockEntityD>(registered);
-        
-        ASSERT_TRUE(registered);
     }
 }

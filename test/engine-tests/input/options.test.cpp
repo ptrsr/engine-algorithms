@@ -2,7 +2,7 @@
 
 #include <engine/input/options.hpp>
 
-TEST(OptionsTest, Init) {
+TEST(OptionsTest, Constructor) {
 	Options opts = Options();
 	EXPECT_FALSE(opts.verbose);
 	EXPECT_FALSE(opts.track_timing);

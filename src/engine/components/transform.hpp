@@ -18,8 +18,7 @@ protected:
 
 public:
     ~Transform() = default;
-    Transform(Entity* const entity);
-    Transform(glm::mat4 init_mat = glm::mat4(1), Entity* const entity = nullptr);
+    Transform(Entity* const entity = nullptr, glm::mat4 init_mat = glm::mat4(1));
 
     // position
     glm::vec3 GetPosition() const;

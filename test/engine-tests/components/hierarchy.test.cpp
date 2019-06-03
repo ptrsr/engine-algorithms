@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 
 #include <engine/components/hierarchy.hpp>
+#include <iostream>
 
 namespace {
     /* Hierarchy has protected destructor.
@@ -58,10 +59,6 @@ namespace {
     TEST(HierarchyTest, UnParent) {
         Hierarchy parent = Hierarchy();
 
-        #ifdef DEBUG
-        // throw while unparenting when object has no parent
-        ASSERT_ANY_THROW(parent.UnParent());
-        #endif
         // add child
         Hierarchy child = Hierarchy();
         parent.AddChild(child);
@@ -87,16 +84,37 @@ namespace {
         ASSERT_EQ(&child, parent2.GetChild());
     }
 
-    TEST(HierarchyTest, Destructor) {
+    TEST(HierarchyTest, Root) {
         Hierarchy root = Hierarchy();
+
+        Hierarchy parent = Hierarchy(nullptr, &root);
+        Hierarchy child = Hierarchy(nullptr, &root);
+
+        // automatically childed too root
+        ASSERT_EQ(2, root.GetChildren().size());
+
+        parent.AddChild(child);
+
+        // child got removed from root and is now childed under parent
+        ASSERT_EQ(1, root.GetChildren().size());
+        ASSERT_EQ(1, parent.GetChildren().size());
+
+        child.UnParent();
+
+        // unparenting results in root as parent
+        ASSERT_EQ(2, root.GetChildren().size());
+    }
+
+    TEST(HierarchyTest, Destructor) {
+        Hierarchy parent = Hierarchy();
         Hierarchy child = Hierarchy();
         {
             Hierarchy middle = Hierarchy();
-            root.AddChild(middle);
+            parent.AddChild(middle);
             middle.AddChild(child);
         }
         // child switched to parent's parent when original parent got deleted
-        ASSERT_EQ(&root, child.GetParent());
-        ASSERT_EQ(&child, root.GetChild());
+        ASSERT_EQ(&parent, child.GetParent());
+        ASSERT_EQ(&child, parent.GetChild());
     }
 }

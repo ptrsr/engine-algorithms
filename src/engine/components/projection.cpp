@@ -2,7 +2,7 @@
 
 #include <stdexcept>
 
-Projection::Projection(const ProjectionContext& context, Entity* const entity)
+Projection::Projection(Entity* const entity, const ProjectionContext& context)
     : Component(entity)
     , ProjectionContext(context)
     , perspective(glm::perspective(context.fov, context.windowSize.x / context.windowSize.y, context.near, context.far)) 

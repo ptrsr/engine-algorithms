@@ -3,7 +3,7 @@
 
 #include <auxiliary/mat.aux.hpp>
 
-TEST(ProjectionTest, Init) {
+TEST(ProjectionTest, Constructor) {
     ProjectionContext context(glm::radians(60.f), glm::vec2(1280, 720), 1, 1000);
 
     // camera projection matrix corresponds to input parameters
@@ -12,7 +12,7 @@ TEST(ProjectionTest, Init) {
         0,       1.7321, 0,     0,
         0,       0,     -1.002, -2.002,
         0,       0,     -1,     0)
-        ), Projection(context).perspective, 0.0001f));
+        ), Projection(nullptr, context).perspective, 0.0001f));
 
 #ifdef DEBUG
     ASSERT_ANY_THROW(ProjectionContext(0, glm::vec2(1280, 720), 1, 1000));

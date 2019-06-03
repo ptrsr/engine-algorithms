@@ -16,7 +16,7 @@ struct ProjectionContext {
 
 class Projection : public Component, public ProjectionContext {
 public:
-    Projection(const ProjectionContext& context, Entity* const entity = nullptr);
+    Projection(Entity* const entity, const ProjectionContext& context);
     
     const glm::mat4 perspective;
 };

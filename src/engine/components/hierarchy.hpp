@@ -5,15 +5,19 @@
 
 #include <engine/core/component.hpp>
 
+class Entity;
+
 class Hierarchy : public Component {
 private:
     // members
-    Hierarchy* parent;
+    Hierarchy* root = nullptr;
+    Hierarchy* parent = nullptr;
     std::vector<Hierarchy*> children;
 
+    void RemoveFromParent();
+
 public:
-    // use component constructor
-    using Component::Component;
+    Hierarchy(Entity* const entity = nullptr, Hierarchy* const root = nullptr);
 
     // destructor
     ~Hierarchy();
