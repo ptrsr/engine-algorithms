@@ -1,6 +1,6 @@
 #include "projection.hpp"
 
-#include <cassert>
+#include <stdexcept>
 
 Projection::Projection(const ProjectionContext& context, Entity* const entity)
     : Component(entity)
@@ -13,8 +13,10 @@ ProjectionContext::ProjectionContext(const float fov, const glm::vec2 windowSize
     , fov(fov)
     , near(near)
     , far(far)
-{ 
-    assert(fov > 0);
-    assert(near > 0);
-    assert(far > near);
+{
+#ifdef DEBUG
+    if (fov <= 0 || near <= 0 || near > far) {
+        throw new std::invalid_argument("Projection parameters invalid.");
+    }
+#endif
 }

@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 
 #include <engine/core/scene.hpp>
+#include <iostream>
 
 namespace {
     // scene test setup
@@ -46,8 +47,13 @@ namespace {
     };
 
     class DerivedEntity : public BaseEntity {
+    public:
         // example of constructor linking
         using BaseEntity::BaseEntity;
+
+        DerivedEntity()
+            : BaseEntity(0)
+            { }
     };
 
     TEST_F(SceneTest, AddEntity) {
@@ -123,6 +129,45 @@ namespace {
         ASSERT_EQ(0, scene.GetEntities<EmtyEntity>().size());
     }
 
+    TEST_F(SceneTest, CloneEntity) {
+        MockEntity& mock_entity = scene.AddEntity<MockEntity>(123);
+        MockEntity& clone_entity = scene.CloneEntity(mock_entity);
+
+        // cloned entity has different address
+        ASSERT_NE(&mock_entity, &clone_entity);
+
+        // cloned entity has incremented id
+        ASSERT_EQ(1, mock_entity.id);
+        ASSERT_EQ(2, clone_entity.id);
+
+        // cloned entity has same field values however
+        ASSERT_EQ(mock_entity.testnr, clone_entity.testnr);
+
+        // clone has been added to scene
+        ASSERT_EQ(2, scene.GetEntities<MockEntity>().size());
+
+        // correct address of clone has been added 
+        ASSERT_EQ(&clone_entity, scene.GetEntity<MockEntity>(1));
+    }
+
+    TEST_F(SceneTest, RegisterEntity) {
+        DerivedEntity& derived_ref = scene.AddEntity<DerivedEntity>();
+
+        // register on base class succesful
+        ASSERT_TRUE(scene.RegisterEntity<BaseEntity>(derived_ref));
+
+        // new shared pointer to base class has same adress
+        BaseEntity* base_ptr = scene.GetEntity<BaseEntity>();
+        ASSERT_EQ(&derived_ref, base_ptr);
+
+        // cannot register since it's already been registered under Base
+        ASSERT_FALSE(scene.RegisterEntity<BaseEntity>(derived_ref));
+
+        // throw when registering entity that has never been added to scene
+        DerivedEntity tmp = DerivedEntity();
+        ASSERT_ANY_THROW(scene.RegisterEntity<BaseEntity>(tmp));
+    }
+
     TEST_F(SceneTest, DeleteEntity) {
         bool removed = false;
 
@@ -147,33 +192,21 @@ namespace {
         ASSERT_TRUE(removed);
     }
 
-    TEST_F(SceneTest, CloneEntity) {
-        MockEntity& mock_entity = scene.AddEntity<MockEntity>(123);
-        MockEntity& clone_entity = scene.CloneEntity(mock_entity);
+    TEST_F(SceneTest, UnRegister) {
+        DerivedEntity& derived = scene.AddEntity<DerivedEntity>();
+        scene.RegisterEntity<BaseEntity>(derived);
 
-        // cloned entity has different address
-        ASSERT_NE(&mock_entity, &clone_entity);
+        // unregistering base type results in nullptr when fetching by base type
+        scene.UnRegisterEntity<BaseEntity>(derived);
+        ASSERT_FALSE(scene.GetEntity<BaseEntity>());
 
-        // cloned entity has incremented id
-        ASSERT_EQ(1, mock_entity.id);
-        ASSERT_EQ(2, clone_entity.id);
+        // re-registering
+        ASSERT_TRUE(scene.RegisterEntity<BaseEntity>(derived));
 
-        // cloned entity has same field values however
-        ASSERT_EQ(mock_entity.testnr, clone_entity.testnr);
+        // deleting results in unregistering of all types
+        scene.DeleteEntity(derived);
 
-        // clone has been added to scene
-        ASSERT_EQ(2, scene.GetEntities<MockEntity>().size());
-
-        // correct address of clone has been added 
-        ASSERT_EQ(&clone_entity, scene.GetEntity<MockEntity>(1));
-    }
-
-    TEST_F(SceneTest, RegisterEntity) {
-        DerivedEntity& derived_ref = scene.AddEntity<DerivedEntity>();
-        scene.RegisterEntity<BaseEntity>(derived_ref);
-        BaseEntity* base_ptr = scene.GetEntity<BaseEntity>();
-
-        // new shared pointer to base class has same adress
-        ASSERT_EQ(&derived_ref, base_ptr);
+        ASSERT_FALSE(scene.GetEntity<DerivedEntity>());
+        ASSERT_FALSE(scene.GetEntity<BaseEntity>());
     }
 }

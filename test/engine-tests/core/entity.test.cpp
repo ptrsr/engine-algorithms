@@ -49,7 +49,7 @@ namespace {
             : registered(registered)
             { }
 
-        void OnRegister(Scene& scene) override {
+        void Init(Scene& scene) override {
             registered = true;
         }
     };

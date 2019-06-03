@@ -14,7 +14,9 @@ TEST(ProjectionTest, Init) {
         0,       0,     -1,     0)
         ), Projection(context).perspective, 0.0001f));
 
-    ASSERT_DEBUG_DEATH(ProjectionContext(0, glm::vec2(1280, 720), 1, 1000), "fov > 0");
-    ASSERT_DEBUG_DEATH(ProjectionContext(glm::radians(60.f), glm::vec2(1280, 720), 0, 1000), "near > 0");
-    ASSERT_DEBUG_DEATH(ProjectionContext(glm::radians(60.f), glm::vec2(1280, 720), 10, 1), "far > near");
+#ifdef DEBUG
+    ASSERT_ANY_THROW(ProjectionContext(0, glm::vec2(1280, 720), 1, 1000));
+    ASSERT_ANY_THROW(ProjectionContext(glm::radians(60.f), glm::vec2(1280, 720), 0, 1000));
+    ASSERT_ANY_THROW(ProjectionContext(glm::radians(60.f), glm::vec2(1280, 720), 10, 1));
+#endif
 }

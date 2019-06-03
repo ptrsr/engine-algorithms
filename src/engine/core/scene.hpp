@@ -23,8 +23,13 @@ private:
     // get Entity_list of type T. return nullptr if non existant
     template<typename T>
     Entity_list* GetEntityList() {
+        return GetEntityList(typeid(T));
+    }
+
+    // get Entity_list of type. return nullptr if non existant
+    Entity_list* GetEntityList(std::type_index type) {
         // search map for entity type
-        auto map_it = entity_map.find(typeid(T));
+        auto map_it = entity_map.find(type);
         if (map_it == entity_map.end()) {
             return nullptr;
         }
@@ -42,6 +47,41 @@ private:
         return (*inserted_pair.first).second;
     }
 
+    bool UnRegisterEntity(Entity& entity, std::type_index type, bool unRegisterInternal = true) {
+        // get list of entity type
+        Entity_list* entity_list = GetEntityList(type);
+
+        // entity list doesn't even exist (entity has never been added to scene)
+        if (!entity_list) {
+            throw new std::runtime_error(
+                "Deleting non existing entity of type: " + 
+                std::string(type.name()) +
+                ". Did you already delete it?"
+            );
+        }
+        // find entity by iterating over list
+        for (auto it = entity_list->begin(); it != entity_list->end(); ++it) {
+            if ((*it).get() != &entity) {
+                // continue searching if not found
+                continue;
+            }
+            // remove entity
+            entity_list->erase(it);
+
+            if (unRegisterInternal) {
+                // remove type from internal entity registery
+                entity.UnRegister(type);
+            }
+            return true;
+        }
+        // entity wasn't found at all
+        throw new std::runtime_error(
+            "Deleting non existing entity of type: " + 
+            std::string(type.name()) +
+            ". Did you already delete it?"
+        );
+    }
+
 public:
     template<typename T, class... P>
     T& AddEntity(P&&... p) {
@@ -54,41 +94,49 @@ public:
         Entity_ptr entity_ptr;
         entity_ptr.reset(static_cast<Entity*>(new_entity));
 
+        // add type to entity for deletion later
+        entity_ptr->Register<T>();
+        
         // save shared pointer
         entity_list.push_back(std::move(entity_ptr));
-        new_entity->OnRegister(*this);
+
+        // allow entity to register or add new entities to scene on init
+        new_entity->Init(*this);
 
         // return reference
         return *new_entity;
     }
 
     template<typename T, typename E>
-    void RegisterEntity(E& entity) {
+    bool RegisterEntity(E& entity) {
         CheckType<Entity, T>();
         CheckType<T, E>();
 
         Entity_list* derived_entity_list = GetEntityList<E>();
-
     #ifdef DEBUG
         if (!derived_entity_list) {
             throw new std::runtime_error("List of type T does not exist.");
         }
     #endif
-    
         for (auto it = derived_entity_list->rbegin(); it != derived_entity_list->rend(); ++it) {
             Entity_ptr entity_ptr = *it;
             if (&entity != entity_ptr.get()) {
                 continue;
             }
-
+            if (!entity_ptr->Register<T>()) {
+                // entity already registered under type T
+                return false;
+            }
             // get list of new registery type
             Entity_list& base_entity_list = ForceEntityList<T>();
 
             base_entity_list.push_back(entity_ptr);
-            return;
+            return true;
         }
 
-        // TODO: throw
+        // remove type from register since it hasn't properly been added
+        entity.type_register.pop_back();
+        throw new std::invalid_argument("Could not find original Entity_ptr.");
     }
 
     template<typename T>
@@ -139,39 +187,6 @@ public:
     }
 
     template<typename T>
-    void DeleteEntity(T& entity) {
-        CheckType<Entity, T>();
-
-        // get list of entity type
-        Entity_list* entity_list = GetEntityList<T>();
-
-        // entity list doesn't even exist (entity has never been added to scene)
-        if (!entity_list) {
-            throw new std::runtime_error(
-                "Deleting non existing entity of type: " + 
-                std::string(typeid(T).name()) +
-                ". Did you already delete it?"
-            );
-        }
-        // find entity by iterating over list
-        for (auto it = entity_list->begin(); it != entity_list->end(); ++it) {
-            if ((*it).get() != &entity) {
-                // continue searching if not found
-                continue;
-            }
-            // remove entity
-            entity_list->erase(it);
-            return;
-        }
-        // entity wasn't found at all
-        throw new std::runtime_error(
-            "Deleting non existing entity of type: " + 
-            std::string(typeid(T).name()) +
-            ". Did you already delete it?"
-        );
-    }
-
-    template<typename T>
     T& CloneEntity(T& entity) {
         CheckType<Entity, T>();
         
@@ -192,6 +207,26 @@ public:
         // return reference
         T& entity_ptr = *static_cast<T*>(clone);
         return entity_ptr;
+    }
+
+    template<typename T, typename E>
+    bool UnRegisterEntity(E& entity) {
+        CheckType<Entity, T>();
+        CheckType<T, E>();
+
+        return UnRegisterEntity(entity, typeid(T));
+    }
+
+    template<typename T>
+    void DeleteEntity(T& entity) {
+        CheckType<Entity, T>();
+
+        Entity* base = static_cast<Entity*>(&entity);
+        for (std::type_index type : base->type_register) {
+            /* since entity is completely deleted, no need to
+               keep track of the internal types */
+            UnRegisterEntity(entity, type, false);
+        }
     }
 };
 
