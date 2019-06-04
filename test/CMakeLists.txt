@@ -12,6 +12,9 @@ add_executable(tests main.test.cpp)
 # wait for googletest before building tests
 add_dependencies(tests googletest)
 
+# define test resources
+add_compile_definitions(TEST_RESOURCE_DIR="${CMAKE_CURRENT_SOURCE_DIR}/test-resources/")
+
 # add engine and game tests seperately
 add_subdirectory(engine-tests)
 add_subdirectory(game-tests)

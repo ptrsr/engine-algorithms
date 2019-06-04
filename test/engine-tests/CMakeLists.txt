@@ -13,6 +13,7 @@ target_sources(tests
 PUBLIC
 	# tests are run in given order
 	engine-tests/input/options.test.cpp
+	engine-tests/input/model.test.cpp
 
 	engine-tests/core/scene.test.cpp
 	engine-tests/core/typemap.test.cpp

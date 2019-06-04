@@ -6,6 +6,8 @@ cmake_minimum_required(VERSION 3.0)
 add_library(engine 
 	glm.hpp
 
+	input/model.cpp
+
 	auxiliary/c_getopt.h
 	auxiliary/options.cpp
 
