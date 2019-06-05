@@ -4,6 +4,8 @@ include_directories(
     ../src/
 	${GOOGLETEST_INCLUDE_DIR}
 	${GLM_INCLUDE_DIR}
+	${GLBINDING_INCLUDE_DIR}
+	${SFML_INCLUDE_DIR}
 )
 
 # create tests executable
@@ -31,6 +33,7 @@ target_link_libraries(tests
 	engine
 	${GOOGLETEST_LIBS}
 	${THREADING}
+	${SFML_LIBS}
 )
 
 set_target_properties(tests

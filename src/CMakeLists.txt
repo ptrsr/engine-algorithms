@@ -16,4 +16,4 @@ include_directories(
 add_subdirectory(engine)
 
 # build game executable
-add_subdirectory(game)
+#add_subdirectory(game)

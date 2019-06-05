@@ -31,4 +31,4 @@ endif()
 set_target_properties(engine PROPERTIES LINKER_LANGUAGE CXX)
 
 # NOTE: glm is header only, no need to link
-target_link_libraries(engine ${GLBINDING_LIBS} ${GLM_LIBS} ${SFML_LIBS})
+target_link_libraries(engine ${GLBINDING_LIBS} ${SFML_LIBS})

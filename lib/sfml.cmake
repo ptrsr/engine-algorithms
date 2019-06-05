@@ -30,4 +30,23 @@ if (${BUILD_HEAD})
         ${INSTALL_DIR}/lib/${CMAKE_STATIC_LIBRARY_PREFIX}sfml-graphics-s$<$<CONFIG:Debug>:-d>${CMAKE_STATIC_LIBRARY_SUFFIX}
         ${INSTALL_DIR}/lib/${CMAKE_STATIC_LIBRARY_PREFIX}sfml-window-s$<$<CONFIG:Debug>:-d>${CMAKE_STATIC_LIBRARY_SUFFIX}
     )
+
+    if (UNIX)
+        find_package(X11 REQUIRED)
+
+        set(OpenGL_GL_PREFERENCE "LEGACY")
+        find_package(OpenGL REQUIRED)
+
+        find_package(UDEV REQUIRED)
+
+        message("FOUND: ${UDEV_FOUND}")
+
+        list(APPEND SFML_INCLUDE_DIR ${X11_INCLUDE_DIR})
+
+        list(APPEND SFML_LIBS
+            ${X11_LIBRARIES}
+            X11::Xrandr
+            OpenGL::GL
+        )
+    endif()
 endif()

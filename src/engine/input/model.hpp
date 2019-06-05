@@ -23,23 +23,22 @@ public:
     // GLuint normal_buffer_id;
     // GLuint uv_buffer_id;
 		
-    class Triplet {
-        public:
-            unsigned vert;
-            unsigned norm;
-            unsigned uv;
-            
-            Triplet(unsigned vert, unsigned norm, unsigned uv)
-                : vert(vert)
-                , norm(norm) 
-                , uv(uv)
-                { }
-            
-            // required for use as key in map
-            bool operator < (const Triplet other) const {
-                return memcmp((void*)this, (void*)&other, sizeof(Triplet)) > 0;
-            }
-		};
+    struct Triplet {
+        unsigned vert;
+        unsigned norm;
+        unsigned uv;
+        
+        Triplet(unsigned vert, unsigned norm, unsigned uv)
+            : vert(vert)
+            , norm(norm) 
+            , uv(uv)
+            { }
+        
+        // required for use as key in map
+        bool operator < (const Triplet other) const {
+            return memcmp((void*)this, (void*)&other, sizeof(Triplet)) > 0;
+        }
+    };
 };
 
 typedef std::unique_ptr<Model> Model_ptr;
