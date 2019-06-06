@@ -6,7 +6,7 @@
 
 #include <ostream>
 
-#include <SFML/Window.hpp>
+#include <GLFW/glfw3.h>
 
 TEST(GpuModelTest, GenerateBuffer) {
     GpuModel model = GpuModel();

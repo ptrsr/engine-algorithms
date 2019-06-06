@@ -8,7 +8,7 @@ include_directories(./)
 include_directories(
 	${GLBINDING_INCLUDE_DIR}
 	${GLM_INCLUDE_DIR}
-	${SFML_INCLUDE_DIR}
+	${GLFW_INCLUDE_DIR}
 	${GOOGLETEST_INCLUDE_DIR}
 )
 
@@ -16,4 +16,4 @@ include_directories(
 add_subdirectory(engine)
 
 # build game executable
-#add_subdirectory(game)
+add_subdirectory(game)

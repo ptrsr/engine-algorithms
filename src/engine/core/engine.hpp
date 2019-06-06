@@ -12,12 +12,13 @@ private:
     bool running = false;
 
 protected:
-    virtual void Update();
+    virtual void Update() = 0;
 
 public:
     Scene_ptr scene;
 
-    Engine() = default;
+    Engine();
+    virtual ~Engine();
 
     void Run();
     void Stop();

@@ -17,13 +17,14 @@ add_library(engine
 	components/transform.cpp
 	components/hierarchy.cpp
 	components/projection.cpp
+	components/window.cpp
 )
 
 # wait for glm before building engine
 add_dependencies(engine glm)
 
 if (${BUILD_HEAD})
-	add_dependencies(engine glbinding sfml)
+	add_dependencies(engine glbinding glfw)
 endif()
 
 # because the libraries do not exist during configuration time,
@@ -31,4 +32,7 @@ endif()
 set_target_properties(engine PROPERTIES LINKER_LANGUAGE CXX)
 
 # NOTE: glm is header only, no need to link
-target_link_libraries(engine ${GLBINDING_LIBS} ${SFML_LIBS})
+target_link_libraries(engine 
+	${GLBINDING_LIBS} 
+	${GLFW_LIBS}
+)

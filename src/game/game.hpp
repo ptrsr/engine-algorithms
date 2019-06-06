@@ -2,12 +2,13 @@
 #define GAME_HPP_
 
 #include <engine/core/engine.hpp>
-
-class Options;
+#include <engine/auxiliary/options.hpp>
 
 class Game : public Engine {
 public:
-    Game(const Options& options);
+    Game();
+
+    void Update() override;
 
 };
 

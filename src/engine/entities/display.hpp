@@ -5,8 +5,10 @@
 #include <engine/components/window.hpp>
 
 class Display : public Entity {
-    Display()
-        : window(AddComponent<Window>())
+public:
+    Display(unsigned int id)
+        : Entity(id)
+        , window(AddComponent<Window>(300, 300, "test"))
         { }
 
     Window& window;

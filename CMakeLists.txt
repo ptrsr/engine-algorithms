@@ -41,7 +41,7 @@ include(glm)
 
 if(${BUILD_HEAD})
     include(glbinding)
-    include(sfml)
+    include(glfw)
 endif()
 
 # preprocessor variable for debugging

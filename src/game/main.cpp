@@ -6,8 +6,8 @@ static Engine_ptr engine;
 int main(int argc, char** argv) {
     Options opts = Options::ParseOptions(argc, argv);
 
-    engine = std::make_unique<Game>(opts);
-    //engine->Run();
+    engine = std::make_unique<Game>();
+    engine->Run();
 
     return 0;
 }

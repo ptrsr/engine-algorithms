@@ -21,7 +21,7 @@ PUBLIC
 	engine-tests/core/component.test.cpp
 	engine-tests/core/system.test.cpp
 
-	engine-tests/core/gpu/gpumodel.test.cpp
+	# engine-tests/core/gpu/gpumodel.test.cpp
 
 	engine-tests/components/transform.test.cpp
 	engine-tests/components/hierarchy.test.cpp
