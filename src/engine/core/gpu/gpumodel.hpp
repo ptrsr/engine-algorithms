@@ -26,7 +26,7 @@ public:
     gl::GLuint GenerateBuffer(std::vector<T>& data, gl::GLenum buffer_type) {
         
         
-        gl::GLuint id = 0;
+        gl::GLuint id;
         gl::glGenBuffers(1, &id);
         std::cout << true << std::endl;
         // gl::glBindBuffer(buffer_type, id);

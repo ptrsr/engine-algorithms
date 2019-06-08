@@ -25,6 +25,9 @@ add_dependencies(engine glm)
 
 if (${BUILD_HEAD})
 	add_dependencies(engine glbinding glfw)
+
+	# do not include OpenGL functions from GLFW
+	target_compile_definitions(engine PUBLIC GLFW_INCLUDE_NONE)
 endif()
 
 # because the libraries do not exist during configuration time,

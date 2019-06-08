@@ -42,7 +42,17 @@ include(glm)
 if(${BUILD_HEAD})
     include(glbinding)
     include(glfw)
+
+    # header files
+    include_directories(
+        ${GLBINDING_INCLUDE_DIR}
+        ${GLFW_INCLUDE_DIR}
+    )
+else()
+    # preprocessor variable for headless (testing)
+    add_compile_options("-DHEADLESS")
 endif()
+    
 
 # preprocessor variable for debugging
 add_compile_options("$<$<CONFIG:DEBUG>:-DDEBUG>")
