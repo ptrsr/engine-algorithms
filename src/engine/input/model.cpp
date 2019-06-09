@@ -1,6 +1,6 @@
 #include "model.hpp"
 
-#include <istream>
+#include <sstream>
 #include <stdexcept>
 #include <map>
 
@@ -8,9 +8,11 @@ bool StringCompare(const char* a, const char* b) {
     return strcmp(a, b) == 0;
 }
 
-Model_ptr Model::FromOBJ(std::istream& file) {
-    Model_ptr model = std::make_unique<Model>();
+Model_ptr Model::FromOBJ(const std::string& path) {
+    std::stringstream stream = std::stringstream(path, std::ios::in);
 
+    Model_ptr model = std::make_unique<Model>();
+    
     std::vector<glm::vec3> vertices;
     std::vector<glm::vec3> normals;
     std::vector<glm::vec2> uvs;
@@ -20,7 +22,7 @@ Model_ptr Model::FromOBJ(std::istream& file) {
     // process by line
     std::string line;
 
-    while (std::getline(file, line)) {
+    while (std::getline(stream, line) && !stream.eof()) {
         // read first two characters from each line
         char cmd[2];
         cmd[2] = 0;
@@ -55,7 +57,7 @@ Model_ptr Model::FromOBJ(std::istream& file) {
             );
 
             if (read != 10) {
-                throw new std::runtime_error("Could read model indices");
+                throw new std::runtime_error("Could not read model indices");
             }
 
             for (unsigned i = 0; i < 3; ++i) {

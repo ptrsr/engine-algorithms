@@ -6,6 +6,7 @@ cmake_minimum_required(VERSION 3.0)
 add_library(engine 
 	glm.hpp
 
+	input/file.cpp
 	input/model.cpp
 
 	auxiliary/c_getopt.h
@@ -13,6 +14,10 @@ add_library(engine
 
 	core/engine.cpp
 	core/system.cpp
+	
+	core/gpu/gpumodel.cpp
+	core/gpu/gpuprogram.cpp
+	core/gpu/shader.cpp
 
 	components/transform.cpp
 	components/hierarchy.cpp

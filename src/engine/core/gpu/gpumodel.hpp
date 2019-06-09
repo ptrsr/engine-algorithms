@@ -5,34 +5,31 @@
 #include <glbinding/gl/types.h>
 #include <glbinding/gl/gl.h>
 
-
 #include <engine/glm.hpp>
-
-#include <iostream>
 
 class Model;
 
 class GpuModel {
 public:
-    // const gl::GLuint index_buffer_id;
-    // const gl::GLuint vertex_buffer_id;
-    // const gl::GLuint normal_buffer_id;
-    // const gl::GLuint uv_buffer_id;
+    const gl::GLuint index_buffer_id;
+    const gl::GLuint vertex_buffer_id;
+    const gl::GLuint normal_buffer_id;
+    const gl::GLuint uv_buffer_id;
 
-    GpuModel() = default;
+    GpuModel(Model& model);
     GpuModel(std::unique_ptr<Model>& model);
 
     template<typename T>
     gl::GLuint GenerateBuffer(std::vector<T>& data, gl::GLenum buffer_type) {
-        
-        
-        gl::GLuint id;
+        gl::GLuint id = -1;
+        // no buffer created when there is no data to put into it
+        if (data.size() == 0) {
+            return id;
+        }
         gl::glGenBuffers(1, &id);
-        std::cout << true << std::endl;
-        // gl::glBindBuffer(buffer_type, id);
-        // gl::glBufferData(buffer_type, data.size() * sizeof(T), &data[0], gl::GL_STATIC_DRAW);
-        return 1;
-        // return id;
+        gl::glBindBuffer(buffer_type, id);
+        gl::glBufferData(buffer_type, data.size() * sizeof(T), &data[0], gl::GL_STATIC_DRAW);
+        return id;
     }
 };
 

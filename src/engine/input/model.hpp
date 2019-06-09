@@ -1,28 +1,22 @@
 #ifndef MODEL_HPP_
 #define MODEL_HPP_
 
+#include <string>
 #include <vector>
 #include <memory>
-#include <iosfwd>
-#include <engine/glm.hpp>
 
-class fstream;
+#include <engine/glm.hpp>
 
 class Model {
 public:
     Model() = default;
-    static std::unique_ptr<Model> FromOBJ(std::istream& stream);
+    static std::unique_ptr<Model> FromOBJ(const std::string& path);
 
     std::vector<unsigned> indices;
     std::vector<glm::vec3> vertices;
     std::vector<glm::vec3> normals;
     std::vector<glm::vec2> uvs;
 
-    // GLuint index_buffer_id;
-    // GLuint vertex_buffer_id;
-    // GLuint normal_buffer_id;
-    // GLuint uv_buffer_id;
-		
     struct Triplet {
         unsigned vert;
         unsigned norm;
