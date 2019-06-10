@@ -12,7 +12,7 @@ namespace {
     // transform test setup
     class TransformTest : public ::testing::Test {
     protected:
-        Transform transform = Transform();
+        Transform transform;
     };
 
     TEST_F(TransformTest, Constructor) {

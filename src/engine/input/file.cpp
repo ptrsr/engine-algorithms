@@ -14,7 +14,7 @@ std::string GetContent(std::string path) {
     in.seekg(0, std::ios::end);
     size_t len = in.tellg();
     in.seekg(0);
-    std::string content(len + 1, '\0');
+    std::string content(len, '\0');
     in.read(&content[0], len);
     in.close();
     return content;

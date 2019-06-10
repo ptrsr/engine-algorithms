@@ -21,7 +21,7 @@ public:
 
     template<typename T>
     gl::GLuint GenerateBuffer(std::vector<T>& data, gl::GLenum buffer_type) {
-        gl::GLuint id = -1;
+        gl::GLuint id = 0;
         // no buffer created when there is no data to put into it
         if (data.size() == 0) {
             return id;

@@ -62,7 +62,7 @@ namespace {
     }
 
     TEST(ComponentTest, Clone) {
-        Scene scene = Scene();
+        Scene scene;
         bool removed = false;
 
         MockEntity& original = scene.AddEntity<MockEntity>(removed);
@@ -72,7 +72,7 @@ namespace {
     }
 
     TEST(ComponentTest, Destructor) {
-        Scene scene = Scene();
+        Scene scene;
         bool removed = false;
 
         MockEntity& entity = scene.AddEntity<MockEntity>(removed);

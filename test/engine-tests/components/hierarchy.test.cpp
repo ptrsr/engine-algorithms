@@ -7,14 +7,14 @@ namespace {
     /* Hierarchy has protected destructor.
        Creating a mock for testing. */
     TEST(HierarchyTest, AddChild) {
-        Hierarchy parent = Hierarchy();
+        Hierarchy parent;
 
         // no children after init
         auto& children = parent.GetChildren();
         ASSERT_TRUE(children.empty());
 
         // adding child results in correct parent
-        Hierarchy child = Hierarchy();
+        Hierarchy child;
         parent.AddChild(child);
         ASSERT_EQ(&parent, child.GetParent());
 
@@ -31,8 +31,7 @@ namespace {
     }
 
     TEST(HierarchyTest, GetChild) {
-        Hierarchy parent = Hierarchy();
-        Hierarchy child = Hierarchy();
+        Hierarchy parent, child;
 
         parent.AddChild(child);
 
@@ -43,9 +42,7 @@ namespace {
     }
 
     TEST(HierarchyTest, GetChildren) {
-        Hierarchy parent = Hierarchy();
-        Hierarchy child0 = Hierarchy();
-        Hierarchy child1 = Hierarchy();
+        Hierarchy parent, child0, child1;
 
         parent.AddChild(child0);
         parent.AddChild(child1);
@@ -57,11 +54,9 @@ namespace {
     }
 
     TEST(HierarchyTest, UnParent) {
-        Hierarchy parent = Hierarchy();
-
-        // add child
-        Hierarchy child = Hierarchy();
+        Hierarchy parent, child;
         parent.AddChild(child);
+
         ASSERT_EQ(1, parent.GetChildren().size());
 
         // parent has no more children after unparenting child
@@ -71,9 +66,7 @@ namespace {
     }
 
     TEST(HierarchyTest, SwitchParent) {
-        Hierarchy parent1 = Hierarchy();
-        Hierarchy parent2 = Hierarchy();
-        Hierarchy child = Hierarchy();
+        Hierarchy parent1, parent2, child;
 
         parent1.AddChild(child);
         parent2.AddChild(child);
@@ -85,10 +78,10 @@ namespace {
     }
 
     TEST(HierarchyTest, Root) {
-        Hierarchy root = Hierarchy();
+        Hierarchy root;
 
-        Hierarchy parent = Hierarchy(nullptr, &root);
-        Hierarchy child = Hierarchy(nullptr, &root);
+        Hierarchy parent(nullptr, &root);
+        Hierarchy child(nullptr, &root);
 
         // automatically childed too root
         ASSERT_EQ(2, root.GetChildren().size());
@@ -106,10 +99,9 @@ namespace {
     }
 
     TEST(HierarchyTest, Destructor) {
-        Hierarchy parent = Hierarchy();
-        Hierarchy child = Hierarchy();
+        Hierarchy parent, child;
         {
-            Hierarchy middle = Hierarchy();
+            Hierarchy middle;
             parent.AddChild(middle);
             middle.AddChild(child);
         }

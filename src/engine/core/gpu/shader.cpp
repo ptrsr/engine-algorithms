@@ -5,12 +5,13 @@
 
 #include <iostream>
 
-Shader::Shader(std::string source, Type type) {
-    const gl::GLuint id = gl::glCreateShader((gl::GLenum)type);
-
+Shader::Shader(const std::string& source, const Type type)
+    : id(gl::glCreateShader((gl::GLenum)type))
+    , type(type) 
+{
     // add source and compile
     const char* source_ptr = source.c_str();
-    gl::glShaderSource(id, 1, (const gl::GLchar* const*)(&source_ptr), nullptr);
+    gl::glShaderSource(id, 1, &source_ptr, NULL);
     gl::glCompileShader(id);
 
     // get compiling result
@@ -31,4 +32,8 @@ Shader::Shader(std::string source, Type type) {
         // throw with message
         throw new std::runtime_error(error.data());
     }
+}
+
+Shader::~Shader() {
+    gl::glDeleteShader(id);
 }

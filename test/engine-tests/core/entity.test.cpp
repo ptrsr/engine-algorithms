@@ -6,7 +6,6 @@
 /* NOTE: since Entity is based on TypeMap, most functionality will be tested
    in typemap.test.cpp . here we will test the possiblities of multi inheritance
    for entities. */
-
 namespace {
     class MockComponent : public Component {
     public:
@@ -55,7 +54,7 @@ namespace {
     };
 
     TEST(EntityTest, Init) {
-        Scene scene = Scene();
+        Scene scene;
         
         bool init = false;
         MockEntityD& d_ref = scene.AddEntity<MockEntityD>(init);
@@ -64,7 +63,7 @@ namespace {
     }
 
     TEST(EntityTest, MultiBase) {
-        MockEntityC test_entity = MockEntityC();
+        MockEntityC test_entity;
 
         // MockEntityC's MockComponents point to the same MockComponent
         ASSERT_EQ(&test_entity.mock_component_a, &test_entity.mock_component_b);

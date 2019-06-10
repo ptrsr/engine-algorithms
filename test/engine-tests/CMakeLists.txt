@@ -12,6 +12,7 @@ endif()
 target_sources(tests
 PUBLIC
 	# tests are run in given order
+	engine-tests/input/file.test.cpp
 	engine-tests/input/options.test.cpp
 	engine-tests/input/model.test.cpp
 
