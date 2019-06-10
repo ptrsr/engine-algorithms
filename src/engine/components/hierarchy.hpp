@@ -29,8 +29,8 @@ public:
     Hierarchy* const GetChild(const unsigned int index = 0) const;
     const std::vector<Hierarchy*>& GetChildren() const;
 
-    virtual Component* Clone() override {
-        return new Hierarchy(*this);
+    virtual Component_ptr Clone(Entity* const entity) override {
+        return Component_ptr(new Hierarchy(entity, root));
     }
     //void Remove(const bool recursive = false);
     //Transform_ptr Clone(const bool recursive = false) const;

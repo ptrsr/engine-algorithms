@@ -9,43 +9,41 @@
 namespace {
     class MockComponent : public Component {
     public:
+        unsigned test = 0;
+
         MockComponent(Entity* const entity)
             : Component(entity)
             { }
-            
-        virtual Component* Clone() override {
-            return new MockComponent(*this);
-        }
     };
 
-    class MockEntityA : virtual public Entity { 
+    typedef std::shared_ptr<MockComponent> MockComponent_ptr;
+
+    class MockEntity : public Entity {
     public:
-        MockEntityA()
-            : mock_component_a(AddComponent<MockComponent>())
+        MockComponent& mock_component;
+
+        /* constructor that instantiates a new component */
+        MockEntity(const unsigned int id = 0)
+            : Entity(id)
+            , mock_component(AddComponent<MockComponent>())
             { }
-        
-        MockComponent& mock_component_a;
+
+        /* constructor that takes a smart pointer to a component.
+           this is for shared components */
+        MockEntity(const unsigned int id, MockComponent_ptr mock_component)
+            : Entity(id)
+            , mock_component(AddComponent(mock_component))
+            { }
     };
 
-    class MockEntityB : virtual public Entity { 
-    public:
-        MockEntityB()
-            : mock_component_b(AddComponent<MockComponent>())
-            { }
-        
-        MockComponent& mock_component_b;
-    };
-
-    class MockEntityC : public MockEntityA, public MockEntityB { };
-
-
-    class MockEntityD : public Entity {
+    class InitEntity : public Entity {
     private:
         bool& init;
 
     public: 
-        MockEntityD(const unsigned int id, bool& init)
-            : init(init)
+        InitEntity(const unsigned id, bool& init)
+            : Entity(id)
+            , init(init)
             { }
 
         void Init(Scene& scene) override {
@@ -53,19 +51,30 @@ namespace {
         }
     };
 
+    TEST(EntityTest, Constructor) {
+        {
+            MockEntity entity;
+            ASSERT_EQ(0, entity.mock_component.test);
+        }
+        {
+            MockComponent_ptr mock_component();
+        }
+    }
+
     TEST(EntityTest, Init) {
         Scene scene;
         
         bool init = false;
-        MockEntityD& d_ref = scene.AddEntity<MockEntityD>(init);
+        scene.AddEntity<InitEntity>(init);
         
+        // Component.Init is called on Scene.AddEntity
         ASSERT_TRUE(init);
     }
 
-    TEST(EntityTest, MultiBase) {
-        MockEntityC test_entity;
+    // TEST(EntityTest, AddComponent) {
+    //     MockEntityC test_entity;
 
-        // MockEntityC's MockComponents point to the same MockComponent
-        ASSERT_EQ(&test_entity.mock_component_a, &test_entity.mock_component_b);
-    }
+    //     // MockEntityC's MockComponents point to the same MockComponent
+    //     ASSERT_EQ(&test_entity.mock_component_a, &test_entity.mock_component_b);
+    // }
 }

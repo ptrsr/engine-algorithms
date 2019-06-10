@@ -11,11 +11,53 @@ class Scene;
 class Entity : protected TypeMap<Component> {
     friend Scene;
 
+public:
+    const unsigned int id;
+
+    Entity(const unsigned int id = 0)
+        : id(id)
+        { }
+
+    template<typename T>
+    T* const GetComponent() {
+        return GetBase<T>();
+    }
+
+    // proper deletion by Entity pointer
+    virtual ~Entity() = default;
+
+protected:
+    virtual void Init(Scene& scene) {
+        for (auto& component_pair : *this) {
+            component_pair.second->Init(scene);
+        }
+     }
+
+    template<typename T, class... P>
+    T& AddComponent(P&&... p) {
+        return AddBase<T>(this, std::forward<P>(p)...);
+    }
+
+    template<typename T>
+    T& AddComponent(const std::shared_ptr<T>& shared_component) {
+        T* const component = GetBase<T>();
+        if (component) {
+            throw new std::runtime_error("Cannot add component: already owns component type");
+        }
+    
+        this->insert(std::make_pair<std::type_index, Component_ptr>(
+                typeid(T), shared_component));
+
+        return *shared_component;
+    }
+
 private:
+    std::vector<std::type_index> type_register;
+
     // copy constructor
     Entity(const Entity& original, const unsigned int new_id)
         : id(new_id)
-        , TypeMap<Component>(original)
+        , TypeMap<Component>(std::move(*original.Clone(this)))
         { }
 
     template<typename T>
@@ -40,35 +82,6 @@ private:
             return true;
         }
         return false;
-    }
-
-protected:
-    virtual void Init(Scene& scene) {
-        for (auto& component_pair : *this) {
-            component_pair.second->Init(scene);
-        }
-     }
-
-    template<typename T, class... P>
-    T& AddComponent(P&&... p) {
-        return AddBase<T>(this, std::forward<P>(p)...);
-    }
-
-public:
-    std::vector<std::type_index> type_register;
-
-    Entity(const unsigned int id = 0)
-        : id(id)
-        { }
-
-    // proper deletion by Entity pointer
-    virtual ~Entity() = default;
-
-    const unsigned int id;
-
-    template<typename T>
-    T* const GetComponent() {
-        return GetBase<T>();
     }
 };
 

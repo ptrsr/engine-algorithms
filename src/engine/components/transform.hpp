@@ -14,11 +14,11 @@ private:
     glm::mat4& transform;
 
 protected:
-    virtual Component* Clone() override;
+    virtual Component_ptr Clone(Entity* const entity) override;
 
 public:
     ~Transform() = default;
-    Transform(Entity* const entity = nullptr, glm::mat4 init_mat = glm::mat4(1));
+    Transform(Entity* const entity = nullptr, const glm::mat4& init_mat = glm::mat4(1));
 
     // position
     glm::vec3 GetPosition() const;

@@ -15,11 +15,6 @@ namespace {
             , on_removal(on_removal)
             { }
 
-        MockComponent(MockComponent& original)
-            : Component(original.entity)
-            , on_removal(original.on_removal)
-            { }
-
         void Init(Scene& scene) override {
             on_init = true;
         }
@@ -28,8 +23,8 @@ namespace {
             on_removal = true;
         }
 
-        virtual Component* Clone() override {
-            return new MockComponent(*this);
+        virtual Component_ptr Clone(Entity* const entity) override {
+            return Component_ptr(new MockComponent(entity, on_removal));
         }
     };
 
@@ -49,13 +44,16 @@ namespace {
 
     };
 
-    TEST(ComponentTest, Init) {
+    TEST(ComponentTest, Constructor) {
         // on init is false when instantiating Component directly
         bool tmp = false;
         ASSERT_FALSE(MockComponent(nullptr, tmp).on_init);
 
         Scene scene = Scene();
         MockEntity& entity = scene.AddEntity<MockEntity>(tmp);
+
+        // reference to entity
+        ASSERT_EQ(&entity, entity.mock_component.entity);
 
         // Init is called through Entity during AddEntity
         ASSERT_TRUE(entity.mock_component.on_init);

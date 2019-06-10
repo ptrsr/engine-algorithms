@@ -15,7 +15,7 @@ Window::Window(Entity* entity, unsigned int width, unsigned int height, std::str
     , context(CreateWindow(width, height, title)) 
 { 
     if (!context) {
-        std::cout << "Could not init window. Exiting..." << std::endl;
+        std::cerr << "Could not init window. Exiting..." << std::endl;
         glfwTerminate();
         exit(EXIT_FAILURE);
     }

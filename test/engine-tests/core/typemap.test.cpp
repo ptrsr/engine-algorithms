@@ -6,10 +6,11 @@ namespace {
     class MockBase {
     public:
         // virtual copy idiom
-        virtual MockBase* Clone() {
+        virtual std::shared_ptr<MockBase> Clone() {
             return nullptr;
         }
     };
+
     class MockMap : public TypeMap<MockBase> { };
 
     class MockDerived : public MockBase { };
@@ -25,8 +26,8 @@ namespace {
             : test(original.test)
             { }
 
-        MockBase* Clone() override {
-            return new TestDerived(*this);
+        std::shared_ptr<MockBase> Clone() override {
+            return std::shared_ptr<MockBase>(new TestDerived(*this));
         }
 
         bool test;
@@ -72,10 +73,10 @@ namespace {
         TestDerived& test_base_original = map.AddBase<TestDerived>(true);
 
         // copy TypeMap with all it's contents
-        MockMap copied_map = MockMap(map);
+        auto* copied_map = map.Clone();
 
         // get pointer to copy of test_base_original
-        TestDerived* const test_base = copied_map.GetBase<TestDerived>();
+        TestDerived* const test_base = copied_map->GetBase<TestDerived>();
 
         // test_base pointer is not a nullptr
         ASSERT_TRUE(test_base);

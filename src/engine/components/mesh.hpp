@@ -3,20 +3,19 @@
 
 #include <engine/core/component.hpp>
 
+#include <memory>
+
+class GpuModel;
+typedef std::shared_ptr<GpuModel> GpuModel_ptr;
+
 class Mesh : public Component {
 public:
-		void load(const std::string& file_name);
+	GpuModel_ptr   gpu_model;
 
-        void streamToOpenGL(GLint pVerticesAttrib, GLint pNormalsAttrib, GLint pUVsAttrib);
+	Mesh(GpuModel_ptr, gpu_model)
+		: gpu_model(gpu_model)
+		{ }
 
-
-
-	protected:
-
-
-
-
-		
 };
 
 #endif//MESH_HPP_

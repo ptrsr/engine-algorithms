@@ -11,11 +11,13 @@
 
 template<class Base>
 class TypeMap 
-    : public std::map<std::type_index, std::unique_ptr<Base>> {
-    typedef std::unique_ptr<Base> Base_ptr;
+    : public std::map<std::type_index, std::shared_ptr<Base>> {
+    typedef std::shared_ptr<Base> Base_ptr;
     typedef std::map<std::type_index, Base_ptr> Base_map;
 
 public:
+    TypeMap() = default;
+
     template<typename T, class... P>
     T& AddBase(P&&... p) {
         CheckType<Base, T>();
@@ -59,26 +61,30 @@ public:
         return static_cast<T*>(base_ptr);
     }
 
-    // copy constructor
-    TypeMap(const TypeMap& original) { 
-        for (auto& pair : original) {
-            Base* clone = pair.second->Clone();
+    template<class... P>
+    TypeMap* Clone(P&&... p) const {
+        TypeMap* type_map = new TypeMap();
 
-            // move raw pointer into unique pointer
-            Base_ptr clone_ptr;
-            clone_ptr.reset(clone);
+        for (auto& pair : *this) {
+            Base_ptr clone = pair.second->Clone(std::forward<P>(p)...);
 
             // insert cloned bases into new typemap
-            this->insert(std::make_pair<std::type_index, Base_ptr>(
-                    std::type_index(pair.first), std::move(clone_ptr)
+            type_map->insert(std::make_pair<std::type_index, Base_ptr>(
+                    std::type_index(pair.first), std::move(clone)
                 )
             );
         }
+        return type_map;
     }
 
-public:
-    // default constructor
-    TypeMap() = default;
+protected:
+    TypeMap(TypeMap&& original) noexcept 
+    : std::map<std::type_index, std::shared_ptr<Base>>(original) 
+    { }
+
+private:
+    TypeMap(const TypeMap& original) = default;
+
 };
 
 #endif//TYPEMAP_HPP_

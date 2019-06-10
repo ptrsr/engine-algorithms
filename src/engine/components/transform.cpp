@@ -1,6 +1,6 @@
 #include "transform.hpp"
 
-Transform::Transform(Entity* const entity, glm::mat4 init_mat) 
+Transform::Transform(Entity* const entity, const glm::mat4& init_mat) 
     : Component(entity)
     , glm::mat4(init_mat)
     , transform(*this) 
@@ -22,8 +22,8 @@ void Transform::Rotate(const float angle, const glm::vec3& axis) {
     transform = glm::rotate(transform, angle, axis);
 }
 
-Component* Transform::Clone() {
-    return new Transform(*this);
+Component_ptr Transform::Clone(Entity* const entity) {
+    return Component_ptr(new Transform(entity, *this));
 }
 
 // void Transform::Remove(bool recursive) {
