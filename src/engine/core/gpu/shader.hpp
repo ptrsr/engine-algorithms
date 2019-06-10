@@ -5,6 +5,8 @@
 #include <memory>
 #include <glbinding/gl/gl.h>
 
+using namespace gl;
+
 class Shader;
 typedef std::shared_ptr<Shader> Shader_ptr;
 
@@ -15,13 +17,13 @@ public:
         return Shader_ptr(new Shader(std::forward<Args>(args)...));
     }
 
-    // will be casted to gl::GLenum
+    // will be casted to GLenum
     enum Type : unsigned int {
         vertex   = 0x8B31,
         fragment = 0x8B30
     };
 
-    gl::GLuint id;
+    GLuint id;
     const Type type;
 
     ~Shader();
@@ -29,6 +31,7 @@ public:
 private:
     Shader(const Shader& copy) = default;
     Shader(const std::string& source, const Type type);
+    
 };
 
 

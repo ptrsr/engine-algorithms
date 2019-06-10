@@ -2,12 +2,9 @@
 
 #include <iostream>
 
-//#ifndef HEADLESS
-#define GLFW_INCLUDE_NONE
 #include <glbinding/gl/gl.h>
 #include <GLFW/glfw3.h>
 #include <glbinding/glbinding.h>
-#define GL_VERSION_3_0 1
 
 using namespace gl;
 using namespace glbinding;

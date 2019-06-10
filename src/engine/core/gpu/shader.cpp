@@ -6,26 +6,26 @@
 #include <iostream>
 
 Shader::Shader(const std::string& source, const Type type)
-    : id(gl::glCreateShader((gl::GLenum)type))
+    : id(glCreateShader((GLenum)type))
     , type(type) 
 {
     // add source and compile
     const char* source_ptr = source.c_str();
-    gl::glShaderSource(id, 1, &source_ptr, NULL);
-    gl::glCompileShader(id);
+    glShaderSource(id, 1, &source_ptr, NULL);
+    glCompileShader(id);
 
     // get compiling result
-    gl::GLboolean result = gl::GL_FALSE;
-    gl::glGetShaderiv(id, gl::GL_COMPILE_STATUS, &result);
+    GLboolean result = GL_FALSE;
+    glGetShaderiv(id, GL_COMPILE_STATUS, &result);
 
     if (!result) {
         // get error length
         int info_length;
-        gl::glGetShaderiv(id, gl::GL_INFO_LOG_LENGTH, &info_length);
+        glGetShaderiv(id, GL_INFO_LOG_LENGTH, &info_length);
 
         // get error message
         std::vector<char> error(info_length + 1);
-        gl::glGetShaderInfoLog(id, info_length, NULL, error.data());
+        glGetShaderInfoLog(id, info_length, NULL, error.data());
 
         std::cerr << error.data() << std::endl;
 
@@ -35,5 +35,5 @@ Shader::Shader(const std::string& source, const Type type)
 }
 
 Shader::~Shader() {
-    gl::glDeleteShader(id);
+    glDeleteShader(id);
 }

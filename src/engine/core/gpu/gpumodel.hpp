@@ -7,30 +7,47 @@
 
 #include <engine/glm.hpp>
 
+using namespace gl;
+
 class Model;
+
+class GpuModel;
+typedef std::shared_ptr<GpuModel> GpuModel_ptr;
 
 class GpuModel {
 public:
-    const gl::GLuint index_buffer_id;
-    const gl::GLuint vertex_buffer_id;
-    const gl::GLuint normal_buffer_id;
-    const gl::GLuint uv_buffer_id;
+    const GLuint index_buffer_id;
+    const GLuint vertex_buffer_id;
+    const GLuint normal_buffer_id;
+    const GLuint uv_buffer_id;
 
-    GpuModel(Model& model);
-    GpuModel(std::unique_ptr<Model>& model);
+    template <class ...Args>
+    static GpuModel_ptr Make(Args&& ...args) {
+        return GpuModel_ptr(new GpuModel(std::forward<Args>(args)...));
+    }
 
     template<typename T>
-    gl::GLuint GenerateBuffer(std::vector<T>& data, gl::GLenum buffer_type) {
-        gl::GLuint id = 0;
+    GLuint GenerateBuffer(std::vector<T>& data, GLenum buffer_type) {
+        GLuint id = 0;
         // no buffer created when there is no data to put into it
         if (data.size() == 0) {
             return id;
         }
-        gl::glGenBuffers(1, &id);
-        gl::glBindBuffer(buffer_type, id);
-        gl::glBufferData(buffer_type, data.size() * sizeof(T), &data[0], gl::GL_STATIC_DRAW);
+        glGenBuffers(1, &id);
+        glBindBuffer(buffer_type, id);
+        glBufferData(buffer_type, data.size() * sizeof(T), &data[0], GL_STATIC_DRAW);
         return id;
     }
+
+    void DeleteBuffer(const GLuint id);
+
+    ~GpuModel();
+
+private:
+    GpuModel(Model& model);
+    GpuModel(std::unique_ptr<Model>& model);
+    GpuModel(const GpuModel& copy) = default;
+
 };
 
 #endif//GPU_MODEL_HPP
