@@ -38,13 +38,6 @@ namespace {
             : Entity(id)
             , mock_component(AddComponent<MockComponent>(data))
             { }
-
-        /* constructor that takes a smart pointer to a component.
-           this is for shared components */
-        // MockEntity(const unsigned id, MockComponent_ptr mock_component)
-        //     : Entity(id)
-        //     , mock_component(AddComponent(mock_component))
-        //     { }
     };
 
     TEST(EntityTest, Constructor) {

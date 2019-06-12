@@ -22,13 +22,11 @@ PUBLIC
 	engine-tests/core/component.test.cpp
 	engine-tests/core/system.test.cpp
 
-	engine-tests/core/gpu/gpumodel.test.cpp
-	engine-tests/core/gpu/gpuprogram.test.cpp
-	engine-tests/core/gpu/shader.test.cpp
-
 	engine-tests/components/transform.test.cpp
 	engine-tests/components/hierarchy.test.cpp
 	engine-tests/components/projection.test.cpp
+	engine-tests/components/mesh.test.cpp
+	engine-tests/components/material.test.cpp
 	
 	engine-tests/entities/camera.test.cpp
 )

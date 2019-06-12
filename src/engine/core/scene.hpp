@@ -121,11 +121,7 @@ public:
     T& CloneEntity(T& entity) {
         CheckType<Entity, T>();
         
-        Entity* clone = new T(entity, ++current_id);
-
-        // convert to unique pointer
-        Entity_ptr clone_ptr = Entity_ptr();
-        clone_ptr.reset(clone);
+        Entity_ptr clone = Entity_ptr(new T(entity, ++current_id));
 
         Entity_list* list = GetEntityList<T>();
     #ifdef DEBUG
@@ -133,10 +129,10 @@ public:
             throw new std::runtime_error("List of type T does not exist.");
         }
     #endif
-        list->push_back(std::move(clone_ptr));
+        list->push_back(clone);
         
         // return reference
-        T& entity_ptr = *static_cast<T*>(clone);
+        T& entity_ptr = *static_cast<T*>(clone.get());
         return entity_ptr;
     }
 

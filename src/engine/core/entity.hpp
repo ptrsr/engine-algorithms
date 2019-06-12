@@ -38,6 +38,8 @@ public:
     /* add a shared Component */
     template<typename T>
     T& AddComponent(const std::shared_ptr<T>& shared_component) {
+        CheckType<SharedComponent, T>();
+
         T* const component = GetBase<T>();
         if (component) {
             throw new std::runtime_error("Cannot add component: already owns component type");

@@ -1,7 +1,6 @@
 #include <gtest/gtest.h>
 
 #include <engine/core/scene.hpp>
-#include <iostream>
 
 namespace {
     class SceneTest : public ::testing::Test {
@@ -48,17 +47,13 @@ namespace {
             , mock_component(AddComponent<MockComponent>(data))
             { }
 
-        MockEntity(const Entity& entity, const unsigned id)
-            : Entity(entity, id)
+
+        /* a copy constructor. Component copying is handled
+           by the base Entity copy constructor */
+        MockEntity(const Entity& original, const unsigned id)
+            : Entity(original, id)
             , mock_component(*GetComponent<MockComponent>())
             { }
-
-        /* constructor that takes a smart pointer to a component.
-           this is for shared components */
-        // MockEntity(const unsigned id, MockComponent_ptr mock_component)
-        //     : Entity(id)
-        //     , mock_component(AddComponent(mock_component))
-        //     { }
     };
 
     class DerivedEntity : public MockEntity { 

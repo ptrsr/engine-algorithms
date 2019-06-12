@@ -15,14 +15,12 @@ add_library(engine
 	core/engine.cpp
 	core/system.cpp
 	
-	core/gpu/gpumodel.cpp
-	core/gpu/gpuprogram.cpp
-	core/gpu/shader.cpp
-
 	components/transform.cpp
 	components/hierarchy.cpp
 	components/projection.cpp
 	components/window.cpp
+	components/material.cpp
+	components/mesh.cpp
 )
 
 # wait for glm before building engine

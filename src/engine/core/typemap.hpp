@@ -6,6 +6,7 @@
 #include <utility>
 #include <memory>
 #include <map>
+#include <iostream>
 
 #include <engine/auxiliary/check.hpp>
 

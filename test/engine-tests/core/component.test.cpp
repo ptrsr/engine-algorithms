@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-#include <engine/core/entity.hpp>
+#include <engine/core/scene.hpp>
 
 
 namespace {
@@ -45,5 +45,48 @@ namespace {
         Component_ptr clone = component.Clone(&entity_B);
         ASSERT_EQ(&entity_B, clone->entity);
         ASSERT_EQ(1, static_cast<MockComponent*>(clone.get())->data);
+    }
+}
+
+namespace {
+    class MockSharedComponent : public SharedComponent {
+    public:
+        using SharedComponent::SharedComponent;
+
+        // example clone function of SharedComponent
+        Component_ptr Clone(Entity* const original) override {
+            return shared_from_this();
+        }
+    };
+
+    class MockEntity : public Entity {
+    public:
+        MockSharedComponent& shared_component;
+        
+        // default constructor
+        MockEntity(const unsigned id, std::shared_ptr<MockSharedComponent>& shared_component)
+            : Entity(id)
+            , shared_component(AddComponent(shared_component))
+            { }
+
+        // copy constructor
+        MockEntity(const Entity& original, const unsigned id)
+            : Entity(original, id)
+            , shared_component(*GetComponent<MockSharedComponent>())
+            { }
+    };
+
+    TEST(SharedComponentTest, Clone) {
+        Scene scene;
+        std::shared_ptr<MockSharedComponent> component = std::make_shared<MockSharedComponent>();
+
+        MockEntity& entity = scene.AddEntity<MockEntity>(component);
+
+        // both Entities have the same Component
+        ASSERT_EQ(component.get(), &scene.GetEntity<MockEntity>()->shared_component);
+
+        // cloning through scene results in new entity with same SharedComponent
+        MockEntity& copy = scene.CloneEntity(entity);
+        ASSERT_EQ(component.get(), &entity.shared_component);
     }
 }

@@ -19,7 +19,7 @@ typedef std::shared_ptr<Component> Component_ptr;
    contents.  */
 class Component {
     friend Entity;
-    friend TypeMap<Component>; // TODO: remove?
+    friend TypeMap<Component>;
 
 public:
     // parent entity owning this Component
@@ -41,7 +41,7 @@ protected:
 
 private:
     // to be used when cloning an Entity (and it's Components!)
-    virtual Component_ptr Clone(Entity* const entity) {
+    virtual Component_ptr Clone(Entity* const original) {
         throw new std::runtime_error("Clone function not implemented in derived class");
         return nullptr;
     };
@@ -52,20 +52,15 @@ private:
    that is similair between all derivatives of an Entity. */
 class SharedComponent 
     : public Component
-    , private std::enable_shared_from_this<SharedComponent> {
+    , public std::enable_shared_from_this<SharedComponent> {
 public:
     SharedComponent() = default;
-
-    // provide a shared pointer of this
-    virtual Component_ptr Clone(Entity* const entity) final override {
-        return shared_from_this();
-    }
     
 private:
     /* there is no single owning entity. the owning Entities will
        neither be tracked. a derived type will exist as long as there
        is an Entity that has this */
-    Entity* const entity;
+    Entity* const entity = nullptr;
 };
 
 #endif//COMPONENT_HPP_
