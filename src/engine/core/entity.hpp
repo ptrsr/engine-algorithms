@@ -4,40 +4,38 @@
 #include <engine/core/component.hpp>
 #include <engine/core/typemap.hpp>
 
-#include <typeinfo>
+#include <typeinfo> // TODO: remove?
 
 class Scene;
 
-class Entity : protected TypeMap<Component> {
+class Entity : private TypeMap<Component> {
     friend Scene;
 
 public:
-    const unsigned int id;
+    // unique id
+    const unsigned id;
 
-    Entity(const unsigned int id = 0)
+    Entity(const unsigned id = 0)
         : id(id)
         { }
+
+    // proper deletion by Entity pointer
+    virtual ~Entity() = default;
+
 
     template<typename T>
     T* const GetComponent() {
         return GetBase<T>();
     }
 
-    // proper deletion by Entity pointer
-    virtual ~Entity() = default;
-
-protected:
-    virtual void Init(Scene& scene) {
-        for (auto& component_pair : *this) {
-            component_pair.second->Init(scene);
-        }
-     }
-
+    /* instantiate a Component of type T and foward a pointer 
+       to this and the function parameters */
     template<typename T, class... P>
     T& AddComponent(P&&... p) {
         return AddBase<T>(this, std::forward<P>(p)...);
     }
 
+    /* add a shared Component */
     template<typename T>
     T& AddComponent(const std::shared_ptr<T>& shared_component) {
         T* const component = GetBase<T>();
@@ -51,14 +49,15 @@ protected:
         return *shared_component;
     }
 
-private:
-    std::vector<std::type_index> type_register;
-
+protected:
     // copy constructor
-    Entity(const Entity& original, const unsigned int new_id)
+    Entity(const Entity& original, const unsigned new_id)
         : id(new_id)
         , TypeMap<Component>(std::move(*original.Clone(this)))
         { }
+
+private:
+    std::vector<std::type_index> type_register;
 
     template<typename T>
     bool Register() {

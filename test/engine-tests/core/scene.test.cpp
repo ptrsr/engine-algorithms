@@ -4,108 +4,122 @@
 #include <iostream>
 
 namespace {
-    // scene test setup
     class SceneTest : public ::testing::Test {
     protected:
         Scene scene;
     };
 
-    class MockEntity : public Entity { 
+    class MockComponent : public Component {
     public:
-        MockEntity(const unsigned int id = 0, const int testnr = 0)
-            : Entity(id)
-            , testnr(testnr) 
+        const int data;
+        bool* removed = nullptr;
+
+        MockComponent(Entity* const entity, const int data = 0)
+            : Component(entity)
+            , data(data)
             { }
 
-        MockEntity(const unsigned int id, const MockEntity& original)
-            : Entity(id)
-            , testnr(original.testnr)
+        MockComponent(MockComponent& copy, Entity* const entity)
+            : Component(entity)
+            , data(copy.data)
             { }
 
-        int testnr;
-    };
+        virtual Component_ptr Clone(Entity* const entity) override {
+            return Copy<MockComponent>(*this, entity);
+        }
 
-    class EmtyEntity : public Entity { };
-
-    class RemovedEntity : public Entity {
-    public:
-        bool& on_removal;
-        
-        RemovedEntity(const unsigned int id, bool& on_removal)
-            : Entity(id)
-            , on_removal(on_removal) 
-            { }
-
-        ~RemovedEntity() {
-            on_removal = true;
+        ~MockComponent() {
+            if (removed) {
+                *removed = true;
+            }
         }
     };
 
-    class BaseEntity : public Entity {
-        // forward constructor to Entity
-        using Entity::Entity;
-    };
+    class NullComponent : public Component { };
 
-    class DerivedEntity : public BaseEntity {
+    class MockEntity : public Entity {
     public:
-        // example of constructor linking
-        using BaseEntity::BaseEntity;
+        MockComponent& mock_component;
 
-        DerivedEntity()
-            : BaseEntity(0)
+        /* constructor that instantiates a new component
+           with forwarded data */
+        MockEntity(const unsigned id = 0, const int data = 0)
+            : Entity(id)
+            , mock_component(AddComponent<MockComponent>(data))
             { }
+
+        MockEntity(const Entity& entity, const unsigned id)
+            : Entity(entity, id)
+            , mock_component(*GetComponent<MockComponent>())
+            { }
+
+        /* constructor that takes a smart pointer to a component.
+           this is for shared components */
+        // MockEntity(const unsigned id, MockComponent_ptr mock_component)
+        //     : Entity(id)
+        //     , mock_component(AddComponent(mock_component))
+        //     { }
     };
+
+    class DerivedEntity : public MockEntity { 
+        /* useful forwarding of base constructors. this is also
+           possible for components */
+        using MockEntity::MockEntity;
+    };
+
 
     TEST_F(SceneTest, AddEntity) {
         {
-            // add test entity and assert parameter forwarding
-            MockEntity& mock_entity = scene.AddEntity<MockEntity>(1);
-            ASSERT_EQ(typeid(MockEntity), typeid(mock_entity));
-            ASSERT_EQ(1, mock_entity.id);
+            auto& entity = scene.AddEntity<MockEntity>();
+            ASSERT_EQ(typeid(MockEntity), typeid(entity));
 
-            // first entity added to scene has ID of 1
-            ASSERT_EQ(1, mock_entity.testnr);
-        }
-        { // test if AddEntity works without parameters
-            MockEntity& mock_entity = scene.AddEntity<MockEntity>();
-            ASSERT_EQ(0, mock_entity.testnr);
+            // first entity added to scene has id of 1
+            ASSERT_EQ(1, entity.id);
 
-            // each entity gets a unique ID that increments
-            ASSERT_EQ(2, mock_entity.id);
+            // used default data
+            ASSERT_EQ(0, entity.mock_component.data);
         }
-        { // not forwarding id results in id of 0 (null)
-            EmtyEntity empty_entity;
-            ASSERT_EQ(0, empty_entity.id);
+        { // test data forwarding through AddEntity
+            MockEntity& entity = scene.AddEntity<MockEntity>(1);
+
+            // id incremented on adding new Entity
+            ASSERT_EQ(2, entity.id);
+
+            // data forwarded correctly
+            ASSERT_EQ(1, entity.mock_component.data);
         }
     }
 
     TEST_F(SceneTest, GetEntity) {
-        // MockEntity does not exist yet, GetEntity returns empty optional
+        // MockEntity does not exist yet, return nullptr
         ASSERT_FALSE(scene.GetEntity<MockEntity>());
 
-        { // GetEntity returns an optional with a reference_wrapper for mock_entity
-            MockEntity& mock_entity = scene.AddEntity<MockEntity>();
+        { // GetEntity returns an optional with a reference_wrapper for entity
+            MockEntity& entity = scene.AddEntity<MockEntity>();
 
             MockEntity* const mock_ptr = scene.GetEntity<MockEntity>();
             ASSERT_TRUE(mock_ptr);
 
             // both references point to the same MockEntity
-            ASSERT_EQ(&mock_entity, mock_ptr);
+            ASSERT_EQ(&entity, mock_ptr);
 
             // GetEntity without index is the same as index 0
-            ASSERT_EQ(&mock_entity, scene.GetEntity<MockEntity>(0));
+            ASSERT_EQ(&entity, scene.GetEntity<MockEntity>(0));
 
             // index 1 is empty
             ASSERT_FALSE(scene.GetEntity<MockEntity>(1));
         }
         { // adding new entity results in index 1 having a value
-            MockEntity& mock_entity = scene.AddEntity<MockEntity>();
+            MockEntity& entity = scene.AddEntity<MockEntity>(1);
 
             MockEntity* const mock_ptr = scene.GetEntity<MockEntity>(1);
+            
+            // returned a valid pointer and new MockEntity has correct data
             ASSERT_TRUE(mock_ptr);
+            ASSERT_EQ(1, entity.mock_component.data);
 
             // both references point to the same MockEntity
-            ASSERT_EQ(&mock_entity, mock_ptr);
+            ASSERT_EQ(&entity, mock_ptr);
         }
     }
 
@@ -126,87 +140,97 @@ namespace {
         ASSERT_EQ(&ref1, test_entities[1]);
 
         // no entities for EmptyEntity
-        ASSERT_EQ(0, scene.GetEntities<EmtyEntity>().size());
+        ASSERT_EQ(0, scene.GetEntities<DerivedEntity>().size());
     }
 
     TEST_F(SceneTest, CloneEntity) {
-        MockEntity& mock_entity = scene.AddEntity<MockEntity>(123);
-        MockEntity& clone_entity = scene.CloneEntity(mock_entity);
+        MockEntity& entity = scene.AddEntity<MockEntity>(123);
+        MockEntity& clone = scene.CloneEntity(entity);
 
-        // cloned entity has different address
-        ASSERT_NE(&mock_entity, &clone_entity);
+        // cloned Entity and it's Components are completely new
+        ASSERT_NE(&entity, &clone);
+        ASSERT_NE(&entity.mock_component, &clone.mock_component);
 
         // cloned entity has incremented id
-        ASSERT_EQ(1, mock_entity.id);
-        ASSERT_EQ(2, clone_entity.id);
+        ASSERT_EQ(1, entity.id);
+        ASSERT_EQ(2, clone.id);
 
         // cloned entity has same field values however
-        ASSERT_EQ(mock_entity.testnr, clone_entity.testnr);
+        ASSERT_EQ(entity.mock_component.data, clone.mock_component.data);
 
         // clone has been added to scene
         ASSERT_EQ(2, scene.GetEntities<MockEntity>().size());
 
         // correct address of clone has been added 
-        ASSERT_EQ(&clone_entity, scene.GetEntity<MockEntity>(1));
+        ASSERT_EQ(&clone, scene.GetEntity<MockEntity>(1));
     }
 
     TEST_F(SceneTest, RegisterEntity) {
-        DerivedEntity& derived_ref = scene.AddEntity<DerivedEntity>();
+        DerivedEntity& entity = scene.AddEntity<DerivedEntity>();
+
+        // no MockEntity exists yet
+        ASSERT_FALSE(scene.GetEntity<MockEntity>());
 
         // register on base class succesful
-        ASSERT_TRUE(scene.RegisterEntity<BaseEntity>(derived_ref));
+        ASSERT_TRUE(scene.RegisterEntity<MockEntity>(entity));
 
-        // new shared pointer to base class has same adress
-        BaseEntity* base_ptr = scene.GetEntity<BaseEntity>();
-        ASSERT_EQ(&derived_ref, base_ptr);
+        // cannot register twice, return false
+        ASSERT_FALSE(scene.RegisterEntity<MockEntity>(entity));
 
-        // cannot register since it's already been registered under Base
-        ASSERT_FALSE(scene.RegisterEntity<BaseEntity>(derived_ref));
+        /* derived class exists once but has been registered twice, 
+           resulting in the same adress */
+        MockEntity* base = scene.GetEntity<MockEntity>();
+        ASSERT_EQ(&entity, base);
 
         // throw when registering entity that has never been added to scene
-        DerivedEntity tmp = DerivedEntity();
-        ASSERT_ANY_THROW(scene.RegisterEntity<BaseEntity>(tmp));
+        {
+            DerivedEntity derived;
+            ASSERT_ANY_THROW(scene.RegisterEntity<MockEntity>(derived));
+        }
     }
 
     TEST_F(SceneTest, DeleteEntity) {
         bool removed = false;
 
-        // create a RemovedEntity
-        RemovedEntity& mock_entity = scene.AddEntity<RemovedEntity>(removed);
+        DerivedEntity& entity = scene.AddEntity<DerivedEntity>();
+        scene.RegisterEntity<MockEntity>(entity);
+        entity.mock_component.removed = &removed;
 
-        { // other scene (with no knowledge of mock_entity) throws on wrong removal
-            Scene tmp_scene = Scene();
-            ASSERT_ANY_THROW(tmp_scene.DeleteEntity(mock_entity));
+        { // other scene (with no knowledge of entity) throws on wrong removal
+            Scene tmp_scene;
+            ASSERT_ANY_THROW(tmp_scene.DeleteEntity(entity));
         }
-        // delete mock_entity
-        scene.DeleteEntity(mock_entity);
 
-        // list contains no more references
-        auto test_entities = scene.GetEntities<RemovedEntity>();
-        ASSERT_EQ(0, test_entities.size());
+        // delete entity
+        scene.DeleteEntity(entity);
+
+        // all registered versions are removed
+        ASSERT_FALSE(scene.GetEntity<MockEntity>());
+        ASSERT_FALSE(scene.GetEntity<DerivedEntity>());
+
+        /* when Entity is removed, so will it's Components.
+           the MockComponent destructor sets removed to true */
+        ASSERT_TRUE(removed);
 
         // throw when trying to delete ref twice
-        ASSERT_ANY_THROW(scene.DeleteEntity(mock_entity));
-
-        // removed has been set to true on deletion of RemovedEntity
-        ASSERT_TRUE(removed);
+        ASSERT_ANY_THROW(scene.DeleteEntity(entity));
     }
 
     TEST_F(SceneTest, UnRegister) {
-        DerivedEntity& derived = scene.AddEntity<DerivedEntity>();
-        scene.RegisterEntity<BaseEntity>(derived);
+        bool removed = false;
 
-        // unregistering base type results in nullptr when fetching by base type
-        scene.UnRegisterEntity<BaseEntity>(derived);
-        ASSERT_FALSE(scene.GetEntity<BaseEntity>());
+        DerivedEntity& entity = scene.AddEntity<DerivedEntity>();
+        scene.RegisterEntity<MockEntity>(entity);
+        entity.mock_component.removed = &removed;
 
-        // re-registering
-        ASSERT_TRUE(scene.RegisterEntity<BaseEntity>(derived));
-
-        // deleting results in unregistering of all types
-        scene.DeleteEntity(derived);
-
+        scene.UnRegisterEntity<DerivedEntity>(entity);
         ASSERT_FALSE(scene.GetEntity<DerivedEntity>());
-        ASSERT_FALSE(scene.GetEntity<BaseEntity>());
+        
+        // removed is still false since Entity still exists as MockEntity
+        ASSERT_FALSE(removed);
+
+        // removing all registered versions results in deletion of Entity
+        scene.UnRegisterEntity<MockEntity>(entity);
+        ASSERT_TRUE(removed);
     }
 }

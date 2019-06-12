@@ -23,7 +23,7 @@ void Transform::Rotate(const float angle, const glm::vec3& axis) {
 }
 
 Component_ptr Transform::Clone(Entity* const entity) {
-    return Component_ptr(new Transform(entity, *this));
+    return Copy<Transform>(entity, *this);
 }
 
 // void Transform::Remove(bool recursive) {

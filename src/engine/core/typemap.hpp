@@ -11,7 +11,7 @@
 
 template<class Base>
 class TypeMap 
-    : public std::map<std::type_index, std::shared_ptr<Base>> {
+    : protected std::map<std::type_index, std::shared_ptr<Base>> {
     typedef std::shared_ptr<Base> Base_ptr;
     typedef std::map<std::type_index, Base_ptr> Base_map;
 

@@ -16,72 +16,6 @@ typedef std::shared_ptr<Entity> Entity_ptr;
 typedef std::list<Entity_ptr> Entity_list;
 
 class Scene {
-private:
-    unsigned int current_id = 0;
-    std::unordered_map<std::type_index, Entity_list> entity_map;
-
-    // get Entity_list of type T. return nullptr if non existant
-    template<typename T>
-    Entity_list* GetEntityList() {
-        return GetEntityList(typeid(T));
-    }
-
-    // get Entity_list of type. return nullptr if non existant
-    Entity_list* GetEntityList(std::type_index type) {
-        // search map for entity type
-        auto map_it = entity_map.find(type);
-        if (map_it == entity_map.end()) {
-            return nullptr;
-        }
-        /* NOTE: raw pointer because we're pointing to an element in an stl container,
-                    only for internal usage */
-        return &map_it->second;
-    }
-
-    // get Entity_list of type T. create new one if non existant
-    template<typename T>
-    Entity_list& ForceEntityList() {
-        // if pair already exists, return reference. otherwise create new one and return reference
-        auto inserted_pair = entity_map.insert(std::pair<std::type_index, Entity_list>(typeid(T), Entity_list()));
-        // return ref to list
-        return (*inserted_pair.first).second;
-    }
-
-    bool UnRegisterEntity(Entity& entity, std::type_index type, bool unRegisterInternal = true) {
-        // get list of entity type
-        Entity_list* entity_list = GetEntityList(type);
-
-        // entity list doesn't even exist (entity has never been added to scene)
-        if (!entity_list) {
-            throw new std::runtime_error(
-                "Deleting non existing entity of type: " + 
-                std::string(type.name()) +
-                ". Did you already delete it?"
-            );
-        }
-        // find entity by iterating over list
-        for (auto it = entity_list->begin(); it != entity_list->end(); ++it) {
-            if ((*it).get() != &entity) {
-                // continue searching if not found
-                continue;
-            }
-            // remove entity
-            entity_list->erase(it);
-
-            if (unRegisterInternal) {
-                // remove type from internal entity registery
-                entity.UnRegister(type);
-            }
-            return true;
-        }
-        // entity wasn't found at all
-        throw new std::runtime_error(
-            "Deleting non existing entity of type: " + 
-            std::string(type.name()) +
-            ". Did you already delete it?"
-        );
-    }
-
 public:
     template<typename T, class... P>
     T& AddEntity(P&&... p) {
@@ -99,9 +33,6 @@ public:
         
         // save shared pointer
         entity_list.push_back(std::move(entity_ptr));
-
-        // allow entity to register or add new entities to scene on init
-        new_entity->Init(*this);
 
         // return reference
         return *new_entity;
@@ -190,7 +121,7 @@ public:
     T& CloneEntity(T& entity) {
         CheckType<Entity, T>();
         
-        Entity* clone = new T(++current_id, entity);
+        Entity* clone = new T(entity, ++current_id);
 
         // convert to unique pointer
         Entity_ptr clone_ptr = Entity_ptr();
@@ -204,9 +135,6 @@ public:
     #endif
         list->push_back(std::move(clone_ptr));
         
-        // init called since clone is a new Entity
-        clone->Init(*this);
-
         // return reference
         T& entity_ptr = *static_cast<T*>(clone);
         return entity_ptr;
@@ -224,12 +152,97 @@ public:
     void DeleteEntity(T& entity) {
         CheckType<Entity, T>();
 
+        // check if a list of Entity type even exists
+        Entity_list* entity_list = GetEntityList<T>();
+       if (!entity_list) {
+            throw new std::runtime_error("Could not delete Entity: already deleted");
+        }
+
+        // check if Entity exists
+        bool found = false;
+        for (Entity_ptr listed_entity : *entity_list) {
+            if (listed_entity.get() == &entity) {
+                found = true;
+                break;
+            }
+        }
+        if (!found) {
+            throw new std::runtime_error("Could not delete Entity: already deleted");
+        }
+
+        // remove all registered versions of Entity
         Entity* base = static_cast<Entity*>(&entity);
         for (std::type_index type : base->type_register) {
             /* since entity is completely deleted, no need to
                keep track of the internal types */
             UnRegisterEntity(entity, type, false);
         }
+    }
+
+private:
+    unsigned int current_id = 0;
+    std::unordered_map<std::type_index, Entity_list> entity_map;
+
+    // get Entity_list of type T. return nullptr if non existant
+    template<typename T>
+    Entity_list* GetEntityList() {
+        return GetEntityList(typeid(T));
+    }
+
+    // get Entity_list of type. return nullptr if non existant
+    Entity_list* GetEntityList(std::type_index type) {
+        // search map for entity type
+        auto map_it = entity_map.find(type);
+        if (map_it == entity_map.end()) {
+            return nullptr;
+        }
+        /* NOTE: raw pointer because we're pointing to an element in an stl container,
+                    only for internal usage */
+        return &map_it->second;
+    }
+
+    // get Entity_list of type T. create new one if non existant
+    template<typename T>
+    Entity_list& ForceEntityList() {
+        // if pair already exists, return reference. otherwise create new one and return reference
+        auto inserted_pair = entity_map.insert(std::pair<std::type_index, Entity_list>(typeid(T), Entity_list()));
+        // return ref to list
+        return (*inserted_pair.first).second;
+    }
+
+    bool UnRegisterEntity(Entity& entity, std::type_index type, bool unRegisterInternal = true) {
+        // get list of entity type
+        Entity_list* entity_list = GetEntityList(type);
+
+        // entity list doesn't even exist (entity has never been added to scene)
+        if (!entity_list) {
+            throw new std::runtime_error(
+                "Deleting non existing entity of type: " + 
+                std::string(type.name()) +
+                ". Did you already delete it?"
+            );
+        }
+        // find entity by iterating over list
+        for (auto it = entity_list->begin(); it != entity_list->end(); ++it) {
+            if ((*it).get() != &entity) {
+                // continue searching if not found
+                continue;
+            }
+            // remove entity
+            entity_list->erase(it);
+
+            if (unRegisterInternal) {
+                // remove type from internal entity registery
+                entity.UnRegister(type);
+            }
+            return true;
+        }
+        // entity wasn't found at all
+        throw new std::runtime_error(
+            "Deleting non existing entity of type: " + 
+            std::string(type.name()) +
+            ". Did you already delete it?"
+        );
     }
 };
 

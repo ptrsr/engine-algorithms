@@ -13,11 +13,16 @@ class Entity;
 class Component;
 typedef std::shared_ptr<Component> Component_ptr;
 
+/* a container class that holds data and functions
+   to easily manipulate said data. it should not
+   manipulate anything other than itself and it's
+   contents.  */
 class Component {
     friend Entity;
     friend TypeMap<Component>; // TODO: remove?
 
 public:
+    // parent entity owning this Component
     Entity* const entity;
 
     Component(Entity* const entity = nullptr)
@@ -28,35 +33,38 @@ public:
     virtual ~Component() = default;
 
 protected:
-    virtual void Init(Scene& scene) { }
-
-    template<typename T, typename F> 
-    Component_ptr Clone(T* original, F* forward = nullptr) {
-        if (this != original) {
-            throw std::runtime_error("Can only clone object where clone is called from");
-        }
-        return Component_ptr(new T(original, forward));
+    // helper function for Clone in derived class
+    template<typename T, class... P> 
+    Component_ptr Copy(P&&... p) {
+        return Component_ptr(new T(std::forward<P>(p)...));
     }
 
 private:
+    // to be used when cloning an Entity (and it's Components!)
     virtual Component_ptr Clone(Entity* const entity) {
         throw new std::runtime_error("Clone function not implemented in derived class");
         return nullptr;
     };
 };
 
-
+/* a component of which only one exists and is shared between
+   multiple Entities. this is useful for saving repetitive data
+   that is similair between all derivatives of an Entity. */
 class SharedComponent 
     : public Component
     , private std::enable_shared_from_this<SharedComponent> {
 public:
     SharedComponent() = default;
 
+    // provide a shared pointer of this
     virtual Component_ptr Clone(Entity* const entity) final override {
         return shared_from_this();
     }
     
 private:
+    /* there is no single owning entity. the owning Entities will
+       neither be tracked. a derived type will exist as long as there
+       is an Entity that has this */
     Entity* const entity;
 };
 

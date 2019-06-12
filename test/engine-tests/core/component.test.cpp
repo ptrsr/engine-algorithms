@@ -1,82 +1,49 @@
 #include <gtest/gtest.h>
 
-#include <engine/core/scene.hpp>
+#include <engine/core/entity.hpp>
+
 
 namespace {
     class MockComponent : public Component {
-    private:
-        bool& on_removal;
-
     public:
-        bool on_init = false;
+        const int data;
 
-        MockComponent(Entity* const entity, bool& on_removal)
+        // default constructor of mock
+        MockComponent(Entity* const entity = nullptr, const int data = 0)
             : Component(entity)
-            , on_removal(on_removal)
+            , data(data)
             { }
 
-        void Init(Scene& scene) override {
-            on_init = true;
-        }
+        // copy constructor of mock
+        MockComponent(MockComponent& copy, Entity* const entity)
+            : Component(entity)
+            , data(copy.data)
+            { }
 
-        ~MockComponent() {
-            on_removal = true;
-        }
-
+        // simple clone function
         virtual Component_ptr Clone(Entity* const entity) override {
-            return Component_ptr(new MockComponent(entity, on_removal));
+            /* copy is a shorthand for creating a new Component_ptr 
+               of <component-type> */
+            return Copy<MockComponent>(*this, entity);
         }
     };
-
-    class MockEntity : public Entity {
-    public:
-        MockComponent& mock_component;
-
-        MockEntity(const unsigned int id, bool& on_removal)
-            : Entity(id)
-            , mock_component(AddComponent<MockComponent>(on_removal)) 
-            { }
-
-        MockEntity(const unsigned int id, MockEntity& original)
-            : Entity(id) 
-            , mock_component(*GetComponent<MockComponent>())
-            { }
-
-    };
-
-    TEST(ComponentTest, Constructor) {
-        // on init is false when instantiating Component directly
-        bool tmp = false;
-        ASSERT_FALSE(MockComponent(nullptr, tmp).on_init);
-
-        Scene scene = Scene();
-        MockEntity& entity = scene.AddEntity<MockEntity>(tmp);
-
-        // reference to entity
-        ASSERT_EQ(&entity, entity.mock_component.entity);
-
-        // Init is called through Entity during AddEntity
-        ASSERT_TRUE(entity.mock_component.on_init);
-    }
 
     TEST(ComponentTest, Clone) {
-        Scene scene;
-        bool removed = false;
+        {
+            // default data with 0
+            MockComponent component;
+            ASSERT_EQ(0, component.data);
+        }
+        // init with entity and data
+        Entity entity_A;
+        MockComponent component(&entity_A, 1);
+        ASSERT_EQ(&entity_A, component.entity);
+        ASSERT_EQ(1, component.data);
 
-        MockEntity& original = scene.AddEntity<MockEntity>(removed);
-        MockEntity& copy = scene.CloneEntity(original);
-
-        ASSERT_NE(&original.mock_component, &copy.mock_component);
-    }
-
-    TEST(ComponentTest, Destructor) {
-        Scene scene;
-        bool removed = false;
-
-        MockEntity& entity = scene.AddEntity<MockEntity>(removed);
-        
-        // removed equals true after calling destructor of MockEntity
-        scene.DeleteEntity(entity);
-        ASSERT_TRUE(removed);
+        // clone component with data but other entity
+        Entity entity_B;
+        Component_ptr clone = component.Clone(&entity_B);
+        ASSERT_EQ(&entity_B, clone->entity);
+        ASSERT_EQ(1, static_cast<MockComponent*>(clone.get())->data);
     }
 }

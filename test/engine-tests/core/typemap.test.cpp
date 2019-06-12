@@ -3,34 +3,37 @@
 #include <engine/core/typemap.hpp>
 
 namespace {
-    class MockBase {
+    class MockItem {
     public:
         // virtual copy idiom
-        virtual std::shared_ptr<MockBase> Clone() {
+        virtual std::shared_ptr<MockItem> Clone(bool cloned) {
             return nullptr;
         }
     };
 
-    class MockMap : public TypeMap<MockBase> { };
+    class MockMap : public TypeMap<MockItem> { };
 
-    class MockDerived : public MockBase { };
+    class EmptyItem : public MockItem { };
 
-    class TestDerived : public MockBase { 
+    class TestItem : public MockItem { 
     public:
-        TestDerived(bool test = false)
+        bool test;
+        bool cloned = false;
+
+        TestItem(bool test = false)
             : test(test)
             { }
 
         // copy constructor
-        TestDerived(const TestDerived& original)
+        TestItem(const TestItem& original)
             : test(original.test)
             { }
 
-        std::shared_ptr<MockBase> Clone() override {
-            return std::shared_ptr<MockBase>(new TestDerived(*this));
+        std::shared_ptr<MockItem> Clone(bool cloned = false) override {
+            auto* derived = new TestItem(*this);
+            derived->cloned = cloned;
+            return std::shared_ptr<MockItem>(derived);
         }
-
-        bool test;
     };
 
     // typemap test setup
@@ -40,51 +43,58 @@ namespace {
     };
 
     TEST_F(TypeMapTest, AddBase) {
-        // add empty MockDerived
-        MockDerived& derived_base = map.AddBase<MockDerived>();
-        ASSERT_EQ(typeid(MockDerived), typeid(derived_base));
+        {
+            // add empty EmptyItem
+            auto& item = map.AddBase<EmptyItem>();
+            ASSERT_EQ(typeid(EmptyItem), typeid(item));
 
-        // re-adding same type results in returning reference to original object 
-        ASSERT_EQ(&derived_base, &map.AddBase<MockDerived>());
+            // re-adding same type results in returning reference to original object 
+            ASSERT_EQ(&item, &map.AddBase<EmptyItem>());
+        }
+        {
+            // add TestItem with constructor parameter forwarding
+            TestItem& test_item = map.AddBase<TestItem>(true);
+            ASSERT_EQ(typeid(TestItem), typeid(test_item));
 
-        // add TestDerived with constructor parameter forwarding
-        TestDerived& test_base = map.AddBase<TestDerived>(true);
-        ASSERT_EQ(typeid(TestDerived), typeid(test_base));
-
-        // assert if forwarding worked
-        ASSERT_TRUE(test_base.test);
+            // assert if forwarding worked
+            ASSERT_TRUE(test_item.test);
+        }
     }
 
     TEST_F(TypeMapTest, GetBase) {
         // GetBase returns nullptr when no base has been added before
-        ASSERT_FALSE(map.GetBase<MockDerived>());
+        ASSERT_FALSE(map.GetBase<EmptyItem>());
 
-        map.AddBase<MockDerived>();
-        // GetBase returns a valid pointer to MockDerived
-        MockDerived* const mock_derived = map.GetBase<MockDerived>();
-        ASSERT_TRUE(mock_derived);
-        ASSERT_EQ(typeid(MockDerived), typeid(*mock_derived));
+        map.AddBase<EmptyItem>();
 
-        // GetBase does returns nullptr when getting other derived class
-        ASSERT_FALSE(map.GetBase<TestDerived>());
+        // GetBase returns a valid pointer to EmptyItem
+        auto* item = map.GetBase<EmptyItem>();
+        ASSERT_TRUE(item);
+        ASSERT_EQ(typeid(EmptyItem), typeid(*item));
+
+        // GetBase still returns nullptr when derived base does not exist
+        ASSERT_FALSE(map.GetBase<TestItem>());
     }
 
-    TEST_F(TypeMapTest, Copy) {
-        TestDerived& test_base_original = map.AddBase<TestDerived>(true);
+    TEST_F(TypeMapTest, Clone) {
+        TestItem& item_original = map.AddBase<TestItem>(true);
 
-        // copy TypeMap with all it's contents
-        auto* copied_map = map.Clone();
+        /* copy TypeMap with all it's contents and
+           forward parameters to Item Clone function */
+        auto* copied_map = map.Clone(true);
 
-        // get pointer to copy of test_base_original
-        TestDerived* const test_base = copied_map->GetBase<TestDerived>();
+        // get pointer to copy of item_original
+        TestItem* const item = copied_map->GetBase<TestItem>();
 
-        // test_base pointer is not a nullptr
-        ASSERT_TRUE(test_base);
+        // item pointer is not a nullptr
+        ASSERT_TRUE(item);
 
         // copy does not point to original
-        ASSERT_NE(&test_base_original, test_base);
+        ASSERT_NE(&item_original, item);
 
         // copied contents have same member values
-        ASSERT_TRUE(test_base->test);
+        ASSERT_TRUE(item->test);
+
+        ASSERT_TRUE(item->cloned);
     }
 }

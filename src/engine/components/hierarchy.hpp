@@ -30,7 +30,7 @@ public:
     const std::vector<Hierarchy*>& GetChildren() const;
 
     virtual Component_ptr Clone(Entity* const entity) override {
-        return Component_ptr(new Hierarchy(entity, root));
+        return Copy<Hierarchy>(entity, root);
     }
     //void Remove(const bool recursive = false);
     //Transform_ptr Clone(const bool recursive = false) const;
