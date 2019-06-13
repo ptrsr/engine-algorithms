@@ -12,7 +12,7 @@ private:
     bool running = false;
 
 protected:
-    virtual void Update() = 0;
+    virtual void Update(UpdateContext& context);
 
 public:
     Scene_ptr scene;
@@ -31,15 +31,6 @@ public:
     template<typename T>
     T* const GetSystem() {
         return GetBase<T>();
-    }
-
-    template<typename T>
-    void UpdateSystems(T context) {
-        CheckType<UpdateContext, T>();
-
-        for (auto& pair : *this) {
-            pair.second->Update(context);
-        }
     }
 };
 

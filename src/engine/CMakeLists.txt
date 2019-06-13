@@ -21,6 +21,11 @@ add_library(engine
 	components/window.cpp
 	components/material.cpp
 	components/mesh.cpp
+
+	entities/gameobject.cpp
+	entities/renderobject.cpp
+
+	systems/renderer.cpp
 )
 
 # wait for glm before building engine

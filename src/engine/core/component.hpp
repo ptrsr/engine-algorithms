@@ -56,6 +56,11 @@ class SharedComponent
 public:
     SharedComponent() = default;
     
+    template<typename T, class... P> 
+    static std::shared_ptr<T> Make(P&&... p) {
+        return std::make_shared<T>(std::forward<P>(p)...);
+    }
+
 private:
     /* there is no single owning entity. the owning Entities will
        neither be tracked. a derived type will exist as long as there

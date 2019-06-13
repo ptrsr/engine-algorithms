@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 3.0)
 
+add_compile_definitions(RESOURCE_DIR="${PROJECT_SOURCE_DIR}/resources/")
+
 # create game executable
 add_executable(game main.cpp
 	game.cpp

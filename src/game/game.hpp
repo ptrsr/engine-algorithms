@@ -8,8 +8,6 @@ class Game : public Engine {
 public:
     Game();
 
-    void Update() override;
-
 };
 
 #endif//GAME_HPP_

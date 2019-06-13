@@ -4,6 +4,7 @@
 #include <engine/core/component.hpp>
 #include <engine/core/typemap.hpp>
 
+#include <vector>
 #include <typeinfo> // TODO: remove?
 
 class Scene;

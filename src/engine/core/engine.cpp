@@ -32,13 +32,21 @@ Engine::~Engine() {
 #endif//HEADLESS
 }
 
+void Engine::Update(UpdateContext& context) {
+        for (auto& pair : *this) {
+            pair.second->Update(context);
+        }
+    }
+
 void Engine::Run() {
     if (running) {
         return;
     }
     running = true;
+
+    UpdateContext context(*scene, 0);
     while (running) {
-        Update();
+        Update(context);
     }
 }
 

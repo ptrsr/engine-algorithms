@@ -18,9 +18,6 @@ struct UpdateContext {
 class Engine;
 
 class System {
-    friend class Engine;
-    friend std::unique_ptr<System>::deleter_type;
-
 public:
     bool enabled;
     virtual void Update(UpdateContext& scene) = 0;

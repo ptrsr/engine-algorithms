@@ -28,6 +28,8 @@ public:
     ~Shader();
 };
 
+typedef std::vector<Shader> Shaders;
+
 class Material : public SharedComponent {
 public:
     const GLint id;
@@ -42,5 +44,7 @@ public:
 
     ~Material();
 };
+
+typedef std::shared_ptr<Material> Material_ptr;
 
 #endif//GPUPROGRAM_HPP_

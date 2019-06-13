@@ -11,45 +11,54 @@
 
 using namespace gl;
 
-class Model;
+template<class Base>
+class Buffer {
+public:
+    const GLuint id = 0;
+    const GLenum type;
+    
+    const unsigned rows;
+    const bool stride;
 
-class Mesh;
-typedef std::shared_ptr<Mesh> Mesh_ptr;
+    Buffer(std::vector<Base>& data, GLenum type, const unsigned rows, const bool stride)
+        : rows(rows)
+        , stride(stride)
+        , type(type)
+        , id(data.size() ? GenBuffer() : 0) 
+    {
+        if (id == 0) {
+            return;
+        }
+
+        glBindBuffer(type, id);
+        glBufferData(type, data.size() * sizeof(Base), &data[0], GL_STATIC_DRAW);
+    }
+    
+    ~Buffer();
+
+    bool Bind(GLint attribute_id);
+
+private:
+    GLuint GenBuffer();
+};
+
+
+class Model;
 
 class Mesh : public SharedComponent {
 public:
-    const GLuint index_buffer_id;
-    const GLuint vertex_buffer_id;
-    const GLuint normal_buffer_id;
-    const GLuint uv_buffer_id;
+    const Buffer<unsigned>  index_buffer;
+    const Buffer<glm::vec3> vertex_buffer;
+    const Buffer<glm::vec3> normal_buffer;
+    const Buffer<glm::vec2> uv_buffer;
 
     Mesh(Model& model);
-
-    template <class ...Args>
-    static Mesh_ptr Make(Args&& ...args) {
-        return Mesh_ptr(new Mesh(std::forward<Args>(args)...));
-    }
-
-    template<typename T>
-    GLuint GenerateBuffer(std::vector<T>& data, GLenum buffer_type) {
-        GLuint id = 0;
-        
-        if (data.size() == 0) {
-            return id;
-        }
-        glGenBuffers(1, &id);
-        glBindBuffer(buffer_type, id);
-        glBufferData(buffer_type, data.size() * sizeof(T), &data[0], GL_STATIC_DRAW);
-        return id;
-    }
-
-    void DeleteBuffer(const GLuint id);
-
-    ~Mesh();
 
 private:
     Mesh(const Mesh& copy) = default;
 
 };
+
+typedef std::shared_ptr<Mesh> Mesh_ptr;
 
 #endif//GPU_MODEL_HPP
