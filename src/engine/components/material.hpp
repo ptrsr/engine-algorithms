@@ -22,20 +22,24 @@ public:
     const GLuint id;
     const Type type;
 
-    Shader(const Shader& copy) = default;
+
+
     Shader(const std::string& source, const Type type);
-    
     ~Shader();
+
+private:
+    Shader(const Shader& copy) = default;
 };
 
-typedef std::vector<Shader> Shaders;
+typedef std::shared_ptr<Shader> Shader_ptr;
+typedef std::vector<Shader_ptr> Shaders;
 
 class Material : public SharedComponent {
 public:
     const GLint id;
 
     Material(const Material& copy) = default;
-    Material(const std::vector<Shader>& shaders);
+    Material(const Shaders& shaders);
 
     void Use();
 

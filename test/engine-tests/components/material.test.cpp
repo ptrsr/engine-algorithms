@@ -18,8 +18,8 @@ namespace {
         File frag_file(std::string(TEST_RESOURCE_DIR) + "engine-test-resources/color.fs");
 
         Material material = Material({
-            Shader(vert_file.content, Shader::vertex),
-            Shader(frag_file.content, Shader::fragment),
+            std::make_shared<Shader>(vert_file.content, Shader::vertex),
+            std::make_shared<Shader>(frag_file.content, Shader::fragment),
         });
 
         // Material has id that isn't 0 (null)
@@ -31,8 +31,8 @@ namespace {
         File frag_file(std::string(TEST_RESOURCE_DIR) + "engine-test-resources/color.fs");
 
         Material material = Material({
-            Shader(vert_file.content, Shader::vertex),
-            Shader(frag_file.content, Shader::fragment),
+            std::make_shared<Shader>(vert_file.content, Shader::vertex),
+            std::make_shared<Shader>(frag_file.content, Shader::fragment),
         });
 
         // Material has id that isn't 0 (null)

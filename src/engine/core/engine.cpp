@@ -15,14 +15,21 @@ Engine::Engine()
     : scene(std::make_unique<Scene>()) 
 {
 #ifndef HEADLESS
+   
     std::cout << "Initializing GLFW..." << std::endl;
     if (!glfwInit()) {
         std::cerr << "Could not init GLFW. Exiting..." << std::endl;
         exit(EXIT_FAILURE);
     }
 
-    std::cout << "Initializing GLbinding..." << std::endl;
-    glbinding::initialize(glfwGetProcAddress);
+    glfwDefaultWindowHints();
+
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, true);
+    
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+
 #endif//HEADLESS
 }
 

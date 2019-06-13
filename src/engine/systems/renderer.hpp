@@ -5,6 +5,7 @@
 
 class Renderer : public System {
 public:
+    Renderer();
     virtual void Update(UpdateContext& scene) override;
 
 };

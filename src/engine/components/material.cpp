@@ -37,16 +37,17 @@ Shader::~Shader() {
     glDeleteShader(id);
 }
 
-Material::Material(const std::vector<Shader>& shaders)
+Material::Material(const Shaders& shaders)
     : id(glCreateProgram())
 {
-    for (const Shader& shader : shaders) {
-        glAttachShader(id, shader.id);
+    for (const Shader_ptr shader : shaders) {
+        glAttachShader(id, shader->id);
     }
     glLinkProgram(id);
 
     GLboolean result = GL_FALSE;
     glGetProgramiv(id, GL_LINK_STATUS, &result);
+
 
     if (!result) {
         GLint info_length;

@@ -8,7 +8,7 @@ class Display : public Entity {
 public:
     Display(unsigned int id)
         : Entity(id)
-        , window(AddComponent<Window>(300, 300, "test"))
+        , window(AddComponent<Window>(1280, 720, "test"))
         { }
 
     Window& window;

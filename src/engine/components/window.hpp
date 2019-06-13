@@ -4,6 +4,8 @@
 #include <string>
 #include <memory>
 #include <functional>
+
+#include <engine/glm.hpp>
 #include <engine/core/component.hpp>
 
 class GLFWwindow;
@@ -18,7 +20,8 @@ public:
     const GLFWwindow_ptr context;
 
     Window(Entity* entity, unsigned int width, unsigned int height, std::string title);
-
+    glm::vec2 GetFrameBufferSize();
+    void SwapBuffer();
 
 };
 

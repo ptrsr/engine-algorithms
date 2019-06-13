@@ -7,20 +7,23 @@
 
 #include <engine/entities/display.hpp>
 #include <engine/entities/renderobject.hpp>
+#include <engine/entities/camera.hpp>
 
 #include <engine/components/mesh.hpp>
 #include <engine/components/material.hpp>
 
 #include <engine/systems/renderer.hpp>
 
+#include <iostream>
+
 
 Game::Game() {
     std::string resources_dir = std::string(RESOURCE_DIR);
 
     scene->AddEntity<Display>();
-    
+
     // load model
-    File model_file(resources_dir + "test-model.obj");
+    File model_file(resources_dir + "cube_flat.obj");
     Model_ptr model = Model::FromOBJ(model_file.content);
 
     // load shaders
@@ -28,8 +31,8 @@ Game::Game() {
     File frag_file(resources_dir + "color.fs");
 
     Shaders shaders = {
-        Shader(vert_file.content, Shader::vertex),
-        Shader(frag_file.content, Shader::fragment)
+        std::make_shared<Shader>(vert_file.content, Shader::vertex),
+        std::make_shared<Shader>(frag_file.content, Shader::fragment)
     };
     
     // create material and mesh
@@ -38,6 +41,11 @@ Game::Game() {
 
     // create 3D object
     RenderObject& object = scene->AddEntity<RenderObject>(material, mesh);
+
+    // create camera
+    Camera& camera = scene->AddEntity<Camera>(ProjectionContext(60, glm::vec2(1280, 720), 1, 1000));
+
+    camera.transform.Translate(glm::vec3(0, 0, 20));
 
     // add render system
     AddSystem<Renderer>();
