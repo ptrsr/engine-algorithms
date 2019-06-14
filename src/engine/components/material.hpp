@@ -22,8 +22,6 @@ public:
     const GLuint id;
     const Type type;
 
-
-
     Shader(const std::string& source, const Type type);
     ~Shader();
 

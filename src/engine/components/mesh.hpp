@@ -21,11 +21,11 @@ public:
     
     const unsigned rows;
     const unsigned size;
-    const bool stride;
+    const bool normalized;
 
-    Buffer(std::vector<Base>& data, GLenum type, const unsigned rows, const bool stride)
+    Buffer(std::vector<Base>& data, GLenum type, const unsigned rows, const bool normalized)
         : rows(rows)
-        , stride(stride)
+        , normalized(normalized)
         , type(type)
         , size(data.size())
         , id(data.size() ? GenBuffer() : 0) 
@@ -38,30 +38,31 @@ public:
         glBufferData(type, data.size() * sizeof(Base), &data[0], GL_STATIC_DRAW);
     }
 
-    bool Bind(const GLint attribute_id) {
+    bool Bind(const GLint attribute_id, const unsigned alt_rows = 0, const GLsizei stride = 0, const void* offset = 0) {
         if (attribute_id == -1) {
             return false;
         }
         glBindBuffer(type, id);
 
-
-        std::cout << "atrib: " << attribute_id << ", buffer: " << id << std::endl;
-
         // no need to bind attributes on indices
         if (type == GL_ELEMENT_ARRAY_BUFFER) {
             return true;
         }
-        // save bound attribute
-        bound = attribute_id;
         glEnableVertexAttribArray(attribute_id);
-        glVertexAttribPointer(attribute_id, rows, GL_FLOAT, stride, 0, 0);
+        glVertexAttribPointer(attribute_id, alt_rows ? alt_rows : rows, GL_FLOAT, normalized, stride, offset);
         return true;
     }
 
-    bool UnBind() {
-        if (bound == -1) {
+    bool UnBind(const GLint attribute_id) {
+        if (attribute_id == -1) {
             return false;
         }
+
+        // no need to unbind attributes on indices
+        if (type == GL_ELEMENT_ARRAY_BUFFER) {
+            return false;
+        }
+
         glDisableVertexAttribArray(bound);
         return true;
     }
