@@ -88,4 +88,22 @@ namespace {
             0,  0,  0,  1
             ), transform, TRIG_DIF));
     }
+
+    TEST_F(TransformTest, Scale) {
+        transform.Scale(glm::vec3(1, 2, 3));
+        ASSERT_TRUE(CompareMats(glm::mat4(
+            1,  0,  0,  0,
+            0,  2,  0,  0,
+            0,  0,  3,  0,
+            0,  0,  0,  1
+            ), transform, TRIG_DIF));
+
+        transform.Scale(glm::vec3(3, 2, 1));
+        ASSERT_TRUE(CompareMats(glm::mat4(
+            3,  0,  0,  0,
+            0,  4,  0,  0,
+            0,  0,  3,  0,
+            0,  0,  0,  1
+            ), transform, TRIG_DIF));
+    }
 }

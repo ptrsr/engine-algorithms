@@ -7,9 +7,9 @@
 
 class Camera : public GameObject {
 public:
-    Camera(const unsigned int id, const ProjectionContext& context)
+    Camera(const unsigned int id, const float fov, const glm::vec2& window_size, const float near, const float far)
         : GameObject(id)
-        , projection(AddComponent<Projection>(context))
+        , projection(AddComponent<Projection>(fov, window_size, near, far))
         { }
     
     Projection& projection;

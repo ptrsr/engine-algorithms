@@ -4,13 +4,12 @@
 
 namespace {
     TEST(CameraTest, Constructor) {
-        ProjectionContext context(glm::radians(60.f), glm::vec2(1280, 720), 1, 1000);
-        Camera camera(0, context);
+        Camera camera(0, glm::radians(60.f), glm::vec2(1280, 720), 1.f, 1000.f);
 
         // context has been correctly forwarded
-        ASSERT_EQ(context.near, camera.projection.near);
-        ASSERT_EQ(context.far, camera.projection.far);
-        ASSERT_EQ(context.fov, camera.projection.fov);
-        ASSERT_EQ(context.windowSize, camera.projection.windowSize);
+        ASSERT_EQ(1, camera.projection.GetNear());
+        ASSERT_EQ(1000, camera.projection.GetFar());
+        ASSERT_EQ(glm::radians(60.f), camera.projection.GetFov());
+        ASSERT_EQ(glm::vec2(1280, 720), camera.projection.GetWindowSize());
     }
 }

@@ -10,16 +10,24 @@ glm::vec3 Transform::GetPosition() const {
     return glm::vec3(transform[3]);
 }
 
-void Transform::SetPosition(const glm::vec3& position) {
+Transform& Transform::SetPosition(const glm::vec3& position) {
     transform[3] = glm::vec4(position, 1);
+    return *this;
 }
 
-void Transform::Translate(const glm::vec3& translation) {
+Transform& Transform::Translate(const glm::vec3& translation) {
     transform[3] += glm::vec4(translation, 0);
+    return *this;
 }
 
-void Transform::Rotate(const float angle, const glm::vec3& axis) {
+Transform& Transform::Rotate(const float angle, const glm::vec3& axis) {
     transform = glm::rotate(transform, angle, axis);
+    return *this;
+}
+
+Transform& Transform::Scale(const glm::vec3& scalar) {
+    transform = glm::scale(transform, scalar);
+    return *this;
 }
 
 Component_ptr Transform::Clone(Entity* const entity) {

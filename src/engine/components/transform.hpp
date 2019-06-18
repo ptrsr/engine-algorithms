@@ -22,10 +22,11 @@ public:
 
     // position
     glm::vec3 GetPosition() const;
-    void SetPosition(const glm::vec3& position);
-    void Translate(const glm::vec3& translation);
-
-    void Rotate(const float angle, const glm::vec3& axis);
+    
+    Transform& SetPosition(const glm::vec3& position);
+    Transform& Translate(const glm::vec3& translation);
+    Transform& Rotate(const float angle, const glm::vec3& axis);
+    Transform& Scale(const glm::vec3& scalar);
 
 };
 

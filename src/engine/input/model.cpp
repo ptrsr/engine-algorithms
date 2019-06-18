@@ -8,10 +8,10 @@ bool StringCompare(const char* a, const char* b) {
     return strcmp(a, b) == 0;
 }
 
-Model_ptr Model::FromOBJ(const std::string& path) {
+Model Model::FromOBJ(const std::string& path) {
     std::stringstream stream = std::stringstream(path, std::ios::in);
 
-    Model_ptr model = std::make_unique<Model>();
+    Model model;
     
     std::vector<glm::vec3> vertices;
     std::vector<glm::vec3> normals;
@@ -22,7 +22,7 @@ Model_ptr Model::FromOBJ(const std::string& path) {
     // process by line
     std::string line;
 
-    while (std::getline(stream, line) && !stream.eof()) {
+    while (!stream.eof() && std::getline(stream, line)) {
         // read first two characters from each line
         char cmd[2];
         cmd[2] = 0;
@@ -51,13 +51,31 @@ Model_ptr Model::FromOBJ(const std::string& path) {
             glm::ivec3 uv_i;
 
             int read = sscanf(line.c_str(), "%2s %d/%d/%d %d/%d/%d %d/%d/%d", cmd,
-                &vertex_i[0], &vertex_i[1], &vertex_i[2],
-                &normal_i[0], &normal_i[1], &normal_i[2],
-                &uv_i[0],     &uv_i[1],     &uv_i[2]
+                &vertex_i[0], &normal_i[0], &uv_i[0],
+                &vertex_i[1], &normal_i[1], &uv_i[1],
+                &vertex_i[2], &normal_i[2], &uv_i[2]
             );
 
             if (read != 10) {
-                throw new std::runtime_error("Could not read model indices");
+                int count = sscanf(line.c_str(), "%2s %d %d %d", cmd, &vertex_i[0], &vertex_i[1], &vertex_i[2]);
+
+                if (count == 4)
+                {
+                    glm::vec3 normal = glm::normalize(glm::cross(
+                        vertices[vertex_i[1] - 1] - vertices[vertex_i[0] - 1], 
+                        vertices[vertex_i[2] - 1] - vertices[vertex_i[0] - 1])
+                    );
+
+                    normals.push_back(normal);
+                    normal_i = glm::ivec3(normals.size());
+
+                    uvs.push_back(glm::vec2());
+                    uv_i = glm::ivec3(uvs.size());
+                }
+                else {
+                    std::cout << ".obj file not supported";
+                    throw new std::runtime_error("Could not read model indices");
+                }
             }
 
             for (unsigned i = 0; i < 3; ++i) {
@@ -69,16 +87,16 @@ Model_ptr Model::FromOBJ(const std::string& path) {
                     unsigned int index = triplets.size();
                     triplets[triplet] = index;
 
-                    model->indices.push_back(index);
-                    model->vertices.push_back(vertices[vertex_i[i] - 1]);
-                    model->normals.push_back(normals[normal_i[i] - 1]);
-                    model->uvs.push_back(uvs[uv_i[i] - 1]);
+                    model.indices.push_back(index);
+                    model.vertices.push_back(vertices[vertex_i[i] - 1]);
+                    model.normals.push_back(normals[normal_i[i] - 1]);
+                    model.uvs.push_back(uvs[uv_i[i] - 1]);
 
                 } else {
-                    model->indices.push_back(it->second);
+                    model.indices.push_back(it->second);
                 }
             }
         }
     }
-    return model;
+    return std::move(model);
 }

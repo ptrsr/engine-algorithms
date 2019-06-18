@@ -10,7 +10,7 @@
 class Model {
 public:
     Model() = default;
-    static std::unique_ptr<Model> FromOBJ(const std::string& path);
+    static Model FromOBJ(const std::string& path);
 
     std::vector<unsigned> indices;
     std::vector<glm::vec3> vertices;
@@ -34,8 +34,6 @@ public:
         }
     };
 };
-
-typedef std::unique_ptr<Model> Model_ptr;
 
 
 #endif//MODEL_HPP_

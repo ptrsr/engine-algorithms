@@ -22,7 +22,8 @@ using namespace gl;
 
 
 Renderer::Renderer() {
-
+	glEnable( GL_DEPTH_TEST );
+	glEnable( GL_CULL_FACE ); // default GL_BACK
 }
 
 glm::mat4 GetModelMatrix(GameObject& object) {
@@ -35,85 +36,62 @@ glm::mat4 GetModelMatrix(GameObject& object) {
     return object.transform * GetModelMatrix(parent);
 }
 
-void Renderer::Update(UpdateContext& context) {
+void UpdateScreenSize(Projection& projection, Window& window) {
+    glm::vec2 size = window.GetFrameBufferSize();
+    
+    // update viewport and projection matrix on window size change
+    if (projection.GetWindowSize() != size) {
+        projection.SetWindowSize(size);
+        glViewport(0, 0, size.x, size.y);
+    }
+}
 
+void Renderer::Render(const RenderObject& object, const Camera& camera, const int mvp_id) const {
+    // set model view projection uniform in shader
+    glm::mat4 mvp = camera.projection.GetPerspective() * camera.transform * object.transform;
+    glUniformMatrix4fv(mvp_id, 1, GL_FALSE, glm::value_ptr(mvp));
+    
+    // draw polygons
+    glDrawElements(GL_TRIANGLES, object.mesh.index_buffer.size, GL_UNSIGNED_INT, (GLvoid*)0);
+}
+
+void Renderer::Update(UpdateContext& context) {
     Window& window = context.scene.GetEntity<Display>()->window;
     RenderObject& object = *context.scene.GetEntity<RenderObject>();
+    Camera& camera = *context.scene.GetEntity<Camera>();
 
-    std::vector<float> verts = { -0.6f, -0.4f, 1.f, 0.f, 0.f,
-       0.6f, -0.4f, 0.f, 1.f, 0.f,
-        0.f,  0.6f, 0.f, 0.f, 1.f };
+    object.transform.Rotate(0.01f, glm::vec3(0, 1, 0));
 
-    Buffer<float> buffer(verts, GL_ARRAY_BUFFER, 2, false);
+    // window resizing
+    UpdateScreenSize(camera.projection, window);
 
-    GLint mvp_location, vpos_location, vcol_location;
-    mvp_location  = object.material.GetUniform("MVP");
-    vpos_location = object.material.GetAttribute("vPos");
-    vcol_location = object.material.GetAttribute("vCol");
+    // clear draw buffer
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    buffer.Bind(vpos_location, 2, sizeof(float) * 5);
-    buffer.Bind(vcol_location, 3, sizeof(float) * 5, (void*) (sizeof(float) * 2));
-
-    float ratio;
-    int width, height;
-
-    glfwGetFramebufferSize(window.context.get(), &width, &height);
-    ratio = width / (float) height;
-
-    glViewport(0, 0, width, height);
-    glClear(GL_COLOR_BUFFER_BIT);
-
-    glm::mat4 m(1);
+    GLint vertex_id = object.material.GetAttribute("vertex");
+    GLint normal_id = object.material.GetAttribute("normal");
     
-    object.material.Use();
-    glUniformMatrix4fv(mvp_location, 1, GL_FALSE, glm::value_ptr(m));
-    glDrawArrays(GL_TRIANGLES, 0, 3);
+    GLint mvp_id = object.material.GetUniform("mvp_mat");
+    
+    // TODO: temporary!
+    GLint model_m_id = object.material.GetUniform("model_mat");
+    glUniformMatrix4fv(model_m_id, 1, GL_FALSE, glm::value_ptr((glm::mat4)object.transform));
 
+    // set gpu program
+    object.material.Use();
+    
+    // bind buffers to gpu program
+    object.mesh.vertex_buffer.Bind(vertex_id);
+    object.mesh.normal_buffer.Bind(normal_id);
+
+    object.mesh.index_buffer.Bind(0);
+
+    Render(object, camera, mvp_id);
+
+    // display on screen
     window.SwapBuffer();
 
-    buffer.UnBind(vpos_location);
-    buffer.UnBind(vcol_location);
-
-    // glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-    // Display& display = *context.scene.GetEntity<Display>();
-    // glm::vec2 buffer_size = display.window.GetFrameBufferSize();
-
-    // Camera& camera = *context.scene.GetEntity<Camera>();
-
-    // glm::mat4 view = GetModelMatrix(camera);
-    // glm::mat4 projection = camera.projection.perspective;
-    
-    // std::vector<RenderObject*> render_objects = context.scene.GetEntities<RenderObject>();
-
-    // glViewport(0, 0, 1280, 720);
-    // glClear(GL_COLOR_BUFFER_BIT);
-
-    // for (RenderObject* object : render_objects) {
-
-    //     object->material.Use();
-
-    //     glm::mat4 model = GetModelMatrix(*object);
-    //     glm::mat4 mvp = projection * view * model;
-
-
-    //     glm::ortho(-2, 2, -2 )
-    //     glUniformMatrix4fv(object->material.GetUniform("mvp"), 1, GL_FALSE, glm::value_ptr(mvp));
-
-
-    //     object->mesh.vertex_buffer.Bind(object->material.GetAttribute("vertex"));
-    //     object->mesh.normal_buffer.Bind(object->material.GetAttribute("normal"));
-    //     object->mesh.uv_buffer.Bind(object->material.GetAttribute("uv"));
-    //     object->mesh.index_buffer.Bind(0);
-
-    //     glDrawElements(GL_TRIANGLES, object->mesh.index_buffer.size, GL_UNSIGNED_INT, (GLvoid*)0);
-
-	//     glBindBuffer(GL_ARRAY_BUFFER, 0);
-        
-    //     object->mesh.vertex_buffer.UnBind();
-    //     object->mesh.normal_buffer.UnBind();
-    //     object->mesh.uv_buffer.UnBind();
-    // }
-
-    //display.window.SwapBuffer();
+    // unbind buffers from gpu program
+    object.mesh.vertex_buffer.UnBind(vertex_id);
+    object.mesh.normal_buffer.UnBind(normal_id);
 }
