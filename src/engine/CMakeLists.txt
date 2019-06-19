@@ -11,6 +11,7 @@ add_library(engine
 
 	auxiliary/c_getopt.h
 	auxiliary/options.cpp
+	auxiliary/timer.cpp
 
 	core/engine.cpp
 	core/system.cpp

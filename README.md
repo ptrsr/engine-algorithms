@@ -23,7 +23,7 @@ Note that only Visual Studio 2017 has been confirmed to work.
 ### Libraries
 - **[GLM](https://github.com/g-truc/glm)**: v0.9.9.5  
 - **[glbinding](https://github.com/cginternals/glbinding)**: v3.0.2  
-- **[SFML](https://github.com/SFML/SFML)**: v2.5.1  
+- **[GLFW](https://github.com/glfw/glfw)**: v3.3
 - **[Google Test](https://github.com/google/googletest)**: v1.8.1
 
 ### Build tools
