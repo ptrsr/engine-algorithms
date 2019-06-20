@@ -7,12 +7,14 @@
 typedef struct Options { 
 	Options() // default options
 		: track_timing(false)
-		, verbose(false) 
+		, verbose(false)
+		, frames(500)
 		{ }
 
 	// options
-	bool track_timing;
-	bool verbose;
+	bool     track_timing;
+	bool     verbose;
+	unsigned frames;
 
     static void PrintUsage(FILE* output = stdout);
     static Options ParseOptions(int argc, char** const argv);

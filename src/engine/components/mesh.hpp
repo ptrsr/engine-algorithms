@@ -9,8 +9,6 @@
 #include <engine/core/component.hpp>
 #include <engine/glm.hpp>
 
-#include <iostream>
-
 using namespace gl;
 
 template<class Base>
@@ -71,6 +69,7 @@ public:
         if (id == 0) {
             return;
         }
+
         glDeleteBuffers(1, &id);
     }
 

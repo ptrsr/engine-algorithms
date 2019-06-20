@@ -1,16 +1,17 @@
 #include "renderer.hpp"
 
-#include <engine/glm.hpp>
 #include <engine/core/scene.hpp>
+#include <engine/glm.hpp>
 
-#include <engine/entities/camera.hpp>
 #include <engine/entities/renderobject.hpp>
+#include <engine/entities/profiler.hpp>
+#include <engine/entities/camera.hpp>
 #include <engine/entities/display.hpp>
 
-#include <engine/components/material.hpp>
-#include <engine/components/mesh.hpp>
 #include <engine/components/hierarchy.hpp>
 #include <engine/components/transform.hpp>
+#include <engine/components/material.hpp>
+#include <engine/components/mesh.hpp>
 
 #include <iostream>
 
@@ -22,8 +23,9 @@ using namespace gl;
 
 
 Renderer::Renderer() {
-	glEnable( GL_DEPTH_TEST );
-	glEnable( GL_CULL_FACE ); // default GL_BACK
+	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_CULL_FACE); // default GL_BACK
+
 }
 
 glm::mat4 GetModelMatrix(GameObject& object) {
@@ -52,10 +54,16 @@ void Renderer::Render(const RenderObject& object, const Camera& camera, const in
     glUniformMatrix4fv(mvp_id, 1, GL_FALSE, glm::value_ptr(mvp));
     
     // draw polygons
-    glDrawElements(GL_TRIANGLES, object.mesh.index_buffer.size, GL_UNSIGNED_INT, (GLvoid*)0);
+    glPolygonMode(GL_FRONT, GL_LINE);
+    glPolygonMode(GL_BACK, GL_LINE);
+    glDrawElements(GL_POLYGON, object.mesh.index_buffer.size, GL_UNSIGNED_INT, (GLvoid*)0);
 }
 
 void Renderer::Update(UpdateContext& context) {
+    Profiler& profiler = *context.scene.GetEntity<Profiler>();
+    TimeTracker tracker = profiler.timer.Start("Renderer");
+
+
     Window& window = context.scene.GetEntity<Display>()->window;
     RenderObject& object = *context.scene.GetEntity<RenderObject>();
     Camera& camera = *context.scene.GetEntity<Camera>();
@@ -94,4 +102,6 @@ void Renderer::Update(UpdateContext& context) {
     // unbind buffers from gpu program
     object.mesh.vertex_buffer.UnBind(vertex_id);
     object.mesh.normal_buffer.UnBind(normal_id);
+
+    profiler.timer.Stop(tracker);
 }

@@ -53,7 +53,7 @@ struct TimeOverview {
 
     float Average() const;
     float Deviation(const float average) const;
-    void Print(const unsigned indent, unsigned columns) const;
+    void Print(unsigned indent = 0, unsigned columns = 0) const;
     unsigned FindMaxColumns(const unsigned indent) const;
 
     friend std::ostream& operator<<(std::ostream& os, const TimeOverview& overview);

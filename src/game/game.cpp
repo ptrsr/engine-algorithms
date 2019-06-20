@@ -32,7 +32,8 @@ Game::Game() {
     };
     
     // load model
-    File model_file(resources_dir + "lucas.obj");
+    //File model_file(resources_dir + "lucas.obj");
+    File model_file(resources_dir + "teapot_smooth.obj");
     Model model = Model::FromOBJ(model_file.content);
     
     // create material and mesh
@@ -41,7 +42,7 @@ Game::Game() {
 
     // create 3D object
     RenderObject& object = scene->AddEntity<RenderObject>(material, mesh);
-    object.transform.Scale(glm::vec3(0.001));
+    //object.transform.Scale(glm::vec3(0.001));
 
     // create camera
     Camera& camera = scene->AddEntity<Camera>(glm::radians(60.f), glm::vec2(1280, 720), 0.5f, 100);

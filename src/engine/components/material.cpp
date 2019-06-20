@@ -34,7 +34,7 @@ Shader::Shader(const std::string& source, const Type type)
 }
 
 Shader::~Shader() {
-    glDeleteShader(id);
+    //glDeleteShader(id);
 }
 
 Material::Material(const Shaders& shaders)
@@ -77,5 +77,5 @@ GLint Material::GetAttribute(const std::string& field) const {
 }
 
 Material::~Material() {
-    glDeleteProgram(id);
+    //glDeleteProgram(id);
 }

@@ -122,7 +122,7 @@ unsigned TimeOverview::FindMaxColumns(const unsigned indent = 0) const {
     return max;
 }
 
-void TimeOverview::Print(const unsigned indent = 0, unsigned columns = 0) const {
+void TimeOverview::Print(unsigned indent, unsigned columns) const {
     // for pretty printing
     if (columns == 0) {
         columns = FindMaxColumns();

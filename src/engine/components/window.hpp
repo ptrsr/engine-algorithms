@@ -7,7 +7,7 @@
 
 #include <engine/glm.hpp>
 #include <engine/core/component.hpp>
-
+#include <iostream>
 class GLFWwindow;
 
 typedef std::unique_ptr<GLFWwindow, std::function<void(GLFWwindow*)>> GLFWwindow_ptr;
