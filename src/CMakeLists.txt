@@ -10,5 +10,7 @@ include_directories(${GLM_INCLUDE_DIR})
 # build engine library
 add_subdirectory(engine)
 
-# build game executable
-add_subdirectory(game)
+if(${BUILD_HEAD})
+    # build game executable
+    add_subdirectory(game)
+endif()
