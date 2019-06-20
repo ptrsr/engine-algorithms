@@ -2,8 +2,6 @@
 
 #include <iostream>
 
-#ifndef HEADLESS
-
 #include <glbinding/gl/gl.h>
 #include <GLFW/glfw3.h>
 #include <glbinding/glbinding.h>
@@ -11,14 +9,10 @@
 using namespace gl;
 using namespace glbinding;
 
-#endif//HEADLESS
-
 Engine::Engine()
     : scene(std::make_unique<Scene>()) 
     , profiler(scene->AddEntity<Profiler>())
 {
-#ifndef HEADLESS
-   
     std::cout << "Initializing GLFW..." << std::endl;
     if (!glfwInit()) {
         std::cerr << "Could not init GLFW. Exiting..." << std::endl;
@@ -26,21 +20,15 @@ Engine::Engine()
     }
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
-
-#endif//HEADLESS
 }
 
 Engine::~Engine() {
-#ifndef HEADLESS
-
     /* necessary for ensuring that all OpenGL objects are
        deleted before terminating window */
     scene.reset();
 
     // terminate window
     glfwTerminate();
-
-#endif//HEADLESS
 }
 
 void Engine::Update(UpdateContext& context) {

@@ -26,9 +26,15 @@ PUBLIC
 	engine-tests/components/projection.test.cpp
 	engine-tests/components/transform.test.cpp
 	engine-tests/components/hierarchy.test.cpp
-	engine-tests/components/material.test.cpp
 	engine-tests/components/timer.test.cpp
-	engine-tests/components/mesh.test.cpp
 	
 	engine-tests/entities/camera.test.cpp
-)
+	)
+	
+	if(${BUILD_HEAD})
+	target_sources(tests
+	PUBLIC
+		engine-tests/components/material.test.cpp
+		engine-tests/components/mesh.test.cpp
+	)
+endif()

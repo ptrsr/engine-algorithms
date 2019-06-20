@@ -2,6 +2,9 @@
 
 #include <GLFW/glfw3.h>
 
+
+#ifndef HEADLESS
+
 #include <glbinding-aux/Meta.h>
 #include <glbinding/AbstractFunction.h>
 #include <glbinding-aux/ContextInfo.h>
@@ -13,6 +16,8 @@
 #include <glbinding-aux/ValidVersions.h>
 #include <glbinding-aux/types_to_string.h>
 
+#endif//HEADLESS
+
 #include <iostream>
 
 // test resources
@@ -22,6 +27,7 @@
 
 int main(int argc, char** argv) {
 #ifndef HEADLESS
+
     if (!glfwInit()) {
         std::cerr << "Could not init GLFW. Exiting..." << std::endl;
         exit(EXIT_FAILURE);
@@ -42,14 +48,19 @@ int main(int argc, char** argv) {
     glbinding::initialize([](const char * name) {
         return glfwGetProcAddress(name);
     });
+    
 #endif
+
 
     testing::InitGoogleTest(&argc, argv);
     int status = RUN_ALL_TESTS();
 
+
 #ifndef HEADLESS
+
     glfwDestroyWindow(window);
     glfwTerminate();
+
 #endif
 
     return status;
