@@ -24,8 +24,8 @@ using namespace gl;
 
 Renderer::Renderer() {
 	glEnable(GL_DEPTH_TEST);
-	glEnable(GL_CULL_FACE); // default GL_BACK
-
+	//glEnable(GL_CULL_FACE); // default GL_BACK
+    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 }
 
 glm::mat4 GetModelMatrix(GameObject& object) {
@@ -54,9 +54,7 @@ void Renderer::Render(const RenderObject& object, const Camera& camera, const in
     glUniformMatrix4fv(mvp_id, 1, GL_FALSE, glm::value_ptr(mvp));
     
     // draw polygons
-    glPolygonMode(GL_FRONT, GL_LINE);
-    glPolygonMode(GL_BACK, GL_LINE);
-    glDrawElements(GL_POLYGON, object.mesh.index_buffer.size, GL_UNSIGNED_INT, (GLvoid*)0);
+    glDrawElements(GL_TRIANGLES, object.mesh.index_buffer.size, GL_UNSIGNED_INT, (GLvoid*)0);
 }
 
 void Renderer::Update(UpdateContext& context) {

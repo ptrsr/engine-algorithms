@@ -72,7 +72,8 @@ endif()
 # build overview
 message("
 ### ENGINE ALGORITHMS
-- Build: ${CMAKE_BUILD_TYPE}
-- Tests: ${BUILD_TESTS}
+- Build : ${CMAKE_BUILD_TYPE}
+- Tests : ${BUILD_TESTS}
+- Head  : ${BUILD_HEAD}
 ###
 ")

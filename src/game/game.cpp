@@ -47,7 +47,7 @@ Game::Game() {
     // create camera
     Camera& camera = scene->AddEntity<Camera>(glm::radians(60.f), glm::vec2(1280, 720), 0.5f, 100);
 
-    camera.transform.Translate(glm::vec3(0, -1, -3));
+    camera.transform.Translate(glm::vec3(0, 0, -3));
 
     // add render system
     AddSystem<Renderer>();
