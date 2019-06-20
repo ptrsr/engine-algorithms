@@ -18,7 +18,7 @@ Model Model::FromOBJ(const std::string& path) {
     std::vector<glm::vec2> uvs;
 
     // triplets
-    std::map<Triplet, unsigned int> triplets;
+    std::map<Triplet, unsigned> triplets;
     // process by line
     std::string line;
 
@@ -59,8 +59,7 @@ Model Model::FromOBJ(const std::string& path) {
             if (read != 10) {
                 int count = sscanf(line.c_str(), "%2s %d %d %d", cmd, &vertex_i[0], &vertex_i[1], &vertex_i[2]);
 
-                if (count == 4)
-                {
+                if (count == 4) {
                     glm::vec3 normal = glm::normalize(glm::cross(
                         vertices[vertex_i[1] - 1] - vertices[vertex_i[0] - 1], 
                         vertices[vertex_i[2] - 1] - vertices[vertex_i[0] - 1])
@@ -71,8 +70,7 @@ Model Model::FromOBJ(const std::string& path) {
 
                     uvs.push_back(glm::vec2());
                     uv_i = glm::ivec3(uvs.size());
-                }
-                else {
+                } else {
                     std::cout << ".obj file not supported";
                     throw new std::runtime_error("Could not read model indices");
                 }
@@ -84,14 +82,13 @@ Model Model::FromOBJ(const std::string& path) {
                 auto it = triplets.find(triplet);
                 if (it == triplets.end()) {
                     // every index has uID
-                    unsigned int index = triplets.size();
+                    unsigned index = triplets.size();
                     triplets[triplet] = index;
 
                     model.indices.push_back(index);
                     model.vertices.push_back(vertices[vertex_i[i] - 1]);
                     model.normals.push_back(normals[normal_i[i] - 1]);
                     model.uvs.push_back(uvs[uv_i[i] - 1]);
-
                 } else {
                     model.indices.push_back(it->second);
                 }

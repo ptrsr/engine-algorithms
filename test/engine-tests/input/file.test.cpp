@@ -4,7 +4,7 @@
 
 namespace {
     TEST(FileTest, Constructor) {
-        File file(std::string(TEST_RESOURCE_DIR) + "engine-test-resources/filetest.txt");
+        File file(std::string(TEST_RESOURCE_DIR) + "filetest.txt");
 
         ASSERT_EQ("test123", file.content);
         ASSERT_EQ("txt", file.extention);

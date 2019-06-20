@@ -71,7 +71,7 @@ public:
     }
 
     template<typename T>
-    T* const GetEntity(const unsigned int index = 0) {
+    T* const GetEntity(const unsigned index = 0) {
         CheckType<Entity, T>();
         
         // get list of entity type
@@ -176,7 +176,7 @@ public:
     }
 
 private:
-    unsigned int current_id = 0;
+    unsigned current_id = 0;
     std::unordered_map<std::type_index, Entity_list> entity_map;
 
     // get Entity_list of type T. return nullptr if non existant

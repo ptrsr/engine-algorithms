@@ -14,7 +14,7 @@ using namespace gl;
 class Shader {
 public:
     // will be casted to GLenum
-    enum Type : unsigned int {
+    enum Type : unsigned {
         vertex   = 0x8B31,
         fragment = 0x8B30
     };

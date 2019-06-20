@@ -14,12 +14,12 @@ typedef std::unique_ptr<GLFWwindow, std::function<void(GLFWwindow*)>> GLFWwindow
 
 class Window : public Component {
 private:
-    GLFWwindow_ptr CreateWindow(unsigned int width, unsigned int height, std::string title);
+    GLFWwindow_ptr CreateWindow(unsigned width, unsigned height, std::string title);
 
 public:
     const GLFWwindow_ptr context;
 
-    Window(Entity* entity, unsigned int width, unsigned int height, std::string title);
+    Window(Entity* entity, unsigned width, unsigned height, std::string title);
     glm::vec2 GetFrameBufferSize();
     void SwapBuffer();
 

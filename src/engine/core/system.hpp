@@ -7,9 +7,9 @@ class Scene;
 
 struct UpdateContext {
     Scene& scene;
-    const unsigned int microseconds;
+    const unsigned microseconds;
 
-    UpdateContext(Scene& scene, const unsigned int ms)
+    UpdateContext(Scene& scene, const unsigned ms)
         : scene(scene)
         , microseconds(ms)
         { }

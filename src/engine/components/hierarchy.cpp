@@ -63,7 +63,7 @@ Hierarchy* const Hierarchy::GetParent() const {
     return parent;
 }
 
-Hierarchy* const Hierarchy::GetChild(const unsigned int index) const {
+Hierarchy* const Hierarchy::GetChild(const unsigned index) const {
     if (index >= children.size()) {
         return nullptr;
     }

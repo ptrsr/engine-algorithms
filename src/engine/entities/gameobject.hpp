@@ -8,7 +8,7 @@ class Transform;
 
 class GameObject : public Entity {
 public:
-    GameObject(const unsigned int id);
+    GameObject(const unsigned id);
 
     Hierarchy& hierarchy;
     Transform& transform;

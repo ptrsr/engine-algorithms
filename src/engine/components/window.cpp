@@ -4,14 +4,14 @@
 #include <GLFW/glfw3.h>
 #include <glbinding/glbinding.h>
 
-GLFWwindow_ptr Window::CreateWindow(unsigned int width, unsigned int height, std::string title) {
+GLFWwindow_ptr Window::CreateWindow(unsigned width, unsigned height, std::string title) {
     return GLFWwindow_ptr(
         glfwCreateWindow(width, height, title.c_str(), nullptr, nullptr), 
         [](GLFWwindow* window) { glfwDestroyWindow(window); }
     );
 }
 
-Window::Window(Entity* entity, unsigned int width, unsigned int height, std::string title)
+Window::Window(Entity* entity, unsigned width, unsigned height, std::string title)
     : Component(entity)
     , context(CreateWindow(width, height, title)) 
 { 

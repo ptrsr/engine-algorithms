@@ -12,23 +12,23 @@ endif()
 target_sources(tests
 PUBLIC
 	# tests are run in given order
-	engine-tests/auxiliary/timer.test.cpp
-
-	engine-tests/input/file.test.cpp
+	
 	engine-tests/input/options.test.cpp
 	engine-tests/input/model.test.cpp
-
-	engine-tests/core/scene.test.cpp
+	engine-tests/input/file.test.cpp
+	
+	engine-tests/core/component.test.cpp
 	engine-tests/core/typemap.test.cpp
 	engine-tests/core/entity.test.cpp
-	engine-tests/core/component.test.cpp
 	engine-tests/core/system.test.cpp
-
+	engine-tests/core/scene.test.cpp
+	
+	engine-tests/components/projection.test.cpp
 	engine-tests/components/transform.test.cpp
 	engine-tests/components/hierarchy.test.cpp
-	engine-tests/components/projection.test.cpp
-	engine-tests/components/mesh.test.cpp
 	engine-tests/components/material.test.cpp
+	engine-tests/components/timer.test.cpp
+	engine-tests/components/mesh.test.cpp
 	
 	engine-tests/entities/camera.test.cpp
 )

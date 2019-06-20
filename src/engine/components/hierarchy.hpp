@@ -26,7 +26,7 @@ public:
     void UnParent();
 
     Hierarchy* const GetParent() const;
-    Hierarchy* const GetChild(const unsigned int index = 0) const;
+    Hierarchy* const GetChild(const unsigned index = 0) const;
     const std::vector<Hierarchy*>& GetChildren() const;
 
     virtual Component_ptr Clone(Entity* const entity) override {

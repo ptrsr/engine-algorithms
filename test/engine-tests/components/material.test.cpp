@@ -5,7 +5,7 @@
 
 namespace {
     TEST(ShaderTest, Constructor) {
-        File file(std::string(TEST_RESOURCE_DIR) + "engine-test-resources/color.vs");
+        File file(std::string(TEST_RESOURCE_DIR) + "color.vs");
         Shader shader(file.content, Shader::vertex);
 
         // shader id isn't 0 (null)
@@ -14,8 +14,8 @@ namespace {
     }
 
     TEST(MaterialTest, Constructor) {
-        File vert_file(std::string(TEST_RESOURCE_DIR) + "engine-test-resources/color.vs");
-        File frag_file(std::string(TEST_RESOURCE_DIR) + "engine-test-resources/color.fs");
+        File vert_file(std::string(TEST_RESOURCE_DIR) + "color.vs");
+        File frag_file(std::string(TEST_RESOURCE_DIR) + "color.fs");
 
         Material material = Material({
             std::make_shared<Shader>(vert_file.content, Shader::vertex),
@@ -27,8 +27,8 @@ namespace {
     }
 
     TEST(MaterialTest, GetFields) {
-        File vert_file(std::string(TEST_RESOURCE_DIR) + "engine-test-resources/color.vs");
-        File frag_file(std::string(TEST_RESOURCE_DIR) + "engine-test-resources/color.fs");
+        File vert_file(std::string(TEST_RESOURCE_DIR) + "color.vs");
+        File frag_file(std::string(TEST_RESOURCE_DIR) + "color.fs");
 
         Material material = Material({
             std::make_shared<Shader>(vert_file.content, Shader::vertex),

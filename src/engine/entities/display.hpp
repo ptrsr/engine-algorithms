@@ -6,7 +6,7 @@
 
 class Display : public Entity {
 public:
-    Display(unsigned int id)
+    Display(const unsigned id)
         : Entity(id)
         , window(AddComponent<Window>(1280, 720, "test"))
         { }

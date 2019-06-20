@@ -12,8 +12,7 @@
 #define MAX_LOG_PRECISION 5
 #define TRIG_DIF 10e-6f
 
-typedef unsigned int uint;
-typedef glm::vec<2, unsigned int> vec2i;
+typedef glm::vec<2, unsigned> vec2i;
 
 template <int cols, int rows, typename type>
 std::string MatDifOut(glm::mat<cols, rows, type> mat, 
@@ -26,15 +25,15 @@ std::string MatDifOut(glm::mat<cols, rows, type> mat,
 	ss.precision(MAX_LOG_PRECISION);
 
 	// for adding extra spacing for easier reading later on
-	glm::vec<cols, uint> maxWidthPerCol = glm::vec<cols, uint>(0);
-	glm::mat<cols, rows, uint> widthPerEntry = glm::mat<cols, rows, uint>(0);
+	glm::vec<cols, unsigned> maxWidthPerCol = glm::vec<cols, unsigned>(0);
+	glm::mat<cols, rows, unsigned> widthPerEntry = glm::mat<cols, rows, unsigned>(0);
 
-	for (uint j = 0; j < cols; ++j) {
-		for (uint i = 0; i < rows; ++i) {
+	for (unsigned j = 0; j < cols; ++j) {
+		for (unsigned i = 0; i < rows; ++i) {
 			// put entry in temporary stream
 			ts << mat[j][i];
 			// count length
-			uint count = ts.str().size();
+			unsigned count = ts.str().size();
 			if (count > maxWidthPerCol[j]) {
 				// maximum width of each column
 				maxWidthPerCol[j] = count;
@@ -46,9 +45,9 @@ std::string MatDifOut(glm::mat<cols, rows, type> mat,
 			ts.str("");
 		}
 	}
-	for (uint i = 0; i < rows; ++i) {
+	for (unsigned i = 0; i < rows; ++i) {
 		ss << "\n|";
-		for (uint j = 0; j < cols; ++j) {
+		for (unsigned j = 0; j < cols; ++j) {
 			if (j != 0) {
 				ss << ", ";
 			}
@@ -58,8 +57,8 @@ std::string MatDifOut(glm::mat<cols, rows, type> mat,
 				ss << mat[j][i];
 			}
 			// add extra spacing
-			uint spaces = maxWidthPerCol[j] - widthPerEntry[j][i];
-			for (uint i = 0; i < spaces; ++i) {
+			unsigned spaces = maxWidthPerCol[j] - widthPerEntry[j][i];
+			for (unsigned i = 0; i < spaces; ++i) {
 				ss << " ";
 			}
 		}
@@ -76,8 +75,8 @@ template <int cols, int rows, typename type>
 {
 	bool error = false;
 	glm::mat<cols, rows, bool> faulty(false);
-	for (uint j = 0; j < cols; ++j) {
-		for (uint i = 0; i < rows; ++i) {
+	for (unsigned j = 0; j < cols; ++j) {
+		for (unsigned i = 0; i < rows; ++i) {
 			if (std::abs(expected[j][i] - result[j][i]) > maxDelta) {
 				faulty[j][i] = true;
 				error = true;
