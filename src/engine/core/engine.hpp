@@ -9,6 +9,8 @@
 
 typedef std::unique_ptr<Scene> Scene_ptr;
 
+class Options;
+
 class Engine : private TypeMap<System> {
 public:
     Scene_ptr scene;
@@ -16,7 +18,7 @@ public:
     Engine();
     virtual ~Engine();
 
-    void Run(unsigned max_updates = 0);
+    void Run(const Options& options);
     void Stop();
 
     template<typename T, class... P>

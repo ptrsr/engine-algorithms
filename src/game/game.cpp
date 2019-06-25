@@ -3,41 +3,29 @@
 #include <engine/input/file.hpp>
 #include <engine/input/model.hpp>
 
-#include <engine/auxiliary/options.hpp>
+#include <engine/input/options.hpp>
 
 #include <engine/entities/display.hpp>
 #include <engine/entities/renderobject.hpp>
 #include <engine/entities/camera.hpp>
 
 #include <engine/components/mesh.hpp>
-#include <engine/components/material.hpp>
+#include <engine/components/materials/meshmaterial.hpp>
 
 #include <engine/systems/renderer.hpp>
+#include <engine/systems/octree.hpp>
 
 #include <iostream>
 
 
-Game::Game() {
-    std::string resources_dir = std::string(RESOURCE_DIR);
-
+Game::Game(const Options& options) {
     scene->AddEntity<Display>();
 
-    // load shaders
-    File vert_file(resources_dir + "lit.vs");
-    File frag_file(resources_dir + "lit.fs");
-
-    Shaders shaders = {
-        std::make_shared<Shader>(vert_file.content, Shader::vertex),
-        std::make_shared<Shader>(frag_file.content, Shader::fragment)
-    };
-    
     // load model
-    //File model_file(resources_dir + "lucas.obj");
-    File model_file(resources_dir + "teapot_smooth.obj");
-    Model model = Model::FromOBJ(model_file.content);
+    Model_ptr model = Model::FromOBJ(File(options.resource_dir + "teapot_smooth.obj"));
     
     // create material and mesh
-    Material_ptr material = SharedComponent::Make<Material>(shaders);
+    auto material = SharedComponent::Make<MeshMaterial>(options.resource_dir + "renderobjects/cube/cube");
     Mesh_ptr mesh = SharedComponent::Make<Mesh>(model);
 
     // create 3D object
@@ -50,5 +38,6 @@ Game::Game() {
     camera.transform.Translate(glm::vec3(0, 0, -3));
 
     // add render system
-    AddSystem<Renderer>();
+    Renderer& renderer = AddSystem<Renderer>();
+    //AddSystem<OcTree>(options);
 }

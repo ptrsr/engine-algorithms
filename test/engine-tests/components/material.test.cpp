@@ -5,7 +5,7 @@
 
 namespace {
     TEST(ShaderTest, Constructor) {
-        File file(std::string(TEST_RESOURCE_DIR) + "color.vs");
+        File file(std::string(TEST_RESOURCE_DIR) + "cube.vs");
         Shader shader(file.content, Shader::vertex);
 
         // shader id isn't 0 (null)
@@ -14,8 +14,8 @@ namespace {
     }
 
     TEST(MaterialTest, Constructor) {
-        File vert_file(std::string(TEST_RESOURCE_DIR) + "color.vs");
-        File frag_file(std::string(TEST_RESOURCE_DIR) + "color.fs");
+        File vert_file(std::string(TEST_RESOURCE_DIR) + "cube.vs");
+        File frag_file(std::string(TEST_RESOURCE_DIR) + "cube.fs");
 
         Material material = Material({
             std::make_shared<Shader>(vert_file.content, Shader::vertex),
@@ -27,8 +27,8 @@ namespace {
     }
 
     TEST(MaterialTest, GetFields) {
-        File vert_file(std::string(TEST_RESOURCE_DIR) + "color.vs");
-        File frag_file(std::string(TEST_RESOURCE_DIR) + "color.fs");
+        File vert_file(std::string(TEST_RESOURCE_DIR) + "cube.vs");
+        File frag_file(std::string(TEST_RESOURCE_DIR) + "cube.fs");
 
         Material material = Material({
             std::make_shared<Shader>(vert_file.content, Shader::vertex),
@@ -43,9 +43,7 @@ namespace {
         EXPECT_EQ(-1, material.GetAttribute("wrong_attrib"));
         
         // valid fields
-        EXPECT_NE(-1, material.GetUniform("model_mat"));
-        EXPECT_NE(-1, material.GetUniform("view_mat"));
-        EXPECT_NE(-1, material.GetUniform("proj_mat"));
+        EXPECT_NE(-1, material.GetUniform("mvp"));
 
         EXPECT_NE(-1, material.GetAttribute("vertex"));
     }

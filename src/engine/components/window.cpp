@@ -28,7 +28,6 @@ Window::Window(Entity* entity, unsigned width, unsigned height, std::string titl
     });
 
     glfwSwapInterval(1);
-    std::cout << "initialized!" << std::endl;
 }
 
 glm::vec2 Window::GetFrameBufferSize() {

@@ -2,24 +2,36 @@
 
 #include <engine/components/mesh.hpp>
 #include <engine/input/model.hpp>
+#include <engine/components/material.hpp>
 
 #include <glbinding/glbinding.h>
 
 #include <iostream>
 
 namespace {
-    TEST(BufferTest, constructor) {
+    TEST(BufferTest, Constructor) {
         std::vector<glm::vec3> data = { glm::vec3(0, 0, 0), glm::vec3(0, 1, 0), glm::vec3(1, 1, 0) };
         Buffer<glm::vec3> buffer(data, GL_ARRAY_BUFFER, 3, false);
 
         ASSERT_NE(0, buffer.id);
     }
 
+    TEST(BufferTest, Bind) {
+        Material material(std::string(TEST_RESOURCE_DIR) + "cube");
+
+        std::vector<glm::vec3> data = { glm::vec3(0, 0, 0), glm::vec3(0, 1, 0), glm::vec3(1, 1, 0) };
+
+        Buffer<glm::vec3> vertex_buffer(data, GL_ARRAY_BUFFER, 3, false);
+        
+        ASSERT_TRUE(vertex_buffer.Bind(material.GetAttribute("vertex"), 3));
+        ASSERT_TRUE(vertex_buffer.UnBind());
+    }
+
     TEST(MeshTest, Constructor) {
-        Model model;
-        model.indices = { 1, 2, 3 };
-        model.vertices = { glm::vec3(0, 0, 0), glm::vec3(0, 1, 0), glm::vec3(1, 1, 0) };
-        model.uvs = { glm::vec2(0, 0), glm::vec2(0, 1), glm::vec2(1, 1) };
+        Model_ptr model = std::make_shared<Model>();
+        model->indices = { 1, 2, 3 };
+        model->vertices = { glm::vec3(0, 0, 0), glm::vec3(0, 1, 0), glm::vec3(1, 1, 0) };
+        model->uvs = { glm::vec2(0, 0), glm::vec2(0, 1), glm::vec2(1, 1) };
         // skipping normals
 
         Mesh mesh(model);

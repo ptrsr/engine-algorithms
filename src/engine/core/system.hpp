@@ -21,6 +21,7 @@ class System {
 public:
     bool enabled;
     virtual void Update(UpdateContext& scene) = 0;
+    virtual void LateUpdate(UpdateContext& scene) { };
 
 };
 

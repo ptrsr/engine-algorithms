@@ -6,11 +6,11 @@ cmake_minimum_required(VERSION 3.0)
 add_library(engine 
 	glm.hpp
 
+	auxiliary/c_getopt.h
+
 	input/model.cpp
 	input/file.cpp
-
-	auxiliary/c_getopt.h
-	auxiliary/options.cpp
+	input/options.cpp
 	
 	core/engine.cpp
 	core/system.cpp
@@ -18,17 +18,20 @@ add_library(engine
 	components/projection.cpp
 	components/transform.cpp
 	components/hierarchy.cpp
-	components/material.cpp
 	components/window.cpp
 	components/timer.cpp
+	components/material.cpp
 	components/mesh.cpp
 
+	components/materials/meshmaterial.cpp
+	
 	entities/renderobject.cpp
 	entities/gameobject.cpp
 
 	systems/renderer.cpp
+	systems/octree.cpp
 )
-
+	
 # wait for glm before building engine
 add_dependencies(engine glm)
 

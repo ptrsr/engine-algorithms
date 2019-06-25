@@ -1,5 +1,7 @@
 #include "material.hpp"
 
+#include <engine/input/file.hpp>
+
 #include <stdexcept>
 #include <iostream>
 
@@ -48,7 +50,6 @@ Material::Material(const Shaders& shaders)
     GLboolean result = GL_FALSE;
     glGetProgramiv(id, GL_LINK_STATUS, &result);
 
-
     if (!result) {
         GLint info_length;
         glGetProgramiv(id, GL_INFO_LOG_LENGTH, &info_length);
@@ -63,6 +64,13 @@ Material::Material(const Shaders& shaders)
         throw new std::runtime_error(error.data());
     }
 }
+
+Material::Material(const std::string& file)
+    : Material({
+        std::make_shared<Shader>(File(file + ".vs").content, Shader::vertex),
+        std::make_shared<Shader>(File(file + ".fs").content, Shader::fragment)
+    })
+    { }
 
 void Material::Use() {
     glUseProgram(id);

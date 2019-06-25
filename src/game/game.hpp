@@ -2,11 +2,12 @@
 #define GAME_HPP_
 
 #include <engine/core/engine.hpp>
-#include <engine/auxiliary/options.hpp>
+
+class Options;
 
 class Game : public Engine {
 public:
-    Game();
+    Game(const Options& options);
 
 };
 

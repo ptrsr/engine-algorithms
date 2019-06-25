@@ -1,7 +1,6 @@
 #include "renderer.hpp"
 
 #include <engine/core/scene.hpp>
-#include <engine/glm.hpp>
 
 #include <engine/entities/renderobject.hpp>
 #include <engine/entities/profiler.hpp>
@@ -10,7 +9,7 @@
 
 #include <engine/components/hierarchy.hpp>
 #include <engine/components/transform.hpp>
-#include <engine/components/material.hpp>
+#include <engine/components/materials/meshmaterial.hpp>
 #include <engine/components/mesh.hpp>
 
 #include <iostream>
@@ -28,7 +27,7 @@ Renderer::Renderer() {
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 }
 
-glm::mat4 GetModelMatrix(GameObject& object) {
+glm::mat4 Renderer::GetModelMatrix(GameObject& object) const {
     Hierarchy* const parent_node = object.hierarchy.GetParent();
 
     if (!parent_node) {
@@ -61,12 +60,8 @@ void Renderer::Update(UpdateContext& context) {
     Profiler& profiler = *context.scene.GetEntity<Profiler>();
     TimeTracker tracker = profiler.timer.Start("Renderer");
 
-
     Window& window = context.scene.GetEntity<Display>()->window;
-    RenderObject& object = *context.scene.GetEntity<RenderObject>();
     Camera& camera = *context.scene.GetEntity<Camera>();
-
-    object.transform.Rotate(0.01f, glm::vec3(0, 1, 0));
 
     // window resizing
     UpdateScreenSize(camera.projection, window);
@@ -74,32 +69,26 @@ void Renderer::Update(UpdateContext& context) {
     // clear draw buffer
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    GLint vertex_id = object.material.GetAttribute("vertex");
-    GLint normal_id = object.material.GetAttribute("normal");
+    std::vector<RenderObject*> render_objects = context.scene.GetEntities<RenderObject>();
     
-    GLint mvp_id = object.material.GetUniform("mvp_mat");
-    
-    // TODO: temporary!
-    GLint model_m_id = object.material.GetUniform("model_mat");
-    glUniformMatrix4fv(model_m_id, 1, GL_FALSE, glm::value_ptr((glm::mat4)object.transform));
+    for (RenderObject* object : render_objects) {
+        object->material.Use();
+        object->material.Bind(object->mesh);
 
-    // set gpu program
-    object.material.Use();
-    
-    // bind buffers to gpu program
-    object.mesh.vertex_buffer.Bind(vertex_id);
-    object.mesh.normal_buffer.Bind(normal_id);
+        // set model view projection in shader
+        glm::mat4 mvp = camera.projection.GetPerspective() * camera.transform * object->transform;
+        glUniformMatrix4fv(object->material.mvp_uniform, 1, GL_FALSE, glm::value_ptr(mvp));
 
-    object.mesh.index_buffer.Bind(0);
+        glUniform3fv(object->material.color_uniform, 1, glm::value_ptr(glm::vec3(1, 0, 0)));
 
-    Render(object, camera, mvp_id);
+        glDrawElements(GL_QUADS, object->mesh.index_buffer.size, GL_UNSIGNED_INT, (GLvoid*)0);
 
-    // display on screen
-    window.SwapBuffer();
-
-    // unbind buffers from gpu program
-    object.mesh.vertex_buffer.UnBind(vertex_id);
-    object.mesh.normal_buffer.UnBind(normal_id);
-
+        object->material.UnBind();
+    }
     profiler.timer.Stop(tracker);
+}
+
+void Renderer::LateUpdate(UpdateContext& context) {
+    // display on screen
+    context.scene.GetEntity<Display>()->window.SwapBuffer();
 }

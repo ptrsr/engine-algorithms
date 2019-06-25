@@ -8,13 +8,11 @@
 
 namespace {
     TEST(ModelTest, Constructor) {
-        File file(std::string(TEST_RESOURCE_DIR) + "cube_flat.obj");
+        Model_ptr model = Model::FromOBJ(File(std::string(TEST_RESOURCE_DIR) + "cube.obj"));
 
-        Model model = Model::FromOBJ(file.content);
-
-        EXPECT_EQ(36, model.indices.size());
-        EXPECT_EQ(24, model.vertices.size());
-        EXPECT_EQ(24, model.normals.size());
-        EXPECT_EQ(24, model.uvs.size());
+        EXPECT_EQ(36, model->indices.size());
+        EXPECT_EQ(24, model->vertices.size());
+        EXPECT_EQ(24, model->normals.size());
+        EXPECT_EQ(24, model->uvs.size());
     }
 }

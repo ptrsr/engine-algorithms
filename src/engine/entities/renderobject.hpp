@@ -3,16 +3,18 @@
 
 #include <engine/entities/gameobject.hpp>
 
-class Material;
+class MeshMaterial;
 class Mesh;
 
 class RenderObject : public GameObject {
 public:
-    Material& material;
+    MeshMaterial& material;
     Mesh& mesh;
+    bool visible = true;
 
-    RenderObject(const unsigned id, std::shared_ptr<Material>& material, std::shared_ptr<Mesh>& mesh);
-
+    /* NOTE: will search for file.obj, file.vs and file.fs */
+    RenderObject(const unsigned id, const std::string& file);
+    RenderObject(const unsigned id, std::shared_ptr<MeshMaterial>& material, std::shared_ptr<Mesh>& mesh);
 };
 
 #endif//RENDEROBJECT_HPP_

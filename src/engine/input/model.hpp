@@ -7,10 +7,17 @@
 
 #include <engine/glm.hpp>
 
+class Model;
+typedef std::shared_ptr<Model> Model_ptr; 
+
+class File;
+
 class Model {
 public:
     Model() = default;
-    static Model FromOBJ(const std::string& path);
+
+    static Model_ptr FromOBJ(const File& file);
+    static Model_ptr FromOBJ(const std::string& data);
 
     std::vector<unsigned> indices;
     std::vector<glm::vec3> vertices;
@@ -34,6 +41,5 @@ public:
         }
     };
 };
-
 
 #endif//MODEL_HPP_

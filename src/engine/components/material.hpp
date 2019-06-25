@@ -38,6 +38,7 @@ public:
 
     Material(const Material& copy) = default;
     Material(const Shaders& shaders);
+    Material(const std::string& file);
 
     void Use();
 

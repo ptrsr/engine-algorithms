@@ -1,17 +1,24 @@
 #include "model.hpp"
 
+#include <engine/input/file.hpp>
+
 #include <sstream>
 #include <stdexcept>
 #include <map>
+#include <iostream>
 
 bool StringCompare(const char* a, const char* b) {
     return strcmp(a, b) == 0;
 }
 
-Model Model::FromOBJ(const std::string& path) {
-    std::stringstream stream = std::stringstream(path, std::ios::in);
+Model_ptr Model::FromOBJ(const File& file) {
+    return FromOBJ(file.content);
+}
 
-    Model model;
+Model_ptr Model::FromOBJ(const std::string& data) {
+    std::stringstream stream = std::stringstream(data, std::ios::in);
+
+    Model_ptr model = std::make_shared<Model>();
     
     std::vector<glm::vec3> vertices;
     std::vector<glm::vec3> normals;
@@ -85,12 +92,12 @@ Model Model::FromOBJ(const std::string& path) {
                     unsigned index = triplets.size();
                     triplets[triplet] = index;
 
-                    model.indices.push_back(index);
-                    model.vertices.push_back(vertices[vertex_i[i] - 1]);
-                    model.normals.push_back(normals[normal_i[i] - 1]);
-                    model.uvs.push_back(uvs[uv_i[i] - 1]);
+                    model->indices.push_back(index);
+                    model->vertices.push_back(vertices[vertex_i[i] - 1]);
+                    model->normals.push_back(normals[normal_i[i] - 1]);
+                    model->uvs.push_back(uvs[uv_i[i] - 1]);
                 } else {
-                    model.indices.push_back(it->second);
+                    model->indices.push_back(it->second);
                 }
             }
         }

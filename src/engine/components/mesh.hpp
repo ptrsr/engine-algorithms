@@ -13,6 +13,15 @@ using namespace gl;
 
 template<class Base>
 class Buffer {
+private:
+    GLint bound = -1;
+  
+    GLuint GenBuffer() {
+        GLuint id = 0;
+        glGenBuffers(1, &id);
+        return id;
+    };
+    
 public:
     const GLuint id = 0;
     const GLenum type;
@@ -37,10 +46,11 @@ public:
     }
 
     bool Bind(const GLint attribute_id, const unsigned alt_rows = 0, const GLsizei stride = 0, const void* offset = 0) {
-        if (attribute_id == -1) {
+        if (id == 0 || attribute_id == -1) {
             return false;
         }
         glBindBuffer(type, id);
+        bound = attribute_id;
 
         // no need to bind attributes on indices
         if (type == GL_ELEMENT_ARRAY_BUFFER) {
@@ -51,8 +61,8 @@ public:
         return true;
     }
 
-    bool UnBind(const GLint attribute_id) {
-        if (attribute_id == -1) {
+    bool UnBind() {
+        if (bound == -1) {
             return false;
         }
 
@@ -62,6 +72,7 @@ public:
         }
 
         glDisableVertexAttribArray(bound);
+        bound = -1;
         return true;
     }
 
@@ -69,22 +80,13 @@ public:
         if (id == 0) {
             return;
         }
-
         glDeleteBuffers(1, &id);
     }
-
-private:
-    GLint bound = -1;
-  
-    GLuint GenBuffer() {
-        GLuint id = 0;
-        glGenBuffers(1, &id);
-        return id;
-    };
 };
 
 
 class Model;
+typedef std::shared_ptr<Model> Model_ptr;
 
 class Mesh : public SharedComponent {
 public:
@@ -93,7 +95,8 @@ public:
     Buffer<glm::vec3> normal_buffer;
     Buffer<glm::vec2> uv_buffer;
 
-    Mesh(Model& model);
+    Mesh(const Model_ptr model);
+    Mesh(const std::string& file);
 
 private:
     Mesh(const Mesh& copy) = default;

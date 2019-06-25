@@ -1,11 +1,7 @@
 cmake_minimum_required(VERSION 3.0)
 
-add_definitions(-DRESOURCE_DIR="${PROJECT_SOURCE_DIR}/resources/")
-
 # create game executable
-add_executable(game main.cpp
-	game.cpp
-)
+add_executable(game main.cpp game.cpp)
 
 # link game executable to engine library
 target_link_libraries(game engine)
