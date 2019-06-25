@@ -1,10 +1,12 @@
 #ifndef OCTREE_HPP_
 #define OCTREE_HPP_
 
-#include <engine/systems/renderer.hpp>
+#include <engine/core/system.hpp>
+
+#include <engine/entities/gameobject.hpp>
+
 #include <engine/components/material.hpp>
 #include <engine/components/mesh.hpp>
-#include <engine/entities/gameobject.hpp>
 
 #include <vector>
 
@@ -16,7 +18,7 @@ struct OcNode {
     std::vector<GameObject> children;
 };
 
-class OcTree : public Renderer {
+class OcTree : public System {
 public:
     const RenderObject& cube;
     

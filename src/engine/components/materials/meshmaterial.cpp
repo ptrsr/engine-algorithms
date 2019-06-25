@@ -26,9 +26,8 @@ bool MeshMaterial::UnBind() {
     if (!bound_mesh) {
         return false;
     }
-    bool bound = bound_mesh->vertex_buffer.UnBind()
-               | bound_mesh->normal_buffer.UnBind()
-               | bound_mesh->uv_buffer.UnBind();
+    return bound_mesh->vertex_buffer.UnBind()
+         | bound_mesh->normal_buffer.UnBind()
+         | bound_mesh->uv_buffer.UnBind();
     
-    return bound;
 }

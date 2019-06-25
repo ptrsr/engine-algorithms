@@ -20,7 +20,7 @@ public:
     const GLFWwindow_ptr context;
 
     Window(Entity* entity, unsigned width, unsigned height, std::string title);
-    glm::vec2 GetFrameBufferSize();
+    glm::vec2 GetFrameBufferSize() const;
     void SwapBuffer();
 
 };

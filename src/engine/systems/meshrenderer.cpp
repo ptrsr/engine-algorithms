@@ -1,4 +1,4 @@
-#include "renderer.hpp"
+#include "meshrenderer.hpp"
 
 #include <engine/core/scene.hpp>
 
@@ -21,13 +21,7 @@
 using namespace gl;
 
 
-Renderer::Renderer() {
-	glEnable(GL_DEPTH_TEST);
-	//glEnable(GL_CULL_FACE); // default GL_BACK
-    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-}
-
-glm::mat4 Renderer::GetModelMatrix(GameObject& object) const {
+glm::mat4 MeshRenderer::GetModelMatrix(GameObject& object) const {
     Hierarchy* const parent_node = object.hierarchy.GetParent();
 
     if (!parent_node) {
@@ -37,17 +31,7 @@ glm::mat4 Renderer::GetModelMatrix(GameObject& object) const {
     return object.transform * GetModelMatrix(parent);
 }
 
-void UpdateScreenSize(Projection& projection, Window& window) {
-    glm::vec2 size = window.GetFrameBufferSize();
-    
-    // update viewport and projection matrix on window size change
-    if (projection.GetWindowSize() != size) {
-        projection.SetWindowSize(size);
-        glViewport(0, 0, size.x, size.y);
-    }
-}
-
-void Renderer::Render(const RenderObject& object, const Camera& camera, const int mvp_id) const {
+void MeshRenderer::Render(const RenderObject& object, const Camera& camera, const int mvp_id) const {
     // set model view projection uniform in shader
     glm::mat4 mvp = camera.projection.GetPerspective() * camera.transform * object.transform;
     glUniformMatrix4fv(mvp_id, 1, GL_FALSE, glm::value_ptr(mvp));
@@ -56,18 +40,21 @@ void Renderer::Render(const RenderObject& object, const Camera& camera, const in
     glDrawElements(GL_TRIANGLES, object.mesh.index_buffer.size, GL_UNSIGNED_INT, (GLvoid*)0);
 }
 
-void Renderer::Update(UpdateContext& context) {
+void MeshRenderer::Update(UpdateContext& context) {
+    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_CULL_FACE); // default GL_BACK
+    
+    if (wireframe) {
+        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    } else {
+        glPolygonMode(GL_FRONT, GL_FILL);
+    }
+
+
     Profiler& profiler = *context.scene.GetEntity<Profiler>();
-    TimeTracker tracker = profiler.timer.Start("Renderer");
+    TimeTracker tracker = profiler.timer.Start("MeshRenderer");
 
-    Window& window = context.scene.GetEntity<Display>()->window;
     Camera& camera = *context.scene.GetEntity<Camera>();
-
-    // window resizing
-    UpdateScreenSize(camera.projection, window);
-
-    // clear draw buffer
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     std::vector<RenderObject*> render_objects = context.scene.GetEntities<RenderObject>();
     
@@ -81,14 +68,10 @@ void Renderer::Update(UpdateContext& context) {
 
         glUniform3fv(object->material.color_uniform, 1, glm::value_ptr(glm::vec3(1, 0, 0)));
 
-        glDrawElements(GL_QUADS, object->mesh.index_buffer.size, GL_UNSIGNED_INT, (GLvoid*)0);
+        glDrawElements(GL_POLYGON, object->mesh.index_buffer.size, GL_UNSIGNED_INT, (GLvoid*)0);
 
         object->material.UnBind();
     }
-    profiler.timer.Stop(tracker);
-}
 
-void Renderer::LateUpdate(UpdateContext& context) {
-    // display on screen
-    context.scene.GetEntity<Display>()->window.SwapBuffer();
+    profiler.timer.Stop(tracker);
 }

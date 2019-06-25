@@ -12,7 +12,8 @@
 #include <engine/components/mesh.hpp>
 #include <engine/components/materials/meshmaterial.hpp>
 
-#include <engine/systems/renderer.hpp>
+#include <engine/systems/meshrenderer.hpp>
+#include <engine/systems/refresher.hpp>
 #include <engine/systems/octree.hpp>
 
 #include <iostream>
@@ -38,6 +39,7 @@ Game::Game(const Options& options) {
     camera.transform.Translate(glm::vec3(0, 0, -3));
 
     // add render system
-    Renderer& renderer = AddSystem<Renderer>();
+    AddSystem<MeshRenderer>();
+    AddSystem<Refresher>();
     //AddSystem<OcTree>(options);
 }

@@ -30,7 +30,7 @@ Window::Window(Entity* entity, unsigned width, unsigned height, std::string titl
     glfwSwapInterval(1);
 }
 
-glm::vec2 Window::GetFrameBufferSize() {
+glm::vec2 Window::GetFrameBufferSize() const {
     int width, height;
     glfwGetFramebufferSize(context.get(), &width, &height);
     return glm::vec2(width, height);

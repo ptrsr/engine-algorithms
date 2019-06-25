@@ -28,7 +28,8 @@ add_library(engine
 	entities/renderobject.cpp
 	entities/gameobject.cpp
 
-	systems/renderer.cpp
+	systems/meshrenderer.cpp
+	systems/refresher.cpp
 	systems/octree.cpp
 )
 	

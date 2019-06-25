@@ -47,16 +47,10 @@ Engine::~Engine() {
 void Engine::Update(UpdateContext& context) {
     const TimeTracker& tracker = profiler.timer.Start("Loop");
     
-    // regular update
     for (auto& pair : *this) {
         pair.second->Update(context);
     }
-
-    // late update
-    for (auto& pair : *this) {
-        pair.second->LateUpdate(context);
-    }
-
+    
     profiler.timer.Stop(tracker);
 }
 
