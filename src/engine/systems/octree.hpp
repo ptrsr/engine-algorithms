@@ -16,6 +16,13 @@ class RenderObject;
 struct OcNode {
     std::vector<OcNode> nodes;
     std::vector<GameObject> children;
+    glm::vec3 local_pos;
+
+    OcNode(const glm::vec3& local_pos = glm::vec3(0, 0, 0))
+        : local_pos(local_pos)
+        { }
+
+    void Divide(const unsigned layers = 1);
 };
 
 class OcTree : public System {

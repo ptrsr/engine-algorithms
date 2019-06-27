@@ -50,7 +50,6 @@ void MeshRenderer::Update(UpdateContext& context) {
         glPolygonMode(GL_FRONT, GL_FILL);
     }
 
-
     Profiler& profiler = *context.scene.GetEntity<Profiler>();
     TimeTracker tracker = profiler.timer.Start("MeshRenderer");
 

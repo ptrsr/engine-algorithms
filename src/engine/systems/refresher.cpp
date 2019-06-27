@@ -4,9 +4,11 @@
 
 #include <engine/components/window.hpp>
 #include <engine/components/projection.hpp>
+#include <engine/components/timer.hpp>
 
 #include <engine/entities/display.hpp>
 #include <engine/entities/camera.hpp>
+#include <engine/entities/profiler.hpp>
 
 #include <glbinding/gl/gl.h>
 
@@ -23,6 +25,9 @@ void Refresher::UpdateScreenSize(Projection& projection, const Window& window) c
 }
 
 void Refresher::Update(UpdateContext& context) {
+    Profiler& profiler = *context.scene.GetEntity<Profiler>();
+    TimeTracker tracker = profiler.timer.Start("Refresher");
+
     // show last buffer on screen
     context.scene.GetEntity<Display>()->window.SwapBuffer();
 
@@ -33,4 +38,6 @@ void Refresher::Update(UpdateContext& context) {
     Window& window = context.scene.GetEntity<Display>()->window;
     Camera& camera = *context.scene.GetEntity<Camera>();
     UpdateScreenSize(camera.projection, window);
+
+    profiler.timer.Stop(tracker);
 }
