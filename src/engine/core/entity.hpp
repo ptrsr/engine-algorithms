@@ -33,23 +33,42 @@ public:
        to this and the function parameters */
     template<typename T, class... P>
     T& AddComponent(P&&... p) {
-        return AddBase<T>(this, std::forward<P>(p)...);
+        T& component = AddBase<T>(this, std::forward<P>(p)...);
+        component.entity = this;
+        return component;
     }
 
     /* add a shared Component */
     template<typename T>
-    T& AddComponent(const std::shared_ptr<T>& shared_component) {
+    T& AddComponent(std::shared_ptr<T> component) {
         CheckType<SharedComponent, T>();
-
-        T* const component = GetBase<T>();
-        if (component) {
-            throw new std::runtime_error("Cannot add component: already owns component type");
+        
+        if (GetBase<T>()) {
+            throw new std::runtime_error("Cannot add SharedComponent: already owns SharedComponent type");
         }
-    
-        this->insert(std::make_pair<std::type_index, Component_ptr>(
-                typeid(T), shared_component));
 
-        return *shared_component;
+        this->insert(std::make_pair<std::type_index, Component_ptr>(
+                typeid(T), component));
+
+        return *component;
+    }
+
+    /* add a previously created Component */
+    template<typename T>
+    T& AddComponent(std::unique_ptr<T>&& component) {
+        CheckType<Component, T>();
+        
+        if (GetBase<T>()) {
+            throw new std::runtime_error("Cannot add Component: already owns Component type");
+        }
+
+        std::shared_ptr<T> component_ptr(std::move(component));
+        component_ptr->entity = this;
+
+        this->insert(std::make_pair<std::type_index, Component_ptr>(
+                typeid(T), component_ptr));
+
+        return *component_ptr.get();
     }
 
 protected:

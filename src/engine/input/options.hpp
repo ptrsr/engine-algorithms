@@ -12,7 +12,8 @@ typedef struct Options {
 	Options() // default options
 		: track_timing(false)
 		, verbose(false)
-		, frames(500)
+		, frames(0)
+		, seed(0)
 		, resource_dir(RESOURCE_DIR)
 		{ }
 
@@ -20,6 +21,7 @@ typedef struct Options {
 	bool         track_timing;
 	bool         verbose;
 	unsigned     frames;
+	int 		 seed;
 	std::string  resource_dir;
 
     static void PrintUsage(FILE* output = stdout);

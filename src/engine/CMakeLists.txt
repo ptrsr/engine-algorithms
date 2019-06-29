@@ -25,10 +25,13 @@ add_library(engine
 
 	components/materials/meshmaterial.cpp
 	
+	components/colliders/sphere.cpp
+
 	entities/renderobject.cpp
 	entities/gameobject.cpp
 
 	systems/meshrenderer.cpp
+	systems/simulator.cpp
 	systems/refresher.cpp
 	systems/octree.cpp
 )

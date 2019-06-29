@@ -21,7 +21,7 @@ TBD\n\
 
 Options Options::ParseOptions(int argc, char** const argv) {
     Options opts;
-    std::string options = "htvf:";
+    std::string options = "htvf:s:";
 
     int c;
     while ((c = getopt(argc, argv, options.c_str())) != -1) {
@@ -31,6 +31,7 @@ Options Options::ParseOptions(int argc, char** const argv) {
             case 'v': opts.verbose      = true;              break;
             case 't': opts.track_timing = true;              break;
             case 'f': opts.frames       = std::stoi(optarg); break;
+            case 's': opts.seed         = std::stoi(optarg); break;
             default:
                 fprintf(stderr, "\n");
                 PrintUsage(stderr);

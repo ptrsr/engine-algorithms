@@ -10,7 +10,6 @@ class RenderObject : public GameObject {
 public:
     MeshMaterial& material;
     Mesh& mesh;
-    bool visible = true;
 
     /* NOTE: will search for file.obj, file.vs and file.fs */
     RenderObject(const unsigned id, const std::string& file);

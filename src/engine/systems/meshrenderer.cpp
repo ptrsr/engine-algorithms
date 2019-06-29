@@ -27,7 +27,7 @@ glm::mat4 MeshRenderer::GetModelMatrix(GameObject& object) const {
     if (!parent_node) {
         return object.transform;
     }
-    GameObject& parent = *static_cast<GameObject*>(parent_node->entity);
+    GameObject& parent = *static_cast<GameObject*>(parent_node->GetEntity());
     return object.transform * GetModelMatrix(parent);
 }
 

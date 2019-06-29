@@ -11,7 +11,7 @@ class Camera;
 
 class MeshRenderer : public System {
 public:
-    bool wireframe = true;
+    bool wireframe = false;
 
     virtual void Update(UpdateContext& scene) override;
     virtual void Render(const RenderObject& object, const Camera& camera, const int mvp_id) const;

@@ -27,6 +27,8 @@ PUBLIC
 	engine-tests/components/transform.test.cpp
 	engine-tests/components/hierarchy.test.cpp
 	engine-tests/components/timer.test.cpp
+	engine-tests/components/colliders/sphere.test.cpp
+
 	
 	engine-tests/entities/renderobject.test.cpp
 	engine-tests/entities/camera.test.cpp

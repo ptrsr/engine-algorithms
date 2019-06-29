@@ -34,6 +34,11 @@ Component_ptr Transform::Clone(Entity* const entity) {
     return Copy<Transform>(entity, *this);
 }
 
+float Transform::DistanceTo(const Transform& other) const {
+    glm::distance(GetPosition(), other.GetPosition());
+}
+
+
 // void Transform::Remove(bool recursive) {
 //     if (!parent && !recursive) {
 //         throw std::runtime_error("Cannot remove without recursion: no parent to reattach children to");

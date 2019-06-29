@@ -22,8 +22,6 @@ class Component {
     friend TypeMap<Component>;
 
 public:
-    // parent entity owning this Component
-    Entity* const entity;
 
     Component(Entity* const entity = nullptr)
         : entity(entity)
@@ -31,6 +29,10 @@ public:
 
     // proper deletion by Component pointer
     virtual ~Component() = default;
+
+    virtual Entity* const GetEntity() const {
+        return entity;
+    }
 
 protected:
     // helper function for Clone in derived class
@@ -40,6 +42,9 @@ protected:
     }
 
 private:
+    // parent entity owning this Component
+    Entity* entity;
+
     // to be used when cloning an Entity (and it's Components!)
     virtual Component_ptr Clone(Entity* const original) {
         throw new std::runtime_error("Clone function not implemented in derived class");
@@ -61,11 +66,12 @@ public:
         return std::make_shared<T>(std::forward<P>(p)...);
     }
 
-private:
     /* there is no single owning entity. the owning Entities will
        neither be tracked. a derived type will exist as long as there
        is an Entity that has this */
-    Entity* const entity = nullptr;
+    Entity* const GetEntity() const override {
+        return nullptr;
+    }
 };
 
 #endif//COMPONENT_HPP_

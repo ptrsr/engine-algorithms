@@ -8,7 +8,7 @@ class Display : public Entity {
 public:
     Display(const unsigned id)
         : Entity(id)
-        , window(AddComponent<Window>(1280, 720, "test"))
+        , window(AddComponent<Window>(1280, 720, "game"))
         { }
 
     Window& window;

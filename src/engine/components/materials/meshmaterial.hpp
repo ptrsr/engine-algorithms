@@ -24,4 +24,6 @@ private:
     Mesh* bound_mesh = nullptr;
 };
 
+typedef std::shared_ptr<MeshMaterial> MeshMaterial_ptr;
+
 #endif//MESH_MATERIAL_HPP_

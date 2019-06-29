@@ -47,7 +47,7 @@ namespace {
             ASSERT_EQ(0, entity.mock_component.data);
 
             // Entity owning Component is given to Component
-            ASSERT_EQ(&entity, entity.mock_component.entity);
+            ASSERT_EQ(&entity, entity.mock_component.GetEntity());
 
         }
         {
@@ -58,7 +58,7 @@ namespace {
             ASSERT_EQ(1, entity.mock_component.data);
 
             // forwarding data does not influence Entity pass to Component
-            ASSERT_EQ(&entity, entity.mock_component.entity);
+            ASSERT_EQ(&entity, entity.mock_component.GetEntity());
         }
     }
 

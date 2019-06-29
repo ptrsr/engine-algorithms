@@ -12,6 +12,7 @@
 
 
 class RenderObject;
+class Camera;
 
 struct OcNode {
     std::vector<OcNode> nodes;
@@ -23,19 +24,19 @@ struct OcNode {
         { }
 
     void Divide(const unsigned layers = 1);
+    void Render(const glm::mat4 mvp, const RenderObject& cube) const;
 };
 
 class OcTree : public System {
 public:
+    OcNode parent_node;
     const RenderObject& cube;
     
     OcTree(const RenderObject& cube);
     void Update(UpdateContext& context) override;
 
 private:
-    OcNode parent_node;
-
-    void Render(const OcNode& node, const glm::mat4 transform) const;
+    void Render(const Camera& camera) const;
 };
 
 #endif//OCTREE_HPP_

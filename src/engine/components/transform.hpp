@@ -28,6 +28,8 @@ public:
     Transform& Rotate(const float angle, const glm::vec3& axis);
     Transform& Scale(const glm::vec3& scalar);
 
+    float DistanceTo(const Transform& other) const;
+
 };
 
 #endif//TRANSFORM_HPP_

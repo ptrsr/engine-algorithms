@@ -37,13 +37,13 @@ namespace {
         // init with entity and data
         Entity entity_A;
         MockComponent component(&entity_A, 1);
-        ASSERT_EQ(&entity_A, component.entity);
+        ASSERT_EQ(&entity_A, component.GetEntity());
         ASSERT_EQ(1, component.data);
 
         // clone component with data but other entity
         Entity entity_B;
         Component_ptr clone = component.Clone(&entity_B);
-        ASSERT_EQ(&entity_B, clone->entity);
+        ASSERT_EQ(&entity_B, clone->GetEntity());
         ASSERT_EQ(1, static_cast<MockComponent*>(clone.get())->data);
     }
 }
