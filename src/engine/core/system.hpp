@@ -20,6 +20,7 @@ class Engine;
 class System {
 public:
     bool enabled;
+    virtual void Start(Scene& scene) { }
     virtual void Update(UpdateContext& scene) = 0;
 
 };

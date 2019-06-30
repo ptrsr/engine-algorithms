@@ -40,7 +40,7 @@ Game::Game(const Options& options) {
         auto sphere_mesh = SharedComponent::Make<Mesh>(options.resource_dir + "models/sphere");
 
         SimulatorContext context(options.seed);
-        context.dynamic_objects = 10;
+        context.dynamic_objects = 1;
 
         AddSystem<Simulator>(*scene, cube_mesh, sphere_mesh, flat_material, context);
     }

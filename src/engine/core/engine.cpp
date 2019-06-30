@@ -60,6 +60,12 @@ void Engine::Run(const Options& options) {
     }
     running = true;
 
+    // start systems
+    for (auto& pair : *this) {
+        pair.second->Start(*scene);
+    }
+
+    // update systems
     UpdateContext context(*scene, 0);
     unsigned updates = 0;
 

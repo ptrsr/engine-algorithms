@@ -34,7 +34,7 @@ Simulator::Simulator(Scene& scene,
     srand(static_seed);
     for (unsigned i = 0; i < context.static_objects; ++i) {
         CollisionObject& static_object = scene.AddEntity<CollisionObject>(
-            std::make_unique<Sphere>(0.1f),
+            std::make_unique<Sphere>(0.01f),
             material,
             sphere
         );
@@ -49,13 +49,13 @@ Simulator::Simulator(Scene& scene,
     srand(dynamic_seed);
     for (unsigned i = 0; i < context.dynamic_objects; ++i) {
         PhysicsObject& dynamic_object = scene.AddEntity<PhysicsObject>(
-            std::make_unique<Sphere>(0.1f),
+            std::make_unique<Sphere>(0.01f),
             material,
             sphere
         );
 
-        dynamic_object.transform.Scale(glm::vec3(0.1f));
-        dynamic_object.transform.SetPosition(GetRandomVec(-1.f, 1.f));
+        dynamic_object.transform.Scale(glm::vec3(0.01f));
+        dynamic_object.transform.SetPosition(GetRandomVec(-.5f, .5f));
         dynamic_object.physics.velocity = GetRandomVec(-.01f, .01f);
 
         scene.RegisterEntity<RenderObject>(dynamic_object);
