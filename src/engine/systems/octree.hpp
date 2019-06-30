@@ -36,7 +36,7 @@ struct OcNode {
     void Render(const glm::mat4 mvp, const RenderObject& cube) const;
     glm::vec3 Fits(const CollisionObject& object) const;
     bool Place(CollisionObject& object);
-
+    void ResolveCollision(std::vector<CollisionObject*> objects);
 
 };
 
@@ -51,7 +51,6 @@ public:
 
 
 private:
-    void EnforceBounds(std::vector<PhysicsObject*> physics_objects, glm::vec3 min, glm::vec3 max);
     void Render(const Camera& camera, const OcNode& node) const;
 };
 

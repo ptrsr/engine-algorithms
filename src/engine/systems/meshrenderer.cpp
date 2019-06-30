@@ -9,8 +9,9 @@
 
 #include <engine/components/hierarchy.hpp>
 #include <engine/components/transform.hpp>
-#include <engine/components/materials/meshmaterial.hpp>
+#include <engine/components/materials/mesh-material.hpp>
 #include <engine/components/mesh.hpp>
+#include <engine/components/colliders/sphere-collider.hpp>
 
 #include <iostream>
 
@@ -65,7 +66,13 @@ void MeshRenderer::Update(UpdateContext& context) {
         glm::mat4 mvp = camera.projection.GetPerspective() * camera.transform * object->transform;
         glUniformMatrix4fv(object->material.mvp_uniform, 1, GL_FALSE, glm::value_ptr(mvp));
 
-        glUniform3fv(object->material.color_uniform, 1, glm::value_ptr(glm::vec3(1, 0, 0)));
+        glm::vec3 color(1, 0, 1);
+        SphereCollider* collider = object->GetComponent<SphereCollider>();
+        if (collider) {
+            color = collider->color;
+            collider->color = glm::vec3(1, 0, 0);
+        }
+        glUniform3fv(object->material.color_uniform, 1, glm::value_ptr(color));
 
         glDrawElements(GL_POLYGON, object->mesh.index_buffer.size, GL_UNSIGNED_INT, (GLvoid*)0);
 

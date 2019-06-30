@@ -8,7 +8,7 @@
 #include <engine/input/model.hpp>
 
 #include <engine/components/mesh.hpp>
-#include <engine/components/materials/meshmaterial.hpp>
+#include <engine/components/materials/mesh-material.hpp>
 #include <engine/components/transform.hpp>
 #include <engine/components/collider.hpp>
 
@@ -58,8 +58,8 @@ void OcNode::Render(const glm::mat4 vp, const RenderObject& cube) const {
 
 glm::vec3 OcNode::Fits(const CollisionObject& object) const {
         // object corners
-        glm::vec3 w_max = object.transform.GetPosition() + object.collider.Max();
-        glm::vec3 w_min = object.transform.GetPosition() + object.collider.Min();
+        glm::vec3 o_max = object.collider.Max(object.transform);
+        glm::vec3 o_min = object.collider.Min(object.transform);
 
         // node corners
         glm::vec3 n_max = position + glm::vec3(size) / 2.f;
@@ -67,9 +67,34 @@ glm::vec3 OcNode::Fits(const CollisionObject& object) const {
 
         // outside vector (0 if completely inside)
         glm::vec3 delta = glm::vec3(0);
-        delta += glm::min(w_min, n_min) - n_min;
-        delta += glm::max(w_max, n_max) - n_max;
+        delta += glm::min(o_min, n_min) - n_min;
+        delta += glm::max(o_max, n_max) - n_max;
         return delta;
+}
+
+void OcNode::ResolveCollision(std::vector<CollisionObject*> objects = std::vector<CollisionObject*>()) {
+    // for each of this node's children
+    for (auto it = children.begin(); it < children.end(); ++it) {
+        // node child
+        CollisionObject* child = *it;
+
+        // for each upper object
+        for (CollisionObject* object : objects) {
+            object->collider.Collide(child->collider);
+        }
+        // for each other child in this node
+        for (auto n_it = it + 1; n_it < children.end(); ++n_it) {
+            CollisionObject* other_child = *n_it;
+            other_child->collider.Collide(child->collider);
+        }
+    }
+    // resolve leaves
+    std::vector<CollisionObject*> new_objects = objects;
+    new_objects.insert(new_objects.end(), children.begin(), children.end());
+
+    for (OcNode& leaf : leaves) {
+        leaf.ResolveCollision(new_objects);
+    }
 }
 
 bool OcNode::Place(CollisionObject& object) {
@@ -93,8 +118,6 @@ bool OcNode::Place(CollisionObject& object) {
     return true;
 }
 
-
-
 OcTree::OcTree(const RenderObject& cube)
     : cube(cube)
     , parent_node(OcNode(nullptr, 1.f, glm::vec3()))
@@ -103,64 +126,46 @@ OcTree::OcTree(const RenderObject& cube)
 }
 
 void OcTree::Start(Scene& scene) {
+    // place static objects
+    std::vector<CollisionObject*> static_objects = scene.GetEntities<CollisionObject>();
+    for (CollisionObject* object : static_objects) {
+        if (parent_node.Place(*object)) {
+            continue;
+        }
+        // place the object back in main cube
+        glm::vec3 delta = parent_node.Fits(*object);
+        object->transform.Translate(-delta * 2.f);
 
-
-    // parent_node.children = 
+        parent_node.Place(*object);
+    }
 }
 
 void OcTree::Update(UpdateContext& context) {
     std::vector<PhysicsObject*> physics_objects = context.scene.GetEntities<PhysicsObject>();
 
     OcNode node = parent_node;
-
     for (PhysicsObject* object : physics_objects) {
-        bool fit = node.Place(*object);
-
-        if (!fit) {
-            glm::vec3 delta = node.Fits(*object);
-
-            object->transform.Translate(-delta * 2.f);
-
-            // ensure consistent speed
-            const float speed = glm::length(object->physics.velocity);
-            object->physics.velocity = glm::normalize(glm::reflect(object->physics.velocity, glm::normalize(delta))) * speed;
-
-            node.Place(*object);
+        if (node.Place(*object)) {
+            continue;
         }
+        // place the object back in main cube
+        glm::vec3 delta = node.Fits(*object);
+        object->transform.Translate(-delta * 2.f);
+
+        // reflect and ensure consistent speed
+        const float speed = glm::length(object->physics.velocity);
+        object->physics.velocity = glm::normalize(glm::reflect(object->physics.velocity, glm::normalize(delta))) * speed;
+
+        // place the object back now that it fits
+        node.Place(*object);
     }
+
+    node.ResolveCollision();
+
     // render
     Camera& camera = *context.scene.GetEntity<Camera>();
     camera.transform.Rotate(0.01f, glm::vec3(0, 1, 0));
     Render(camera, node);
-}
-
-void OcTree::EnforceBounds(std::vector<PhysicsObject*> physics_objects, glm::vec3 min, glm::vec3 max) {
-for (PhysicsObject* object : physics_objects) {
-        // world minimum and maximum positions 
-        glm::vec3 w_max = object->transform.GetPosition() + object->collider.Max();
-        glm::vec3 w_min = object->transform.GetPosition() + object->collider.Min();
-
-        glm::vec3 normal = glm::vec3(0);
-        glm::vec3 delta = glm::vec3(0);
-        {
-            glm::vec3 d_min = glm::min(w_min, min) - min;
-            delta += d_min;
-            normal += glm::floor(d_min);
-        }
-        {
-            glm::vec3 d_max = glm::max(w_max, max) - max;
-            delta += d_max;
-            normal += glm::ceil(d_max);
-        }
-        if (normal == glm::vec3(0)) {
-            // no bounce
-            continue;
-        }
-        object->transform.Translate(-delta * 2.f);
-
-        const float speed = glm::length(object->physics.velocity);
-        object->physics.velocity = glm::normalize(glm::reflect(object->physics.velocity, normal)) * speed;
-    }
 }
 
 void OcTree::Render(const Camera& camera, const OcNode& node) const {

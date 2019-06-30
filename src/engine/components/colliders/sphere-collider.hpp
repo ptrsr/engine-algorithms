@@ -6,20 +6,20 @@
 
 class Transform;
 
-class Sphere : public Collider {
+class SphereCollider : public Collider {
 public:
     const float diameter;
     const float radius;
 
-    Sphere(const float diameter);
+    SphereCollider(const float diameter);
     void Collide(Collider& collider) override;
 
-    glm::vec3 Min() override;
-    glm::vec3 Max() override;
+    glm::vec3 Min(const Transform& transform) const override;
+    glm::vec3 Max(const Transform& transform) const override;
 
 protected:
     void CollideWith(Collider& other) override { }
-    void CollideWith(Sphere& other) override;
+    void CollideWith(SphereCollider& other) override;
 
 };
 

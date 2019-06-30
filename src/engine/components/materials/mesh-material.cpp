@@ -1,4 +1,4 @@
-#include "meshmaterial.hpp"
+#include "mesh-material.hpp"
 
 #include <engine/components/mesh.hpp>
 

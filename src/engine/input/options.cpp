@@ -1,10 +1,10 @@
 #include "options.hpp"
-#include "c_getopt.h"
+#include <engine/auxiliary/cgetopt.h>
 
 void Options::PrintUsage(FILE* output) {
-        Options opts;
-        
-        fprintf(output, "\
+    Options opts;
+    
+    fprintf(output, "\
 =============== ENGINE ALGORITHMS ===============\n\
 Research project on c++ optimization for Saxion\n\
 University of applied sciences by Ruud Peters.\n\

@@ -6,7 +6,7 @@ cmake_minimum_required(VERSION 3.0)
 add_library(engine 
 	glm.hpp
 
-	auxiliary/c_getopt.h
+	auxiliary/c-getopt.h
 
 	input/model.cpp
 	input/file.cpp
@@ -23,9 +23,9 @@ add_library(engine
 	components/material.cpp
 	components/mesh.cpp
 
-	components/materials/meshmaterial.cpp
+	components/materials/mesh-material.cpp
 	
-	components/colliders/sphere.cpp
+	components/colliders/sphere-collider.cpp
 
 	entities/renderobject.cpp
 	entities/gameobject.cpp

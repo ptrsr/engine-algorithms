@@ -2,7 +2,7 @@
 
 #include <engine/input/file.hpp>
 
-#include <engine/components/materials/meshmaterial.hpp>
+#include <engine/components/materials/mesh-material.hpp>
 #include <engine/components/mesh.hpp>
 
 

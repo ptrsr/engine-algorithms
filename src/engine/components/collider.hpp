@@ -4,18 +4,20 @@
 #include <engine/core/component.hpp>
 #include <engine/glm.hpp>
 
-class Sphere;
+class Transform;
+class SphereCollider;
 
 class Collider : public Component {
 public:
     virtual void Collide(Collider& other) = 0;
 
-    virtual glm::vec3 Min() = 0;
-    virtual glm::vec3 Max() = 0;
+    virtual glm::vec3 Min(const Transform& transform) const = 0;
+    virtual glm::vec3 Max(const Transform& transform) const = 0;
 
-protected:
     virtual void CollideWith(Collider& other) = 0;
-    virtual void CollideWith(Sphere& other) = 0;
+    virtual void CollideWith(SphereCollider& other) = 0;
+
+    glm::vec3 color = glm::vec3(1, 0, 1);
 };
 
 typedef std::shared_ptr<Collider> Collider_ptr;

@@ -1,4 +1,4 @@
-#include "sphere.hpp"
+#include "sphere-collider.hpp"
 
 #include <engine/core/entity.hpp>
 #include <engine/components/transform.hpp>
@@ -6,16 +6,16 @@
 #include <stdexcept>
 #include <iostream>
 
-Sphere::Sphere(const float diameter)
+SphereCollider::SphereCollider(const float diameter)
     : diameter(diameter)
     , radius(diameter / 2.f)
     { }
 
-void Sphere::Collide(Collider& collider) {
-    std::cout << "error!" << std::endl;
+void SphereCollider::Collide(Collider& collider) {
+    collider.CollideWith(*this);
 }
 
-void Sphere::CollideWith(Sphere& sphere) {
+void SphereCollider::CollideWith(SphereCollider& sphere) {
     Entity* const owner = GetEntity();
     if (!owner) {
         throw new std::runtime_error("cannot check collision: no entity owning collider");
@@ -28,13 +28,14 @@ void Sphere::CollideWith(Sphere& sphere) {
         return; // no collision
     }
 
-    std::cout << "boink!" << std::endl;
+    color = glm::vec3(0, 1, 0);
+    sphere.color = glm::vec3(0, 1, 0);
 }
 
-glm::vec3 Sphere::Min() {
-    return glm::vec3(-radius);
+glm::vec3 SphereCollider::Min(const Transform& transform) const {
+    return transform.GetPosition() + glm::vec3(-radius);
 }
 
-glm::vec3 Sphere::Max() {
-    return glm::vec3(radius);
+glm::vec3 SphereCollider::Max(const Transform& transform) const {
+    return transform.GetPosition() * glm::vec3(radius);
 }

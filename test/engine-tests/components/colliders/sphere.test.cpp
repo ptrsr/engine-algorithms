@@ -1,8 +1,8 @@
 #include <gtest/gtest.h>
 
-#include <engine/components/colliders/sphere.hpp>
+#include <engine/components/colliders/sphere-collider.hpp>
 
-#include <engine/components/materials/meshmaterial.hpp>
+#include <engine/components/materials/mesh-material.hpp>
 #include <engine/components/mesh.hpp>
 
 #include <engine/entities/collisionobject.hpp>
@@ -15,10 +15,10 @@ TEST(CollisionObject, lmao) {
 
     CollisionObject obj = CollisionObject(
         0,
-        std::make_unique<Sphere>(1.f),
+        std::make_unique<SphereCollider>(1.f),
         material, 
         mesh
     );
 
-    std::cout << obj.GetComponent<Sphere>()->diameter << std::endl;
+    std::cout << obj.GetComponent<SphereCollider>()->diameter << std::endl;
 }

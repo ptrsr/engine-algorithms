@@ -8,18 +8,19 @@
 
 class Cube : public Model {
 public:
-    Cube() {
+    Cube(float side_length = 1.f) {
+        const float s = side_length / 2.f;
         glm::vec3 ind[] = {
             // front vertices
-            glm::vec3(-0.5f, -0.5f, -0.5f),	// 0
-            glm::vec3( 0.5f, -0.5f, -0.5f),	// 1
-            glm::vec3( 0.5f,  0.5f, -0.5f),	// 2
-            glm::vec3(-0.5f,  0.5f, -0.5f),	// 3
+            glm::vec3(-s, -s, -s),	// 0
+            glm::vec3( s, -s, -s),	// 1
+            glm::vec3( s,  s, -s),	// 2
+            glm::vec3(-s,  s, -s),	// 3
             // rear vertices
-            glm::vec3(-0.5f, -0.5f, 0.5f),	// 4
-            glm::vec3( 0.5f, -0.5f, 0.5f),	// 5
-            glm::vec3( 0.5f,  0.5f, 0.5f),	// 6
-            glm::vec3(-0.5f,  0.5f, 0.5f)	// 7
+            glm::vec3(-s, -s,  s),	// 4
+            glm::vec3( s, -s,  s),	// 5
+            glm::vec3( s,  s,  s),	// 6
+            glm::vec3(-s,  s,  s)	// 7
         };
         vertices = {
             // front quad

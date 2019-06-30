@@ -10,7 +10,7 @@
 #include <engine/entities/camera.hpp>
 
 #include <engine/components/mesh.hpp>
-#include <engine/components/materials/meshmaterial.hpp>
+#include <engine/components/materials/mesh-material.hpp>
 
 #include <engine/systems/meshrenderer.hpp>
 #include <engine/systems/refresher.hpp>
@@ -40,7 +40,8 @@ Game::Game(const Options& options) {
         auto sphere_mesh = SharedComponent::Make<Mesh>(options.resource_dir + "models/sphere");
 
         SimulatorContext context(options.seed);
-        context.dynamic_objects = 1;
+        context.static_objects = 0;
+        context.dynamic_objects = 10;
 
         AddSystem<Simulator>(*scene, cube_mesh, sphere_mesh, flat_material, context);
     }

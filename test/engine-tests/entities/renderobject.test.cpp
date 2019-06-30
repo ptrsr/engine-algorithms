@@ -2,7 +2,7 @@
 
 #include <engine/entities/renderobject.hpp>
 
-#include <engine/components/materials/meshmaterial.hpp>
+#include <engine/components/materials/mesh-material.hpp>
 #include <engine/components/mesh.hpp>
 
 
