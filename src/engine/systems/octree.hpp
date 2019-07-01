@@ -16,7 +16,11 @@ class RenderObject;
 class CollisionObject;
 class Camera;
 
+typedef std::pair<CollisionObject*, CollisionObject*> Collision;
+typedef std::vector<Collision> Collisions;
+
 struct OcNode {
+
     const OcNode* parent;
     const float size;
     const glm::vec3 position;
@@ -36,7 +40,7 @@ struct OcNode {
     void Render(const glm::mat4 mvp, const RenderObject& cube) const;
     glm::vec3 Fits(const CollisionObject& object) const;
     bool Place(CollisionObject& object);
-    void ResolveCollision(std::vector<CollisionObject*> objects);
+    void GetCollisions(Collisions& collisions, std::vector<CollisionObject*> objects);
 
 };
 
@@ -49,6 +53,7 @@ public:
     void Start(Scene& scene) override;
     void Update(UpdateContext& context) override;
 
+    virtual void OnCollision(CollisionObject& a, CollisionObject& b);
 
 private:
     void Render(const Camera& camera, const OcNode& node) const;

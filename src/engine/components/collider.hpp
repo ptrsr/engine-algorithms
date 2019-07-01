@@ -6,18 +6,20 @@
 
 class Transform;
 class SphereCollider;
+class AllignedBoxCollider;
 
 class Collider : public Component {
 public:
-    virtual void Collide(Collider& other) = 0;
+    virtual bool Collide(Collider& other) = 0;
 
     virtual glm::vec3 Min(const Transform& transform) const = 0;
     virtual glm::vec3 Max(const Transform& transform) const = 0;
 
-    virtual void CollideWith(Collider& other) = 0;
-    virtual void CollideWith(SphereCollider& other) = 0;
+    virtual bool CollidesWith(Collider& other) = 0;
+    virtual bool CollidesWith(SphereCollider& other) = 0;
+    virtual bool CollidesWith(AllignedBoxCollider& other) = 0;
 
-    glm::vec3 color = glm::vec3(1, 0, 1);
+    bool Collides(SphereCollider& sphere, AllignedBoxCollider& box);
 };
 
 typedef std::shared_ptr<Collider> Collider_ptr;

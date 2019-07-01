@@ -19,6 +19,4 @@ TEST(CollisionObject, lmao) {
         material, 
         mesh
     );
-
-    std::cout << obj.GetComponent<SphereCollider>()->diameter << std::endl;
 }

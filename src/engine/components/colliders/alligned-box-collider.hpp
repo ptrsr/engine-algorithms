@@ -1,17 +1,19 @@
-#ifndef SPHERE_HPP_
-#define SPHERE_HPP_
+#ifndef CUBE_COLLIDER_HPP_
+#define CUBE_COLLIDER_HPP_
 
 #include <engine/components/collider.hpp>
-#include <iostream>
 
-class Transform;
-class AllignedBoxCollider;
+#include <vector>
 
-class SphereCollider : public Collider {
+
+class AllignedBoxCollider : public Collider {
 public:
-    const float radius;
+    const float size;
 
-    SphereCollider(const float radius);
+    AllignedBoxCollider(const float size)
+        : size(size)
+        { }
+
     bool Collide(Collider& collider) override;
 
     glm::vec3 Min(const Transform& transform) const override;
@@ -19,9 +21,8 @@ public:
 
 protected:
     bool CollidesWith(Collider& other) override { return false; }
-    bool CollidesWith(SphereCollider& other) override;
     bool CollidesWith(AllignedBoxCollider& other) override;
-
+    bool CollidesWith(SphereCollider& other) override;
 };
 
-#endif//SPHERE_HPP_
+#endif//CUBE_COLLIDER_HPP_

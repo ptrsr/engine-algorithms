@@ -7,14 +7,17 @@
 #include <engine/input/file.hpp>
 #include <engine/input/model.hpp>
 
-#include <engine/components/mesh.hpp>
 #include <engine/components/materials/mesh-material.hpp>
 #include <engine/components/transform.hpp>
 #include <engine/components/collider.hpp>
+#include <engine/components/mesh.hpp>
+#include <engine/components/timer.hpp>
 
 #include <engine/entities/renderobject.hpp>
-#include <engine/entities/camera.hpp>
 #include <engine/entities/physicsobject.hpp>
+#include <engine/entities/profiler.hpp>
+#include <engine/entities/camera.hpp>
+
 
 #include <iostream>
 
@@ -72,7 +75,7 @@ glm::vec3 OcNode::Fits(const CollisionObject& object) const {
         return delta;
 }
 
-void OcNode::ResolveCollision(std::vector<CollisionObject*> objects = std::vector<CollisionObject*>()) {
+void OcNode::GetCollisions(Collisions& collisions, std::vector<CollisionObject*> objects = std::vector<CollisionObject*>()) {
     // for each of this node's children
     for (auto it = children.begin(); it < children.end(); ++it) {
         // node child
@@ -80,12 +83,16 @@ void OcNode::ResolveCollision(std::vector<CollisionObject*> objects = std::vecto
 
         // for each upper object
         for (CollisionObject* object : objects) {
-            object->collider.Collide(child->collider);
+            if (object->collider.Collide(child->collider)) {
+                collisions.push_back(Collision(object, child));
+            }
         }
         // for each other child in this node
         for (auto n_it = it + 1; n_it < children.end(); ++n_it) {
             CollisionObject* other_child = *n_it;
-            other_child->collider.Collide(child->collider);
+            if (child->collider.Collide(other_child->collider)) {
+                collisions.push_back(Collision(child, other_child));
+            }
         }
     }
     // resolve leaves
@@ -93,7 +100,7 @@ void OcNode::ResolveCollision(std::vector<CollisionObject*> objects = std::vecto
     new_objects.insert(new_objects.end(), children.begin(), children.end());
 
     for (OcNode& leaf : leaves) {
-        leaf.ResolveCollision(new_objects);
+        leaf.GetCollisions(collisions, new_objects);
     }
 }
 
@@ -122,7 +129,7 @@ OcTree::OcTree(const RenderObject& cube)
     : cube(cube)
     , parent_node(OcNode(nullptr, 1.f, glm::vec3()))
 {
-    parent_node.Divide(4);
+    parent_node.Divide(3);
 }
 
 void OcTree::Start(Scene& scene) {
@@ -141,10 +148,20 @@ void OcTree::Start(Scene& scene) {
 }
 
 void OcTree::Update(UpdateContext& context) {
-    std::vector<PhysicsObject*> physics_objects = context.scene.GetEntities<PhysicsObject>();
+    //profiling
+    Timer& timer = context.scene.GetEntity<Profiler>()->timer;
+    auto octree_tracker = timer.Start("OcTree");
+    auto collisions_tracker = timer.Start("Collisions");
 
+    // copy the tree with static objects
     OcNode node = parent_node;
-    for (PhysicsObject* object : physics_objects) {
+    std::vector<PhysicsObject*> dynamic_objects = context.scene.GetEntities<PhysicsObject>();
+
+    // put all the dynamic objects in the tree
+    for (PhysicsObject* object : dynamic_objects) {
+        // NOTE: to be removed!
+        object->color.color = glm::vec3(1, 0, 0);
+
         if (node.Place(*object)) {
             continue;
         }
@@ -160,13 +177,39 @@ void OcTree::Update(UpdateContext& context) {
         node.Place(*object);
     }
 
-    node.ResolveCollision();
+    // NOTE: temporary!
+    std::vector<CollisionObject*> static_objects = context.scene.GetEntities<CollisionObject>();
+    for (CollisionObject* object : static_objects) {
+        object->color.color = glm::vec3(1, 0, 0);
+    }
+
+    auto resolve_tracker = timer.Start("Resolving");
+
+    // resolve collisions
+    Collisions collisions;
+    node.GetCollisions(collisions);
+    for (Collision& collision : collisions) {
+        OnCollision(*collision.first, *collision.second);
+    }
+
+    timer.Stop(resolve_tracker);
+    timer.Stop(collisions_tracker);
+    auto render_tracker = timer.Start("Render");
 
     // render
     Camera& camera = *context.scene.GetEntity<Camera>();
     camera.transform.Rotate(0.01f, glm::vec3(0, 1, 0));
     Render(camera, node);
+
+    timer.Stop(render_tracker);
+    timer.Stop(octree_tracker);
 }
+
+void OcTree::OnCollision(CollisionObject& a, CollisionObject& b) {
+    a.color.color = glm::vec3(0, 1, 0);
+    b.color.color = glm::vec3(0, 1, 0);
+}
+
 
 void OcTree::Render(const Camera& camera, const OcNode& node) const {
     cube.material.Use();

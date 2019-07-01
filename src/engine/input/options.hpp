@@ -13,15 +13,20 @@ typedef struct Options {
 		: track_timing(false)
 		, verbose(false)
 		, frames(0)
+		, dynamics(0)
+		, statics(0)
 		, seed(0)
 		, resource_dir(RESOURCE_DIR)
 		{ }
 
 	// options
-	bool         track_timing;
-	bool         verbose;
-	unsigned     frames;
-	int 		 seed;
+	bool      track_timing;
+	bool      verbose;
+	unsigned  frames;
+	unsigned  dynamics;
+	unsigned  statics;
+	unsigned  seed;
+
 	std::string  resource_dir;
 
     static void PrintUsage(FILE* output = stdout);

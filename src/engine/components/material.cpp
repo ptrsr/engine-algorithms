@@ -36,7 +36,7 @@ Shader::Shader(const std::string& source, const Type type)
 }
 
 Shader::~Shader() {
-    //glDeleteShader(id);
+    glDeleteShader(id);
 }
 
 Material::Material(const Shaders& shaders)

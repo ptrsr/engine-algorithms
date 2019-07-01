@@ -19,6 +19,7 @@
 
 #include <engine/auxiliary/cube.hpp>
 
+#include <iostream>
 
 Game::Game(const Options& options) {
     scene->AddEntity<Display>();
@@ -40,8 +41,8 @@ Game::Game(const Options& options) {
         auto sphere_mesh = SharedComponent::Make<Mesh>(options.resource_dir + "models/sphere");
 
         SimulatorContext context(options.seed);
-        context.static_objects = 0;
-        context.dynamic_objects = 10;
+        context.static_objects  = options.statics;
+        context.dynamic_objects = options.dynamics;
 
         AddSystem<Simulator>(*scene, cube_mesh, sphere_mesh, flat_material, context);
     }

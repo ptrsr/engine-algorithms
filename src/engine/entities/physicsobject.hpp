@@ -13,7 +13,7 @@ public:
         , physics(AddComponent<Physics>())
         { }
 
-    PhysicsObject(const unsigned id, std::unique_ptr<CubeCollider>&& collider, MeshMaterial_ptr& material, Mesh_ptr& mesh)
+    PhysicsObject(const unsigned id, std::unique_ptr<AllignedBoxCollider>&& collider, MeshMaterial_ptr& material, Mesh_ptr& mesh)
         : CollisionObject(id, std::move(collider), material, mesh)
         , physics(AddComponent<Physics>())
         { }

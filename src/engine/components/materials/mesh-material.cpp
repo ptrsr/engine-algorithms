@@ -12,7 +12,8 @@ MeshMaterial::MeshMaterial(const std::string& file)
     { }
 
 bool MeshMaterial::Bind(Mesh& mesh) {
-    bool bound = mesh.vertex_buffer.Bind(vertex_attribute)
+    bool bound = mesh.index_buffer.Bind()
+               | mesh.vertex_buffer.Bind(vertex_attribute)
                | mesh.normal_buffer.Bind(normal_attribute)
                | mesh.uv_buffer.Bind(uv_attribute);
 

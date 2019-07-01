@@ -45,17 +45,23 @@ public:
         glBufferData(type, data.size() * sizeof(Base), &data[0], GL_STATIC_DRAW);
     }
 
-    bool Bind(const GLint attribute_id, const unsigned alt_rows = 0, const GLsizei stride = 0, const void* offset = 0) {
-        if (id == 0 || attribute_id == -1) {
+    bool Bind(const GLint attribute_id = -1, const unsigned alt_rows = 0, const GLsizei stride = 0, const void* offset = 0) {
+        if (id == 0) {
             return false;
         }
-        glBindBuffer(type, id);
-        bound = attribute_id;
 
         // no need to bind attributes on indices
         if (type == GL_ELEMENT_ARRAY_BUFFER) {
+            glBindBuffer(type, id);
             return true;
+        } else if (attribute_id == -1) {
+            // should bind to valid attribute
+            return false;
         }
+       
+        glBindBuffer(type, id);
+
+        bound = attribute_id;
         glEnableVertexAttribArray(attribute_id);
         glVertexAttribPointer(attribute_id, alt_rows ? alt_rows : rows, GL_FLOAT, normalized, stride, offset);
         return true;

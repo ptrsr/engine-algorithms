@@ -5,6 +5,8 @@
 #include <engine/core/scene.hpp>
 
 #include <engine/components/colliders/sphere-collider.hpp>
+#include <engine/components/colliders/alligned-box-collider.hpp>
+
 #include <engine/components/transform.hpp>
 
 #include <engine/entities/physicsobject.hpp>
@@ -20,9 +22,19 @@ glm::vec3 GetRandomVec(const float min, const float max) {
     return glm::vec3(GetRandom(min, max), GetRandom(min, max), GetRandom(min, max));
 }
 
+void SetParameters(CollisionObject& static_object, const float scale, const float spawn_box_size) {
+    static_object.transform.Scale(glm::vec3(scale));
+    static_object.transform.SetPosition(GetRandomVec(-spawn_box_size, spawn_box_size));
+}
+
+void SetParameters(PhysicsObject& dynamic_object, const float scale, const float spawn_box_size, const float max_velocity) {
+    dynamic_object.physics.velocity = GetRandomVec(-max_velocity, max_velocity);
+    SetParameters(dynamic_object, scale, spawn_box_size);
+}
+
 Simulator::Simulator(Scene& scene, 
                      Mesh_ptr& cube, 
-                     Mesh_ptr& sphere, 
+                     Mesh_ptr& sphere,
                      MeshMaterial_ptr& material, 
                      const SimulatorContext& context) 
 {
@@ -33,32 +45,27 @@ Simulator::Simulator(Scene& scene,
     // static objects
     srand(static_seed);
     for (unsigned i = 0; i < context.static_objects; ++i) {
-        CollisionObject& static_object = scene.AddEntity<CollisionObject>(
-            std::make_unique<SphereCollider>(0.01f),
-            material,
-            sphere
-        );
-
-        static_object.transform.Scale(glm::vec3(0.1f));
-        static_object.transform.SetPosition(GetRandomVec(-1.f, 1.f));
-
-        scene.RegisterEntity<RenderObject>(static_object);
+        {
+            auto& static_object = Spawn<CollisionObject, SphereCollider>(scene, sphere, material, 0.05f);
+            SetParameters(static_object, 0.05f, 1.f);
+        }
+        {
+            auto& static_object = Spawn<CollisionObject, AllignedBoxCollider>(scene, cube, material, 0.1f);
+            SetParameters(static_object, 0.1f, 1.f);
+        }
     }
 
     // dynamic objects
     srand(dynamic_seed);
     for (unsigned i = 0; i < context.dynamic_objects; ++i) {
-        PhysicsObject& dynamic_object = scene.AddEntity<PhysicsObject>(
-            std::make_unique<SphereCollider>(0.2f),
-            material,
-            sphere
-        );
-
-        dynamic_object.transform.Scale(glm::vec3(0.1f));
-        dynamic_object.transform.SetPosition(GetRandomVec(-.5f, .5f));
-        dynamic_object.physics.velocity = GetRandomVec(-.01f, .01f);
-
-        scene.RegisterEntity<RenderObject>(dynamic_object);
+        {
+            auto& dynamic_object = Spawn<PhysicsObject, SphereCollider>(scene, sphere, material, 0.05f);
+            SetParameters(dynamic_object, 0.05f, 0.5f, 0.01f);
+        }
+        {
+            auto& dynamic_object = Spawn<PhysicsObject, AllignedBoxCollider>(scene, cube, material, 0.1f);
+            SetParameters(dynamic_object, 0.1f, 0.5f, 0.01f);
+        }
     }
 }
 
